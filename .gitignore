@@ -1,0 +1,6 @@
+index.html
+!frontend/index.html
+/assets
+/frontend/node_modules
+/index-1.php
+config.ts
