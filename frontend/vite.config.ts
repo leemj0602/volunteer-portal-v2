@@ -6,7 +6,8 @@ export default defineConfig({
   plugins: [react()],
   base: "/wordpress/portal",
   build: {
+    assetsInlineLimit: 0,
     outDir: "../",
-    assetsDir: "assets"
+    assetsDir: "build"
   }
 })
