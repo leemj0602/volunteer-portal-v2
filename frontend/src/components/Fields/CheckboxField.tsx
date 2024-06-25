@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
-import { CustomFieldOptions } from "../../../utils/classes/CustomFieldSetManager";
+import { CustomFieldOptions } from "../../../utils/managers/CustomFieldSetManager";
 
 interface CheckboxFieldProps {
     id: string;

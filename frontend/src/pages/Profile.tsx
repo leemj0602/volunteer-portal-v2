@@ -1,7 +1,8 @@
 import { FormEvent, useEffect, useState } from "react";
 import Wrapper from "../components/Wrapper";
-import ContactManager, { Contact, ContactProps } from "../../utils/classes/ContactManager";
-import CustomFieldSetManager, { CustomField } from "../../utils/classes/CustomFieldSetManager";
+import ContactManager from "../../utils/managers/ContactManager";
+import { Contact, ContactProps } from "../../utils/classes/Contact";
+import CustomFieldSetManager, { CustomField } from "../../utils/managers/CustomFieldSetManager";
 import config from "../../../config";
 import Loading from "../components/Loading";
 import ConfirmationModal from "../components/ConfirmationModal";
@@ -25,7 +26,7 @@ export default function Profile() {
     const [customFieldData, setCustomFieldData] = useState<Map<string, CustomField>>();
 
     const handleContact = function(id: keyof Contact, value: any) {
-        const updated = { ...contact } as Contact;
+        const updated = new Contact(contact!);
         updated[id] = value;
         setContact(updated);
     }
@@ -144,7 +145,6 @@ export default function Profile() {
                                 { label: "Female", value: "1" },
                                 { label: "Others", value: "0" },
                             ]} />
-
                             
                             {/* Custom Fields */}
                             {customFieldData && Array.from(customFieldData).map(value => {
@@ -159,7 +159,6 @@ export default function Profile() {
                                     case "CheckBox":
                                         return <CheckboxField className="flex justify-center" label={field.label} id={id} fields={contact} disabled={!isEditing} handleFields={handleContact} options={field.options!} />
                                 }
-                                return <></>
                             })}
                         </div>
                     </form>

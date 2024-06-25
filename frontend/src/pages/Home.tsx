@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import ContactManager, { Contact } from "../../utils/classes/ContactManager";
-import CustomFieldSetManager, { CustomField } from "../../utils/classes/CustomFieldSetManager";
+import ContactManager, { Contact } from "../../utils/managers/ContactManager";
+import CustomFieldSetManager, { CustomField } from "../../utils/managers/CustomFieldSetManager";
 import config from "../../../config";
 import Wrapper from "../components/Wrapper";
 
