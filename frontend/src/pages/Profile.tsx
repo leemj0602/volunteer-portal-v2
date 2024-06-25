@@ -55,7 +55,7 @@ export default function Profile() {
             setName(`${data.first_name}${data.last_name?.length ? ` ${data.last_name}` : ""}`);
             setContact(data);
             setUnsavedContact(data);
-            setCustomFieldData(await CustomFieldSetManager.get(config.customFieldSets.contactDetails));
+            setCustomFieldData(await CustomFieldSetManager.get("Volunteer_Contact_Details"));
         })();
     }, []);
 

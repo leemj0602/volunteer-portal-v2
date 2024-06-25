@@ -9,7 +9,7 @@ export default class ContactManager {
         this.email = email ?? config.email;
     }
 
-    async fetch(): Promise<Contact> {        
+    async fetch(): Promise<Contact> {
         const response = await CRM(this.entity, "get", {
             select: [
                 "email_primary.email",

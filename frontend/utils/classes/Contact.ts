@@ -32,7 +32,16 @@ export class Contact implements ContactProps {
     [key: string]: any;
     
     constructor(props: ContactProps) {
-        for (const key in props) this[key] = props[key];
+        this.id = props.id;
+        this["email_primary.email"] = props["email_primary.email"];
+        this["address_primary.street_address"] = props["address_primary.street_address"];
+        this["address_primary.postal_code"] = props["address_primary.postal_code"];
+        this["phone_primary.phone_numeric"] = props["phone_primary.phone_numeric"];
+        this.gender_id = props.gender_id;
+        this.first_name = props.first_name;
+        this.last_name = props.last_name;
+        
+        for (const key in props) if (key.startsWith("Volunteer_Contact_Details")) this[key] = props[key];
     }
 
     async update(props: Partial<ContactProps>) {
