@@ -16,7 +16,6 @@ import swal from "sweetalert";
 
 export default function Profile() {
     const email = (window as any).email ?? config.email;
-    const contactManager = new ContactManager(email);
     const [name, setName] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
@@ -35,23 +34,23 @@ export default function Profile() {
         e.preventDefault();
         setIsSaving(true);
 
-        const updatedProps = { ...contact } as ContactProps;
-        updatedProps.first_name = name.split(" ")[0];
-        updatedProps.last_name = name.split(" ").splice(1, name.split(" ").length).join(" ");
+        const updated = { ...contact } as ContactProps;
+        updated.first_name = name.split(" ")[0];
+        updated.last_name = name.split(" ").splice(1, name.split(" ").length).join(" ");
 
-        const updated = await contact?.update(updatedProps);
-
+        const data = await ContactManager.update(email, updated);
         swal("Successfully updated profile", { icon: "success" });
 
         setIsSaving(false);
-        setContact(updated);
-        setUnsavedContact(updated);
+        setContact(data);
+        setUnsavedContact(data);
         setIsEditing(false);
     }
 
     useEffect(() => {
         (async function () {
-            const data = await contactManager.fetch();
+            const data = await ContactManager.fetch(email);
+            data["Volunteer_Contact_Details.Skills_Interests"]
             setName(`${data.first_name}${data.last_name?.length ? ` ${data.last_name}` : ""}`);
             setContact(data);
             setUnsavedContact(data);

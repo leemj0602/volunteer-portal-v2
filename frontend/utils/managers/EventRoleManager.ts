@@ -1,73 +1,45 @@
 import config from "../../../config";
-import CRM from "../crm";
+import { EventRole, EventRoleProps } from "../classes/EventRole";
+import CRM, { ComparisonOperator } from "../crm";
 
-interface MandatoryCustomEventDetailProps {
-    "Volunteer_Event_Details.Category:name": string;
-    "Volunteer_Event_Details.Attendance_Code": string;
-    "Volunteer_Event_Details.Thumbnail": number;
-}
-
-interface EventDetails extends MandatoryCustomEventDetailProps {
-    id: number;
-    activity_date_time: string;
-    subject: string;
-    duration: number;
-    details: string;
-    location: string;
-    "status_id:name": "Scheduled" | "Canceled";
-    [key: string]: any;
-}
-
-interface MandatoryCustomEventRoleProps {
-    "Volunteer_Event_Role_Details.Role:name": string;
-    "Volunteer_Event_Role_Details.Vacancy": number;
-    "Volunteer_Event_Role_Details.Volunteer_Event_Details": number;
-}
-
-interface EventRoleProps extends MandatoryCustomEventRoleProps {
-    id: number;
-    activity_date_time: string;
-    duration: number;
-    [key: string]: any;
-}
-
-class EventRole implements EventRoleProps {
-    public id: number;
-    public activity_date_time: string;
-    public duration: number;
-
-    public "Volunteer_Event_Role_Details.Role:name": string;
-    public "Volunteer_Event_Role_Details.Vacancy": number;
-    public "Volunteer_Event_Role_Details.Volunteer_Event_Details": number;
-    [key: string]: any;
-
-    constructor(props: EventRoleProps) {
-        this.id = props.id;
-        this.activity_date_time = props.activity_date_time;
-        this.duration = props.duration;
-        for (const key in props) if (key.startsWith("Volunteer_Event_Role_Details")) this[key] = props[key];
-    }
-
-    async fetchEvent() {
-        
-    }
-}
-
-export class EventRoleManager {
+const EventRoleManager = new class EventRoleManager {
     private entity = "Activity";
-    
-    async fetchEventRoles(options?: { limit?: number, page?: number }): Promise<EventRoleProps[]> {
-        const response = await CRM(this.entity, "get", {
-            where: [["activity_type_id:name", "=", "Volunteer Event Role"]],
+
+    async fetch(options?: { id?: string, limit?: number, page?: number }): Promise<EventRole | EventRole[]> {
+        const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Event Role"]];
+        if (options?.id) where.push(["id", "=", options.id]);
+
+        const response = await CRM(this.entity, "get", { 
+            where,
             select: [
                 "activity_date_time",
                 "duration",
-                `Volunteer_Event_Role_Details.Role:name`,
-                `Volunteer_Event_Role_Details.Vacancy`,
-                `Volunteer_Event_Role_Details.Volunteer_Event_Details`,
+
+                "Volunteer_Event_Role_Details.Vacancy",
+                "Volunteer_Event_Role_Details.Role:name",
+
+                "event.id",
+                "event.subject",
+                "event.details",
+                "event.activity_date_time",
+                "event.duration",
+                "event.details",
+                "event.location",
+                "event.status_id:name",
+                
+                "event.Volunteer_Event_Details.*",
+                "event.Volunteer_Event_Details.Category:name",
+                "thumbnail.uri"
+            ],
+            join: [
+                ["Activity AS event", "LEFT", ["event.id", "=", "Volunteer_Event_Role_Details.Volunteer_Event_Details"]],
+                ["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "event.Volunteer_Event_Details.Thumbnail"]]
             ]
         });
-        const result = response!.data as EventRoleProps[];
-        return result.map(r => new EventRole(r));
+
+        if (options?.id) return new EventRole(response!.data[0]);
+        return response!.data.map((r: EventRoleProps) => new EventRole(r));
     }
 }
+
+export default EventRoleManager;

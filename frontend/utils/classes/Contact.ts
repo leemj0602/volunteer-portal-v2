@@ -2,6 +2,7 @@ import CRM from "../crm";
 
 interface MandatoryContactDetailProps {
     "Volunteer_Contact_Details.Skills_Interests": string[];
+    [key: string]: any;
 }
 
 export interface ContactProps extends MandatoryContactDetailProps {
@@ -13,13 +14,10 @@ export interface ContactProps extends MandatoryContactDetailProps {
     gender_id: number;
     first_name: string;
     last_name: string;
-    [key: string]: any;
 }
 
 export class Contact implements ContactProps {
-    private entity = "contact";
-
-    public "id": number;
+     public "id": number;
     public "email_primary.email": string;
     public "address_primary.street_address": string;
     public "address_primary.postal_code": string;
@@ -42,15 +40,6 @@ export class Contact implements ContactProps {
         this.last_name = props.last_name;
         
         for (const key in props) if (key.startsWith("Volunteer_Contact_Details")) this[key] = props[key];
-    }
-
-    async update(props: Partial<ContactProps>) {
-        for (const key in props) this[key] = props[key];
-        await CRM(this.entity, "update", {
-            where: [["id", "=", this.id]],
-            values: Object.keys(props).map((p) => ([p, props[p]]))
-        });
-        return this;
     }
 
     getMandatory<K extends keyof MandatoryContactDetailProps>(input: K): MandatoryContactDetailProps[K] {

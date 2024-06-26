@@ -1,15 +1,10 @@
-import config from "../../../config";
 import { Contact } from "../classes/Contact";
 import CRM from "../crm";
 
-export default class ContactManager {
-    public email: string;
+const ContactManager = new class ContactManager {
     private entity: string = "contact";
-    constructor(email: string) {
-        this.email = email ?? config.email;
-    }
 
-    async fetch(): Promise<Contact> {
+    async fetch(email: string): Promise<Contact> {
         const response = await CRM(this.entity, "get", {
             select: [
                 "email_primary.email",
@@ -21,14 +16,18 @@ export default class ContactManager {
                 "last_name",
                 "Volunteer_Contact_Details.*"
             ],
-            where: [["email_primary.email", "=", this.email]]
+            where: [["email_primary.email", "=", email]]
         })!;
         return new Contact(response!.data[0]);
     }
 
-    async update(props: Partial<Contact>) {
-        const contact = await this.fetch();
-        await contact.update(props);
-        return contact;
+    async update(email: string, props: Partial<Contact>) {
+        const response = await CRM(this.entity, "update", {
+            where: [["email_primary.email", "=", email]],
+            values: Object.keys(props).map((p) => ([p, props[p]]))
+        })
+        return new Contact(response!.data[0]);
     }
 }
+
+export default ContactManager;
