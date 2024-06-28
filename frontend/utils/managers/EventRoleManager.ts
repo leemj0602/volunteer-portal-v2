@@ -1,4 +1,3 @@
-import config from "../../../config";
 import { EventRole, EventRoleProps } from "../classes/EventRole";
 import CRM, { ComparisonOperator } from "../crm";
 
@@ -15,7 +14,7 @@ const EventRoleManager = new class EventRoleManager {
                 "activity_date_time",
                 "duration",
 
-                "Volunteer_Event_Role_Details.Vacancy",
+                "Volunteer_Event_Role_Details.*",
                 "Volunteer_Event_Role_Details.Role:name",
 
                 "event.id",

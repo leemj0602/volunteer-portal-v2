@@ -1,6 +1,5 @@
 interface MandatoryCustomEventDetailProps {
     "Volunteer_Event_Details.Category:name": string;
-    "Volunteer_Event_Details.Attendance_Code": string;
     "Volunteer_Event_Details.Thumbnail": number;
     [key: string]: any;
 }

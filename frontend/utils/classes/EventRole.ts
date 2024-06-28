@@ -4,6 +4,8 @@ import { EventDetails } from "./EventDetails";
 interface MandatoryCustomEventRoleProps {
     "Volunteer_Event_Role_Details.Role:name": string;
     "Volunteer_Event_Role_Details.Vacancy": number;
+    "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number;
+    "Volunteer_Event_Role_Details.Registration_End_Days_Before": number;
     [key: string]: any;
 }
 
@@ -22,6 +24,10 @@ export class EventRole implements EventRoleProps {
 
     public "Volunteer_Event_Role_Details.Role:name": string;
     public "Volunteer_Event_Role_Details.Vacancy": number;
+    public "Volunteer_Event_Role_Details.Approval_Required": boolean;
+    public "Volunteer_Event_Role_Details.Attendance_Code": string;
+    public "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number;
+    public "Volunteer_Event_Role_Details.Registration_End_Days_Before": number;
     [key: string]: any;
 
     constructor(props: EventRoleProps) {
@@ -35,6 +41,5 @@ export class EventRole implements EventRoleProps {
                 this.event[key.split("event.")[1]] = props[key];
             else if (key.startsWith("thumbnail"))
                 this.event.thumbnail = props[key];
-                
     }
 }
