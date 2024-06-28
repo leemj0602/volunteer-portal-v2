@@ -15,7 +15,7 @@ const EventRoleManager = new class EventRoleManager {
                 "duration",
 
                 "Volunteer_Event_Role_Details.*",
-                "Volunteer_Event_Role_Details.Role:name",
+                "Volunteer_Event_Role_Details.Role:label",
 
                 "event.id",
                 "event.subject",
