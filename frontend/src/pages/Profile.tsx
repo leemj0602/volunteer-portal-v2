@@ -24,6 +24,18 @@ export default function Profile() {
     const [contact, setContact] = useState<Contact>();
     const [customFieldData, setCustomFieldData] = useState<Map<string, CustomField>>();
 
+    useEffect(() => {
+        (async function () {
+            const data = await ContactManager.fetch(email);
+            data["Volunteer_Contact_Details.Skills_Interests"]
+            setName(`${data.first_name}${data.last_name?.length ? ` ${data.last_name}` : ""}`);
+            setContact(data);
+            setUnsavedContact(data);
+            setCustomFieldData(await CustomFieldSetManager.get("Volunteer_Contact_Details"));
+        })();
+    }, []);
+
+
     const handleContact = function(id: keyof Contact, value: any) {
         const updated = new Contact(contact!);
         updated[id] = value;
@@ -46,17 +58,6 @@ export default function Profile() {
         setUnsavedContact(data);
         setIsEditing(false);
     }
-
-    useEffect(() => {
-        (async function () {
-            const data = await ContactManager.fetch(email);
-            data["Volunteer_Contact_Details.Skills_Interests"]
-            setName(`${data.first_name}${data.last_name?.length ? ` ${data.last_name}` : ""}`);
-            setContact(data);
-            setUnsavedContact(data);
-            setCustomFieldData(await CustomFieldSetManager.get("Volunteer_Contact_Details"));
-        })();
-    }, []);
 
     const [showModal, setShowModal] = useState(false);
     const openModal = () => {
