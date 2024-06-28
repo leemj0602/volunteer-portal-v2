@@ -1,5 +1,3 @@
-import CRM from "../crm";
-
 interface MandatoryContactDetailProps {
     "Volunteer_Contact_Details.Skills_Interests": string[];
     [key: string]: any;
@@ -17,7 +15,7 @@ export interface ContactProps extends MandatoryContactDetailProps {
 }
 
 export class Contact implements ContactProps {
-     public "id": number;
+    public "id": number;
     public "email_primary.email": string;
     public "address_primary.street_address": string;
     public "address_primary.postal_code": string;
@@ -44,5 +42,16 @@ export class Contact implements ContactProps {
 
     getMandatory<K extends keyof MandatoryContactDetailProps>(input: K): MandatoryContactDetailProps[K] {
         return this[input] as MandatoryContactDetailProps[K];
+    }
+
+    public getOptionalCustomFields() {
+        const keys = Object.keys(this);
+        const emptyEventDetails = new Contact({} as ContactProps);
+        const defaultKeys = Object.keys(emptyEventDetails);
+        const customKeys = keys.filter(k => !defaultKeys.includes(k));
+
+        const result: { [key: string]: any } = {};
+        for (const key of customKeys) result[key] = this[key as keyof ContactProps];
+        return result;
     }
 }
