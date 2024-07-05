@@ -22,7 +22,6 @@ export default function Event() {
         (async function () {
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setEventRole(eventRole);
-            console.log(eventRole.event.getOptionalCustomFields());
         })();
     }, []);
 
@@ -94,6 +93,13 @@ export default function Event() {
                         </div>
                     </div>
                 </div>
+                {/* Custom Fields */}
+                <div className="mt-6">
+                    {Object.keys(eventRole.event.getOptionalCustomFields()).map(key => <div className="mb-6">
+                        <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1]}</h1>
+                        <p className="text-black/70">{eventRole.event.getOptionalCustomFields()[key]}</p>
+                    </div>)}
+                </div>
             </div>
         </div>}
     </Wrapper>
@@ -112,6 +118,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
 }
 
 function RegistrationDateRange(props: EventRoleFieldProp) {
+    console.log(props.eventRole);
     const activityDateTime = new Date(props.eventRole.activity_date_time);
 
     const startDateTime = new Date(activityDateTime);

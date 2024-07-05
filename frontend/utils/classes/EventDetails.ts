@@ -1,6 +1,7 @@
 interface MandatoryCustomEventDetailProps {
     "Volunteer_Event_Details.Category": any;
     "Volunteer_Event_Details.Category:name": string | null;
+    "Volunteer_Event_Details.Attendance_Code": string | null;
     "Volunteer_Event_Details.Thumbnail": number | null;
     [key: string]: any;
 }
@@ -28,6 +29,7 @@ export class EventDetails implements EventDetailProps {
 
     public "Volunteer_Event_Details.Category": any = null;
     public "Volunteer_Event_Details.Category:name": string | null = null;
+    public "Volunteer_Event_Details.Attendance_Code": string | null = null;
     public "Volunteer_Event_Details.Thumbnail": number | null = null;
 
     constructor(props: Partial<EventDetailProps>) {

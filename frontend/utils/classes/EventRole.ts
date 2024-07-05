@@ -4,6 +4,9 @@ import { EventDetailProps, EventDetails } from "./EventDetails";
 interface MandatoryCustomEventRoleProps {
     "Volunteer_Event_Role_Details.Role:label": string;
     "Volunteer_Event_Role_Details.Vacancy": number;
+    "Volunteer_Event_Role_Details.Approval_Required": boolean;
+    "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
+    "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
     "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number;
     "Volunteer_Event_Role_Details.Registration_End_Days_Before": number;
     [key: string]: any;
@@ -25,7 +28,8 @@ export class EventRole implements EventRoleProps {
     public "Volunteer_Event_Role_Details.Role:label": string;
     public "Volunteer_Event_Role_Details.Vacancy": number;
     public "Volunteer_Event_Role_Details.Approval_Required": boolean;
-    public "Volunteer_Event_Role_Details.Attendance_Code": string;
+    public "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
+    public "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
     public "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number;
     public "Volunteer_Event_Role_Details.Registration_End_Days_Before": number;
     [key: string]: any;
