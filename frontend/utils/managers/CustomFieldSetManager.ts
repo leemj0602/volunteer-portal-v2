@@ -33,13 +33,13 @@ const CustomFieldSetManager = new class CustomFieldSetManager {
         });
         const customFieldOptionValues = response2!.data as CustomFieldOptions[];
 
-        const result: Map<string, CustomField> = new Map<string, CustomField>(customFields.map(f => (
+        const result = new Map<string, CustomField>(customFields.map(f => (
             [`${name}.${f.name}`, {
                 ...f,
                 options: customFieldOptionValues.filter(opt => opt.option_group_id == f.option_group_id)
             }]
         )));
-        return result;
+        return result as Map<string, CustomField>;
     }
 }
 
