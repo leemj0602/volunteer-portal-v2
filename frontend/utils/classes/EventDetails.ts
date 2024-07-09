@@ -1,3 +1,8 @@
+export enum EventStatus {
+    Scheduled = "Scheduled",
+    Cancelled = "Cancelled"
+}
+
 interface MandatoryCustomEventDetailProps {
     "Volunteer_Event_Details.Category": any;
     "Volunteer_Event_Details.Category:name": string | null;
@@ -14,7 +19,7 @@ export interface EventDetailProps extends MandatoryCustomEventDetailProps {
     details: string | null;
     location: string | null;
     thumbnail: string | null;
-    "status_id:name": null | "Scheduled" | "Canceled";
+    "status_id:name": null | EventStatus;
 }
 
 export class EventDetails implements EventDetailProps {
@@ -25,7 +30,7 @@ export class EventDetails implements EventDetailProps {
     public details: string | null = null;
     public location: string | null = null;
     public thumbnail: string | null = null;
-    public "status_id:name": null | "Scheduled" | "Canceled" = null;
+    public "status_id:name": null | EventStatus = null;
 
     public "Volunteer_Event_Details.Category": any = null;
     public "Volunteer_Event_Details.Category:name": string | null = null;
