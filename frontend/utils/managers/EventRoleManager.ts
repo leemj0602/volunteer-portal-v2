@@ -4,12 +4,13 @@ import CRM, { ComparisonOperator } from "../crm";
 
 export interface FetchOptions {
     id?: string;
-    search?: string;
-    startDate?: Date;
-    endDate?: Date;
+    search?: string | null;
+    startDate?: string | null;
+    endDate?: string | null;
     limit?: number;
     page?: number;
     [key: string]: any;
+    select?: string[];
 }
 
 const EventRoleManager = new class EventRoleManager {
@@ -19,14 +20,18 @@ const EventRoleManager = new class EventRoleManager {
         const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Event Role"]];
         if (options?.id) where.push(["id", "=", options.id]);
         else {
-            if (options?.search) where.push(["Event.subject", "CONTAINS", options.search]);
+            if (options?.search) where.push(["event.subject", "CONTAINS", options.search]);
             if (options?.startDate) {
+                const startDate = JSON.parse(options.startDate);
                 where.push(
-                    ["event.activity_date_time", ">=", `${moment(options.startDate).format("YYYY-MM-DD")} 00:00:00`],
-                    ["event_activity_date_time", "<=", `${moment(options.endDate ?? options.startDate).format("YYYY-MM-DD")} 23:59:59`]
+                    ["activity_date_time", ">=", `${moment(startDate).format("YYYY-MM-DD")} 00:00:00`],
+                    ["activity_date_time", "<=", `${moment(options.endDate ? JSON.parse(options.endDate) : startDate).format("YYYY-MM-DD")} 23:59:59`]
                 );
             }
-            else if (options?.endDate) where.push(["event.activity_date_time", "<=", `${moment(options.endDate).format("YYYY-MM-DD")} 23:59:59`]);
+            else if (options?.endDate) {
+                const endDate = JSON.parse(options.endDate);
+                where.push(["event.activity_date_time", "<=", `${moment(endDate).format("YYYY-MM-DD")} 23:59:59`]);
+            }
         }
 
         for (const key in options) {
@@ -36,7 +41,7 @@ const EventRoleManager = new class EventRoleManager {
 
         const response = await CRM(this.entity, "get", {
             where,
-            select: [
+            select: options?.select ?? [
                 "activity_date_time",
                 "duration",
 
@@ -62,11 +67,13 @@ const EventRoleManager = new class EventRoleManager {
             join: [
                 ["Activity AS event", "LEFT", ["event.id", "=", "Volunteer_Event_Role_Details.Event"]],
                 ["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "event.Volunteer_Event_Details.Thumbnail"]]
-            ]
+            ],
+            limit: options?.limit,
+            offset: options?.page && options?.limit ? (options?.page - 1) * options?.limit : 0
         });
 
         if (options?.id) return new EventRole(response!.data[0]);
-        return response!.data.map((r: EventRoleProps) => new EventRole(r));
+        return response?.data.map((r: EventRoleProps) => new EventRole(r));
     }
 };
 
