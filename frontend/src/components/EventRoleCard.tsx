@@ -2,6 +2,11 @@ import { useNavigate } from "react-router-dom";
 import config from "../../../config";
 import { EventStatus } from "../../utils/classes/EventDetails";
 import { EventRole } from "../../utils/classes/EventRole";
+import { FiCalendar } from "react-icons/fi";
+import moment from "moment";
+import { GrGroup, GrLocation } from "react-icons/gr";
+import { IoBriefcaseOutline } from "react-icons/io5";
+import { useState } from "react";
 
 interface EventRoleCardProps {
     eventRole: EventRole;
@@ -10,6 +15,7 @@ interface EventRoleCardProps {
 
 export default function EventRoleCard(props: EventRoleCardProps) {
     const navigate = useNavigate();
+    const [volunteers, setVolunteers] = useState(0);
 
     return <div className={props.className}>
         <div className="bg-white w-full shadow-md rounded-md p-4 transition-transform duration-300 transform hover:scale-105 flex flex-col justify-between relative">
@@ -19,12 +25,46 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                     Event Cancelled
                 </div>
             </div>}
+            {/* Main body */}
             <div>
                 {/* Image */}
                 <div className={`mb-4 h-[160px] rounded-lg relative bg-gray-200 cursor-pointer`} onClick={() => navigate(`/events/${props.eventRole.id}`)}>
                     {props.eventRole.event.thumbnail && <img src={`${config.domain}/wp-content/uploads/civicrm/custom/${props.eventRole.event.thumbnail}`} className="w-full h-full object-cover rounded-lg" />}
                 </div>
+                <h1 className="font-semibold mb-4">{props.eventRole.event.subject}</h1>
+                <div className="grid grid-rows-1 gap-y-2 text-black/70">
+                    {/* Date and Time */}
+                    <div className="flex items-center">
+                        <FiCalendar className="text-secondary mr-3" />
+                        <span className="text-sm font-semibold">
+                            {moment(props.eventRole.activity_date_time).format("D MMM YYYY h:mma")}
+                            <span className="text-sm mx-1">-</span>
+                            {moment(new Date(props.eventRole.activity_date_time).getTime() + (props.eventRole.duration * 60 * 1000)).format("h:mma")}
+                        </span>
+                    </div>
+                    {/* Location */}
+                    <div className="gap-x-3 flex items-center">
+                        <GrLocation className="text-secondary" />
+                        <span className="text-sm font-semibold">{props.eventRole.event.location}</span>
+                    </div>
+                    {/* Role */}
+                    <div className="gap-x-3 flex items-center">
+                        <IoBriefcaseOutline className="text-secondary" />
+                        <span className="text-sm font-semibold">{props.eventRole["Volunteer_Event_Role_Details.Role:label"]}</span>
+                    </div>
+                    {/* Vacancy */}
+                    <div className="gap-x-3 flex items-center">
+                        <GrGroup className="text-secondary"/>
+                        <span className="text-sm font-semibold items-center">
+                            {volunteers}{props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ? ` out of ${props.eventRole["Volunteer_Event_Role_Details.Vacancy"]}` : ""} registered
+                        </span>
+                    </div>
+                </div>
             </div>
+            {/* Read More Button */}
+            <button className="text-white bg-secondary text-center w-full rounded-md text-sm mt-6 py-2" onClick={() => navigate(`/events/${props.eventRole.id}`)}>
+                Read More
+            </button>
         </div>
     </div>
 }
