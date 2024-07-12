@@ -69,7 +69,6 @@ export default function Events() {
                 }
             });
             if (updateSearchParams) setSearchParams(searchParams);
-            console.log(filters);
             setCustomFields(filters);
         })();
     }, []);
@@ -217,10 +216,15 @@ export default function Events() {
                 </div>
                 {/* Event role cards */}
                 {!eventRoles ? <Loading className="items-center h-full mt-20" /> : <div className="flex flex-col justify-between h-full">
+                    {/* Search results */}
+                    {searchParams.get("search") && <h1 className="text-xl font-semibold text-gray-600">Results for: {searchParams.get("search")}</h1>}
+                    {/* No events */}
                     {!eventRoles.length && <p className="text-lg text-gray-500">Looks like there aren't any events</p>}
+                    {/* If there are events, display */}
                     {eventRoles.length > 0 && <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
                         {eventRoles.map(eventRole => <EventRoleCard className="flex justify-center" eventRole={eventRole} />)}
                     </div>}
+                    {/* If there is more than 1 page */}
                     {totalPages > 1 && <div className="mt-8 items-center justify-center text-center w-full">
                         {Array.from({ length: totalPages }).map((_, n) => <button onClick={() => {
                             searchParams.set("page", `${n + 1}`);

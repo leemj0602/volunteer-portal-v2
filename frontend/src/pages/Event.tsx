@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Wrapper from "../components/Wrapper";
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { EventRole } from "../../utils/classes/EventRole";
 import EventRoleManager from "../../utils/managers/EventRoleManager";
 import Loading from "../components/Loading";
@@ -11,19 +11,27 @@ import { MdPeopleAlt } from "react-icons/md";
 import { GrLocation } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
 import { IoMdBriefcase } from "react-icons/io";
+import { EventRegistration } from "../../utils/classes/EventRegistration";
 
 export default function Event() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const email = (window as any).email ?? config.email;
 
     const [eventRole, setEventRole] = useState<EventRole>();
+    const [registrations, setRegistrations] = useState<EventRegistration[]>();
 
     useEffect(() => {
         (async function () {
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setEventRole(eventRole);
+            setRegistrations(await eventRole.fetchRegistrations());
         })();
     }, []);
+
+    useEffect(() => {
+        console.log(registrations);
+    }, [registrations]);
 
     return <Wrapper>
         {!eventRole ? <Loading className="h-screen items-center" /> : <div className="p-4">
@@ -46,7 +54,7 @@ export default function Event() {
                     </div>
                     {/* Registration Section */}
                     <div className="text-center min-w-[180px] max-w-[180px] hidden lg:block">
-                        <RegistrationButton eventRole={eventRole} />
+                        <RegistrationButton email={email} eventRole={eventRole} />
                         <RegistrationDateRange eventRole={eventRole} />
                     </div>
                 </header>
@@ -108,17 +116,21 @@ export default function Event() {
 
 
 interface EventRoleFieldProp {
+    email?: string;
     eventRole: EventRole;
 }
 
 function RegistrationButton(props: EventRoleFieldProp) {
-    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary">
+    const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
+        // This is for monday
+    }
+
+    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" onClick={handleClick}>
         Sign Up
     </button>
 }
 
 function RegistrationDateRange(props: EventRoleFieldProp) {
-    console.log(props.eventRole);
     const activityDateTime = new Date(props.eventRole.activity_date_time);
 
     const startDateTime = new Date(activityDateTime);
