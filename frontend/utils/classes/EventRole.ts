@@ -1,5 +1,7 @@
-import CRM from "../crm";
+import CRM, { ComparisonOperator } from "../crm";
+import ContactManager from "../managers/ContactManager";
 import { EventDetailProps, EventDetails } from "./EventDetails";
+import { EventRegistration, EventRegistrationProps, RegistrationStatus } from "./EventRegistration";
 
 interface MandatoryCustomEventRoleProps {
     "Volunteer_Event_Role_Details.Role:label": string;
@@ -41,12 +43,42 @@ export class EventRole implements EventRoleProps {
 
         const eventDetails: Partial<EventDetailProps> = {};
         for (const key in props)
-            if (key.startsWith("Volunteer_Event_Role_Details")) 
+            if (key.startsWith("Volunteer_Event_Role_Details"))
                 this[key] = props[key];
             else if (key.startsWith("event"))
                 eventDetails[key.split("event.")[1]] = props[key];
             else if (key.startsWith("thumbnail"))
                 eventDetails.thumbnail = props[key];
         this.event = new EventDetails(eventDetails);
+    }
+
+    async register(email: string) {
+        const contact = await ContactManager.fetch(email);
+        console.log(contact.id);
+        const response = await CRM("Activity", "create", {
+            values: [
+                ["activity_type_id:name", "Volunteer Event Registration"],
+                ["target_contact_id", [contact.id]],
+                ["source_contact_id", contact.id],
+                ["subject", `${this["Volunteer_Event_Role_Details.Role:label"]} - ${this.event.subject}`],
+                ["status_id:name", this["Volunteer_Event_Role_Details.Approval_Required"] ? RegistrationStatus.ApprovalRequired : RegistrationStatus.Approved],
+                ["Volunteer_Event_Registration_Details.Event_Role", this.id]
+            ]
+        }).catch(() => null);
+
+        return response?.data?.length ? true : false;
+    }
+
+    async fetchRegistrations() {
+        const response = await CRM("Activity", "get", {
+            select: ["contact.email_primary.email", "status_id:name"],
+            join: [["Contact AS contact", "LEFT", ["target_contact_id", "=", "contact.id"]]],
+            where: [
+                ["activity_type_id:name", "=", "Volunteer Event Registration"],
+                ["Volunteer_Event_Registration_Details.Event_Role", "=", this.id]                    
+            ],
+        });
+
+        return (response?.data as EventRegistrationProps[]).map(d => new EventRegistration(d));
     }
 }
