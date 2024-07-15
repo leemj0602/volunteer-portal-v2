@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Wrapper from "../components/Wrapper";
-import { MouseEvent, useEffect, useState } from "react";
+import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
 import { EventRole } from "../../utils/classes/EventRole";
 import EventRoleManager from "../../utils/managers/EventRoleManager";
 import Loading from "../components/Loading";
@@ -11,7 +11,8 @@ import { MdPeopleAlt } from "react-icons/md";
 import { GrLocation } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
 import { IoMdBriefcase } from "react-icons/io";
-import { EventRegistration } from "../../utils/classes/EventRegistration";
+import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
+import swal from "sweetalert";
 
 export default function Event() {
     const { id } = useParams();
@@ -19,19 +20,15 @@ export default function Event() {
     const email = (window as any).email ?? config.email;
 
     const [eventRole, setEventRole] = useState<EventRole>();
-    const [registrations, setRegistrations] = useState<EventRegistration[]>();
+    const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
 
     useEffect(() => {
         (async function () {
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
-            setEventRole(eventRole);
             setRegistrations(await eventRole.fetchRegistrations());
+            setEventRole(eventRole);
         })();
     }, []);
-
-    useEffect(() => {
-        console.log(registrations);
-    }, [registrations]);
 
     return <Wrapper>
         {!eventRole ? <Loading className="h-screen items-center" /> : <div className="p-4">
@@ -54,7 +51,7 @@ export default function Event() {
                     </div>
                     {/* Registration Section */}
                     <div className="text-center min-w-[180px] max-w-[180px] hidden lg:block">
-                        <RegistrationButton email={email} eventRole={eventRole} />
+                        <RegistrationButton eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
                         <RegistrationDateRange eventRole={eventRole} />
                     </div>
                 </header>
@@ -65,7 +62,7 @@ export default function Event() {
                         <h3 className="text-xs font-semibold mb-2">Registered</h3>
                         <div className="flex flex-row items-center gap-x-3 font-bold text-lg">
                             <MdPeopleAlt size={22} />
-                            <span>0</span>
+                            <span>{registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length}</span>
                             {eventRole["Volunteer_Event_Role_Details.Vacancy"] > 0 && <>
                                 <span>/</span>
                                 <span>{eventRole["Volunteer_Event_Role_Details.Vacancy"]}</span>
@@ -116,21 +113,43 @@ export default function Event() {
 
 
 interface EventRoleFieldProp {
-    email?: string;
     eventRole: EventRole;
+    registrations: EventRegistration[];
+    setRegistrations: Dispatch<SetStateAction<EventRegistration[]>>;
 }
 
 function RegistrationButton(props: EventRoleFieldProp) {
-    const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
-        // This is for monday
-    }
+    const [isLoading, setIsLoading] = useState(false);
+    const email = (window as any).email ?? config.email;
 
-    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" onClick={handleClick}>
-        Sign Up
+
+    const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
+        setIsLoading(true);
+        // If they already registered
+        if (!props.registrations.find(r => r["contact.email_primary.email"] == email)) {
+            const registrations = await props.eventRole.register(email);
+            props.setRegistrations(registrations);
+            swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
+        }
+        else swal("An error has occurred while registering.\nPlease contact an administrator.", { icon: "error" });
+        setIsLoading(false);
+    }
+    
+    // Whether they have already registered
+    const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ?? null;
+    // Whether they're within the registration date time and it's before the event ends
+    const withinDate =  Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time).getTime() + (props.eventRole.duration * 60_000);
+    // If there's even space in the first place
+    const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
+
+    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || !(!registered) || !withinDate || !hasSpace} onClick={handleClick}>
+        {isLoading ? "Loading..." : 
+            registered ? registered["status_id:name"] == RegistrationStatus.Unapproved ? "Unapproved" : registered["status_id:name"] == RegistrationStatus.ApprovalRequired ? "Pending" : "Registered"
+            : (!withinDate || !hasSpace) ? "Closed" : "Sign Up" }
     </button>
 }
 
-function RegistrationDateRange(props: EventRoleFieldProp) {
+function RegistrationDateRange(props: Omit<EventRoleFieldProp, "registrations" | "setRegistrations">) {
     const activityDateTime = new Date(props.eventRole.activity_date_time);
 
     const startDateTime = new Date(activityDateTime);
