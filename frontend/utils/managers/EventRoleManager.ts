@@ -51,17 +51,10 @@ const EventRoleManager = new class EventRoleManager {
                 "Event.*",
                 "Event.Role:label",
 
-                "event.id",
-                "event.subject",
-                "event.details",
-                "event.activity_date_time",
-                "event.duration",
-                "event.details",
-                "event.location",
+                "event.*",
                 "event.status_id:name",
 
                 "event.Volunteer_Event_Details.*",
-                "event.Volunteer_Event_Details.Category:name",
                 "thumbnail.uri"
             ],
             join: [
