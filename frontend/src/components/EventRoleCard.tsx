@@ -6,7 +6,9 @@ import { FiCalendar } from "react-icons/fi";
 import moment from "moment";
 import { GrGroup, GrLocation } from "react-icons/gr";
 import { IoBriefcaseOutline } from "react-icons/io5";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
+import { Spinner } from "flowbite-react";
 
 interface EventRoleCardProps {
     eventRole: EventRole;
@@ -15,7 +17,12 @@ interface EventRoleCardProps {
 
 export default function EventRoleCard(props: EventRoleCardProps) {
     const navigate = useNavigate();
-    const [volunteers, setVolunteers] = useState(0);
+    const [registrations, setVolunteers] = useState<EventRegistration[]>();
+    useEffect(() => {
+        (async () => {
+            setVolunteers(await props.eventRole.fetchRegistrations());
+        })();
+    }, []);
 
     return <div className={props.className}>
         <div className="bg-white w-full shadow-md rounded-md p-4 transition-transform duration-300 transform hover:scale-105 flex flex-col justify-between relative">
@@ -56,7 +63,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                     <div className="gap-x-3 flex items-center">
                         <GrGroup className="text-secondary"/>
                         <span className="text-sm font-semibold items-center">
-                            {volunteers}{props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ? ` out of ${props.eventRole["Volunteer_Event_Role_Details.Vacancy"]}` : ""} registered
+                            {registrations ? registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}{props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ? ` out of ${props.eventRole["Volunteer_Event_Role_Details.Vacancy"]}` : ""} registered
                         </span>
                     </div>
                 </div>
