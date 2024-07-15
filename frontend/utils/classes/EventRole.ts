@@ -54,8 +54,7 @@ export class EventRole implements EventRoleProps {
 
     async register(email: string) {
         const contact = await ContactManager.fetch(email);
-        console.log(contact.id);
-        const response = await CRM("Activity", "create", {
+        await CRM("Activity", "create", {
             values: [
                 ["activity_type_id:name", "Volunteer Event Registration"],
                 ["target_contact_id", [contact.id]],
@@ -66,7 +65,7 @@ export class EventRole implements EventRoleProps {
             ]
         }).catch(() => null);
 
-        return response?.data?.length ? true : false;
+        return this.fetchRegistrations();
     }
 
     async fetchRegistrations() {
