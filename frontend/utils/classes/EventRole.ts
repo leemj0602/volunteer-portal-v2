@@ -4,36 +4,36 @@ import { EventDetailProps, EventDetails } from "./EventDetails";
 import { EventRegistration, EventRegistrationProps, RegistrationStatus } from "./EventRegistration";
 
 interface MandatoryCustomEventRoleProps {
-    "Volunteer_Event_Role_Details.Role:label": string;
-    "Volunteer_Event_Role_Details.Vacancy": number;
-    "Volunteer_Event_Role_Details.Approval_Required": boolean;
+    "Volunteer_Event_Role_Details.Role:label": string | null;
+    "Volunteer_Event_Role_Details.Vacancy": number | null;
+    "Volunteer_Event_Role_Details.Approval_Required": boolean | null;
     "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
     "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
-    "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number;
-    "Volunteer_Event_Role_Details.Registration_End_Days_Before": number;
+    "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number | null;
+    "Volunteer_Event_Role_Details.Registration_End_Days_Before": number | null;
     [key: string]: any;
 }
 
 export interface EventRoleProps extends MandatoryCustomEventRoleProps {
-    id: number;
-    activity_date_time: string;
-    duration: number;
+    id: number | null;
+    activity_date_time: string | null;
+    duration: number | null;
 }
 
 
 export class EventRole implements EventRoleProps {
-    public id: number;
-    public activity_date_time: string;
-    public duration: number;
+    public id: number | null;
+    public activity_date_time: string | null;
+    public duration: number | null;
     public event: EventDetails;
 
-    public "Volunteer_Event_Role_Details.Role:label": string;
-    public "Volunteer_Event_Role_Details.Vacancy": number;
+    public "Volunteer_Event_Role_Details.Role:label": string | null;
+    public "Volunteer_Event_Role_Details.Vacancy": number | null;
     public "Volunteer_Event_Role_Details.Approval_Required": boolean;
     public "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
     public "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
-    public "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number;
-    public "Volunteer_Event_Role_Details.Registration_End_Days_Before": number;
+    public "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number | null;
+    public "Volunteer_Event_Role_Details.Registration_End_Days_Before": number | null;
     [key: string]: any;
 
     constructor(props: EventRoleProps) {
