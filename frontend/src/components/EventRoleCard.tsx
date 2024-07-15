@@ -46,7 +46,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                         <span className="text-sm font-semibold">
                             {moment(props.eventRole.activity_date_time).format("D MMM YYYY h:mma")}
                             <span className="text-sm mx-1">-</span>
-                            {moment(new Date(props.eventRole.activity_date_time).getTime() + (props.eventRole.duration * 60 * 1000)).format("h:mma")}
+                            {moment(new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60 * 1000)).format("h:mma")}
                         </span>
                     </div>
                     {/* Location */}

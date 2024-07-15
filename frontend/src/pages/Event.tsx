@@ -63,7 +63,7 @@ export default function Event() {
                         <div className="flex flex-row items-center gap-x-3 font-bold text-lg">
                             <MdPeopleAlt size={22} />
                             <span>{registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length}</span>
-                            {eventRole["Volunteer_Event_Role_Details.Vacancy"] > 0 && <>
+                            {eventRole["Volunteer_Event_Role_Details.Vacancy"]! > 0 && <>
                                 <span>/</span>
                                 <span>{eventRole["Volunteer_Event_Role_Details.Vacancy"]}</span>
                             </>}
@@ -85,7 +85,7 @@ export default function Event() {
                             <div className="flex flex-col sm:flex-row gap-x-3">
                                 <span>{moment(eventRole.activity_date_time).format("D MMM YYYY, h:mm A")}</span>
                                 <span className="hidden sm:block">-</span>
-                                <span>{moment(new Date(eventRole.activity_date_time).getTime() + (eventRole.duration * 60 * 1000)).format("D MMM YYYY, h:mm A")}</span>
+                                <span>{moment(new Date(eventRole.activity_date_time!).getTime() + (eventRole.duration! * 60 * 1000)).format("D MMM YYYY, h:mm A")}</span>
                             </div>
                         </div>
                     </div>
@@ -138,7 +138,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
     // Whether they have already registered
     const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ?? null;
     // Whether they're within the registration date time and it's before the event ends
-    const withinDate =  Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time).getTime() + (props.eventRole.duration * 60_000);
+    const withinDate =  Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
     // If there's even space in the first place
     const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
 
@@ -150,7 +150,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
 }
 
 function RegistrationDateRange(props: Omit<EventRoleFieldProp, "registrations" | "setRegistrations">) {
-    const activityDateTime = new Date(props.eventRole.activity_date_time);
+    const activityDateTime = new Date(props.eventRole.activity_date_time!);
 
     const startDateTime = new Date(activityDateTime);
     startDateTime.setDate(activityDateTime.getDate() - (props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Days_Before"] ?? 0));
