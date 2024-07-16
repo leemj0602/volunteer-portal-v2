@@ -26,6 +26,7 @@ export default function Event() {
         (async function () {
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setRegistrations(await eventRole.fetchRegistrations());
+            console.log(await eventRole.fetchRegistrations());
             setEventRole(eventRole);
         })();
     }, []);

@@ -14,8 +14,7 @@ export default function Home() {
             const contact = await ContactManager.fetch(email);
             setContact(contact);
             const registeredEventRoles = await contact.fetchRegisteredEventRoles();
-            console.log(registeredEventRoles[0]["status_id:name"]);
-            console.log(registeredEventRoles[0].eventRole?.event["status_id:name"]);
+            console.log(registeredEventRoles);
         })();
     }, []);
 

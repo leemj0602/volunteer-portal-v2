@@ -62,6 +62,7 @@ export class Contact implements ContactProps {
     async fetchRegisteredEventRoles() {
         const response = await CRM("Activity", "get", {
             select: [
+                "contact.email_primary.email",
                 "status_id:name",
                 "eventRole.id",
                 "eventRole.activity_date_time",
