@@ -13,7 +13,7 @@ export default function Home() {
         (async () => {
             const contact = await ContactManager.fetch(email);
             setContact(contact);
-            const registeredEventRoles = await contact.fetchRegisteredEventRoles();
+            const registeredEventRoles = await contact.fetchRegistrations();
             console.log(registeredEventRoles);
         })();
     }, []);
