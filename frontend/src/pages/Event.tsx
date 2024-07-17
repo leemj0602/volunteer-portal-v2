@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Wrapper from "../components/Wrapper";
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
 import { EventRole } from "../../utils/classes/EventRole";
@@ -16,8 +16,6 @@ import swal from "sweetalert";
 
 export default function Event() {
     const { id } = useParams();
-    const navigate = useNavigate();
-    const email = (window as any).email ?? config.email;
 
     const [eventRole, setEventRole] = useState<EventRole>();
     const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
@@ -26,7 +24,6 @@ export default function Event() {
         (async function () {
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setRegistrations(await eventRole.fetchRegistrations());
-            console.log(await eventRole.fetchRegistrations());
             setEventRole(eventRole);
         })();
     }, []);
@@ -122,7 +119,6 @@ interface EventRoleFieldProp {
 function RegistrationButton(props: EventRoleFieldProp) {
     const [isLoading, setIsLoading] = useState(false);
     const email = (window as any).email ?? config.email;
-
 
     const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
         setIsLoading(true);
