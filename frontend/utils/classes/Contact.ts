@@ -1,4 +1,5 @@
 import CRM from "../crm";
+import EventRegistrationManager from "../managers/EventRegistrationManager";
 import { EventRegistration, EventRegistrationProps } from "./EventRegistration";
 
 interface MandatoryContactDetailProps {
@@ -59,32 +60,7 @@ export class Contact implements ContactProps {
     }
 
 
-    async fetchRegisteredEventRoles() {
-        const response = await CRM("Activity", "get", {
-            select: [
-                "contact.email_primary.email",
-                "status_id:name",
-                "eventRole.id",
-                "eventRole.activity_date_time",
-                "eventRole.duration",
-                "eventRole.Volunteer_Event_Role_Details.*",
-                "eventRole.Volunteer_Event_Role_Details.Role:label",
-                
-                "event.*",
-                "event.status_id:name",
-                "event.Volunteer_Event_Details.*",
-            ],
-            join: [
-                ["Contact AS contact", "LEFT", ["target_contact_id", "=", "contact.id"]],
-                ["Activity AS eventRole", "LEFT", ["Volunteer_Event_Registration_Details.Event_Role", "=", "eventRole.id"]],
-                ["Activity AS event", "LEFT", ["eventRole.Volunteer_Event_Role_Details.Event", "=", "event.id"]]
-            ],
-            where: [
-                ["activity_type_id:name", "=", "Volunteer Event Registration"],
-                ["contact.id", "=", this.id]
-            ]
-        });
-
-        return (response?.data as EventRegistrationProps[]).map(d => new EventRegistration(d));
+    async fetchRegistrations() {
+        return EventRegistrationManager.fetch({ contactId: this.id });
     }
 }
