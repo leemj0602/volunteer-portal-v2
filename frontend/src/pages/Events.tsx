@@ -222,7 +222,7 @@ export default function Events() {
                     {/* No events */}
                     {!eventRoles.length && <p className="text-lg text-gray-500">Looks like there aren't any events</p>}
                     {/* If there are events, display */}
-                    {eventRoles.length > 0 && <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
+                    {eventRoles.length > 0 && <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 mt-6">
                         {eventRoles.map(eventRole => <EventRoleCard className="flex justify-center" eventRole={eventRole} />)}
                     </div>}
                     {/* If there is more than 1 page */}
