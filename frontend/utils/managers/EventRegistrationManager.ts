@@ -39,6 +39,20 @@ const EventRegistrationManager = new class EventRegistrationManager {
 
         return (response?.data as EventRegistrationProps[]).map(d => new EventRegistration(d));
     }
+
+    async cancelEvent(registrationActivityId: number) {
+        const cancel = await CRM("Activity", 'update', {
+            values: [
+                ['status_id:name', 'Cancelled'],
+            ],
+            where: [
+                ['id', '=', registrationActivityId],
+            ]
+        });
+    
+        return cancel?.data.length > 0;
+    }
+    
 }
 
 export default EventRegistrationManager;
