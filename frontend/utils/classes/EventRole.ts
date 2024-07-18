@@ -1,7 +1,7 @@
 import CRM, { ComparisonOperator } from "../crm";
 import ContactManager from "../managers/ContactManager";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
-import { EventDetailProps, EventDetails } from "./EventDetails";
+import { EventDetailProps, EventDetails, EventStatus } from "./EventDetails";
 import { EventRegistration, EventRegistrationProps, RegistrationStatus } from "./EventRegistration";
 
 interface MandatoryCustomEventRoleProps {
@@ -19,6 +19,7 @@ export interface EventRoleProps extends MandatoryCustomEventRoleProps {
     id: number | null;
     activity_date_time: string | null;
     duration: number | null;
+    "status_id:name": EventStatus | null;
 }
 
 
@@ -27,6 +28,7 @@ export class EventRole implements EventRoleProps {
     public activity_date_time: string | null;
     public duration: number | null;
     public event: EventDetails;
+    public "status_id:name": EventStatus | null;
 
     public "Volunteer_Event_Role_Details.Role:label": string | null;
     public "Volunteer_Event_Role_Details.Vacancy": number | null;
@@ -41,6 +43,7 @@ export class EventRole implements EventRoleProps {
         this.id = props.id;
         this.activity_date_time = props.activity_date_time;
         this.duration = props.duration;
+        this["status_id:name"] = props["status_id:name"];
 
         const eventDetails: Partial<EventDetailProps> = {};
         for (const key in props)

@@ -14,6 +14,7 @@ const EventRegistrationManager = new class EventRegistrationManager {
                 "eventRole.id",
                 "eventRole.activity_date_time",
                 "eventRole.duration",
+                "eventRole.status_id:name",
                 "eventRole.Volunteer_Event_Role_Details.*",
                 "eventRole.Volunteer_Event_Role_Details.Role:label",
 

@@ -44,6 +44,7 @@ const EventRoleManager = new class EventRoleManager {
             select: options?.select ?? [
                 "activity_date_time",
                 "duration",
+                "status_id:name",
 
                 "Volunteer_Event_Role_Details.*",
                 "Volunteer_Event_Role_Details.Role:label",

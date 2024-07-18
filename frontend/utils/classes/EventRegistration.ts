@@ -17,7 +17,8 @@ class EventAttendance implements EventAttendanceProps {
 export enum RegistrationStatus {
     Approved = "Completed",
     ApprovalRequired = "Approval Required",
-    Unapproved = "Unapproved"
+    Unapproved = "Unapproved",
+    Cancelled = "Cancelled"
 }
 
 export interface EventRegistrationProps {
