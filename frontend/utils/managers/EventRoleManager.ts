@@ -1,6 +1,7 @@
 import moment from "moment";
 import { EventRole, EventRoleProps } from "../classes/EventRole";
 import CRM, { ComparisonOperator } from "../crm";
+import { format } from "date-fns";
 
 export interface FetchOptions {
     id?: string;
@@ -69,6 +70,47 @@ const EventRoleManager = new class EventRoleManager {
         if (options?.id) return new EventRole(response!.data[0]);
         return response?.data.map((r: EventRoleProps) => new EventRole(r));
     }
+
+    async fetchUnregistered(registeredEventRoles: number[]) {
+        // console.log(registeredEventRoles);
+        const now = new Date();
+        const formattedNow = format(now, "yyyy-MM-dd HH:mm:ss");
+        const response = await CRM("Activity", "get", {
+            select: [
+                "activity_date_time",
+                "duration",
+                "status_id:name",
+
+                "Volunteer_Event_Role_Details.*",
+                "Volunteer_Event_Role_Details.Role:label",
+
+                "Event.*",
+                "Event.Role:label",
+
+                "event.*",
+                "event.status_id:name",
+
+                "event.Volunteer_Event_Details.*",
+                "thumbnail.uri"
+            ],
+            join: [
+                ["Activity AS event", "LEFT", ["event.id", "=", "Volunteer_Event_Role_Details.Event"]],
+                ["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "event.Volunteer_Event_Details.Thumbnail"]]
+            ],
+            where: [
+                ["activity_type_id:name", "=", "Volunteer Event Role"],
+                ['activity_date_time', '>', formattedNow],
+                ['id', 'NOT IN', registeredEventRoles],
+            ],
+            order: [
+                ['activity_date_time', 'ASC'],
+            ],
+            limit: 3,
+        });
+        // console.log(response?.data);
+        return response?.data.map((r: EventRoleProps) => new EventRole(r));
+    }
+
 };
 
 export default EventRoleManager;

@@ -30,7 +30,7 @@ export class Contact implements ContactProps {
 
     public "Volunteer_Contact_Details.Skills_Interests": string[];
     [key: string]: any;
-    
+
     constructor(props: ContactProps) {
         this.id = props.id;
         this["email_primary.email"] = props["email_primary.email"];
@@ -40,7 +40,7 @@ export class Contact implements ContactProps {
         this.gender_id = props.gender_id;
         this.first_name = props.first_name;
         this.last_name = props.last_name;
-        
+
         for (const key in props) if (key.startsWith("Volunteer_Contact_Details")) this[key] = props[key];
     }
 
