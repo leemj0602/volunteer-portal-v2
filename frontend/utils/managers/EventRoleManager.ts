@@ -50,13 +50,15 @@ const EventRoleManager = new class EventRoleManager {
                 "Volunteer_Event_Role_Details.*",
                 "Volunteer_Event_Role_Details.Role:label",
 
-                "Event.*",
-                "Event.Role:label",
-
-                "event.*",
+                "event.id",
+                "event.activity_date_time",
+                "event.subject",
+                "event.duration",
+                "event.details",
+                "event.location",
                 "event.status_id:name",
-
                 "event.Volunteer_Event_Details.*",
+                
                 "thumbnail.uri"
             ],
             join: [
@@ -84,13 +86,15 @@ const EventRoleManager = new class EventRoleManager {
                 "Volunteer_Event_Role_Details.*",
                 "Volunteer_Event_Role_Details.Role:label",
 
-                "Event.*",
-                "Event.Role:label",
-
-                "event.*",
+                "event.id",
+                "event.activity_date_time",
+                "event.subject",
+                "event.duration",
+                "event.details",
+                "event.location",
                 "event.status_id:name",
-
                 "event.Volunteer_Event_Details.*",
+
                 "thumbnail.uri"
             ],
             join: [
@@ -107,7 +111,6 @@ const EventRoleManager = new class EventRoleManager {
             ],
             limit: 3,
         });
-        // console.log(response?.data);
         return response?.data.map((r: EventRoleProps) => new EventRole(r));
     }
 

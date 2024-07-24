@@ -17,7 +17,7 @@ interface EventRoleCardProps {
 
 export default function EventRoleCard(props: EventRoleCardProps) {
     const navigate = useNavigate();
-    const [registrations, setVolunteers] = useState<EventRegistration[]>();
+    const [volunteers, setVolunteers] = useState<EventRegistration[]>();
     useEffect(() => {
         (async () => {
             setVolunteers(await props.eventRole.fetchRegistrations());
@@ -63,7 +63,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                     <div className="gap-x-3 flex items-center">
                         <GrGroup className="text-secondary"/>
                         <span className="text-sm font-semibold items-center">
-                            {registrations ? registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}{props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ? ` out of ${props.eventRole["Volunteer_Event_Role_Details.Vacancy"]}` : ""} registered
+                            {volunteers ? volunteers.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}{props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ? ` out of ${props.eventRole["Volunteer_Event_Role_Details.Vacancy"]}` : ""} registered
                         </span>
                     </div>
                 </div>

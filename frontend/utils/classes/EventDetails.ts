@@ -1,3 +1,5 @@
+import CRM from "../crm";
+
 export enum EventStatus {
     Scheduled = "Scheduled",
     Cancelled = "Cancelled"
@@ -38,14 +40,30 @@ export class EventDetails implements EventDetailProps {
         for (const key in props) this[key as keyof EventDetails] = props[key];
     }
 
-    public getOptionalCustomFields() {
+    public async getOptionalCustomFields() {
         const keys = Object.keys(this);
         const emptyEventDetails = new EventDetails({} as EventDetailProps);
         const defaultKeys = Object.keys(emptyEventDetails);
         const customKeys = keys.filter(k => !defaultKeys.includes(k));
 
+        const response = await CRM("OptionGroup", "get", {
+            select: ["name", "option.value", "option.label"],
+            join: [["OptionValue AS option", "LEFT", ["option.option_group_id", "=", "id"]]],
+            where: [["name", "IN", customKeys.map(c => `Volunteer_Event_Details_${c.split("Volunteer_Event_Details.")[1]}`)]]
+        });
+        const datas = response?.data as OptionalFieldData[];
+        
         const result: { [key: string]: any } = {};
-        for (const key of customKeys) result[key] = this[key as keyof EventDetails];
+        for (const key of customKeys) {
+            const data = datas.find(d => d.name == `Volunteer_Event_Details_${key.split("Volunteer_Event_Details.")[1]}` && d["option.value"] == this[key as keyof EventDetails]);
+            result[key] = data ? data["option.label"] : this[key as keyof EventDetails]
+        }
         return result;
     }
+}
+
+export interface OptionalFieldData {
+    name: string;
+    "option.value": any;
+    "option.label": string;
 }

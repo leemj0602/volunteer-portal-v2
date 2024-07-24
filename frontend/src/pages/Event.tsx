@@ -19,11 +19,13 @@ export default function Event() {
 
     const [eventRole, setEventRole] = useState<EventRole>();
     const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
+    const [optionalFields, setOptionalFields] = useState<{ [key: string]: any }>();
 
     useEffect(() => {
         (async function () {
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setRegistrations(await eventRole.fetchRegistrations());
+            setOptionalFields(await eventRole.event.getOptionalCustomFields());
             setEventRole(eventRole);
         })();
     }, []);
@@ -98,9 +100,9 @@ export default function Event() {
                 </div>
                 {/* Custom Fields */}
                 <div className="mt-6">
-                    {Object.keys(eventRole.event.getOptionalCustomFields()).map(key => <div className="mb-6">
+                    {Object.keys(optionalFields!).map(key => <div className="mb-6">
                         <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1]}</h1>
-                        <p className="text-black/70">{eventRole.event.getOptionalCustomFields()[key]}</p>
+                        <p className="text-black/70">{optionalFields![key]}</p>
                     </div>)}
                 </div>
             </div>
