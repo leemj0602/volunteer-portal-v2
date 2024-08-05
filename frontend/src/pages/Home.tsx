@@ -90,8 +90,9 @@ export default function Home() {
                         formattedDateTime: eventRole.activity_date_time ? format(parseISO(eventRole.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A", // Formatted date time for display
                         status: eventStatus,
                         location: eventRole.event.location,
-                        eventId: eventRole.id,
+                        eventRoleId: eventRole.id,
                         duration: eventRole.duration,
+                        eventId: eventRole.event.id,
                     };
                 });
 
@@ -177,7 +178,7 @@ export default function Home() {
                         <DashboardStats {...{ hours: hoursVolunteered, events: numEventsParticipated }} />
 
                         <EventStatus
-                            events={registeredEventRoles}
+                            eventRegistrations={registeredEventRoles}
                             openCancelModal={(registrationId: number) => {
                                 setCurrentRegistrationId(registrationId);
                                 setShowCancelModal(true);

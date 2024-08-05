@@ -6,19 +6,22 @@ import { AiOutlineStop } from "react-icons/ai";
 import ConfirmationModal from "./ConfirmationModal";
 import config from "../../../config";
 import swal from "sweetalert";
+import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
+import ContactManager from "../../utils/managers/ContactManager";
 
-interface Event {
+interface EventRegistration {
   id: number;
   name: string;
   formattedDateTime: string;
   status: string;
   location: string;
-  eventId: number;
+  eventRoleId: number;
   duration: number;
+  eventId: number;
 }
 
 interface EventStatusProps {
-  events: Event[];
+  eventRegistrations: EventRegistration[];
   openCancelModal: (registrationId: number) => void;
 }
 
@@ -38,7 +41,7 @@ interface EventStatusProps {
 //   return eventDetail.data;
 // }
 
-export default function EventStatus({ events, openCancelModal }: EventStatusProps) {
+export default function EventStatus({ eventRegistrations, openCancelModal }: EventStatusProps) {
   const email = (window as any).email as string ?? config.email;
 
   const statusStyles: { [key: string]: string } = {
@@ -58,17 +61,18 @@ export default function EventStatus({ events, openCancelModal }: EventStatusProp
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const [attendanceCode, setAttendanceCode] = useState("");
   const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
+  const [selectedEventRoleId, setSelectedEventRoleId] = useState<number | null>(null);
   const [selectedEventDuration, setSelectedEventDuration] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [eventList, setEventList] = useState<Event[]>(events);
+  const [eventList, setEventList] = useState<EventRegistration[]>(eventRegistrations);
   const eventsPerPage = 5;
 
   const dropdownRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Update eventList when events prop changes
   useEffect(() => {
-    setEventList(events);
-  }, [events]);
+    setEventList(eventRegistrations);
+  }, [eventRegistrations]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -98,7 +102,7 @@ export default function EventStatus({ events, openCancelModal }: EventStatusProp
   const totalPages = Math.ceil(eventList.length / eventsPerPage);
 
   // Get the events to display on the current page
-  const currentEvents = eventList.slice(
+  const currentEventRegistrations = eventList.slice(
     (currentPage - 1) * eventsPerPage,
     currentPage * eventsPerPage
   );
@@ -128,72 +132,60 @@ export default function EventStatus({ events, openCancelModal }: EventStatusProp
 
   const navigate = useNavigate();
 
-  const handleCheckInClick = (event: Event) => {
-    setSelectedEventId(event.eventId);
-    setSelectedEventDuration(event.duration);
+  const handleCheckInClick = (eventRegistration: EventRegistration) => {
+    setSelectedEventId(eventRegistration.eventId);
+    setSelectedEventRoleId(eventRegistration.eventRoleId);
+    setSelectedEventDuration(eventRegistration.duration);
     setIsPopupOpen(true);
   };
 
-  // const handlePopupSubmit = async () => {
-  //   if (selectedEventId !== null) {
-  //     setAttendanceCode("");
-  //     setIsSubmitting(true);
-  //     console.log("Attendance code submitted:", attendanceCode, "for event ID:", selectedEventId);
-  //     const result = await checkAttendanceCode(selectedEventId, attendanceCode);
-  //     console.log(result);
-  //     if (result.length > 0) {
-  //       let response = await CRM("Contact", "get", {
-  //         select: ["id"],
-  //         where: [["email_primary.email", "=", email]]
-  //       });
-  //       const { id } = response.data[0];
+  const handlePopupSubmit = async () => {
+    if (selectedEventId !== null) {
+      setAttendanceCode("");
+      setIsSubmitting(true);
+      console.log("Attendance code submitted:", attendanceCode, "for event ID:", selectedEventId);
+      const checkAttendanceCodeResult = await EventRegistrationManager.checkAttendanceCode(selectedEventId, attendanceCode);
+      if (checkAttendanceCodeResult.length > 0) {
+        let contact = await ContactManager.fetch(email);
 
-  //       // Creating the Participation Activity
-  //       response = await CRM("Activity", "create", {
-  //         values: [
-  //           ["activity_type_id:name", config.LoggingAttendanceActivityTypeName],
-  //           ["target_contact_id", [id]],
-  //           ["source_contact_id", id], //add status update
-  //           ["duration", selectedEventDuration],
-  //           [`${config.LoggingAttendanceCustomFieldSetName}.event_activity_id`, selectedEventId],
-  //         ]
-  //       });
+        if (selectedEventRoleId !== null && selectedEventDuration !== null) {
+          // Creating the Event Attendance Activity
+          const createEventAttendance = await EventRegistrationManager.createAttendance(contact.id, selectedEventRoleId, selectedEventDuration);
 
-  //       console.log(response.data);
+          if (createEventAttendance) {
+            // Close the popup
+            setIsPopupOpen(false);
 
-  //       if (response.data.length > 0) {
-  //         // Close the popup
-  //         setIsPopupOpen(false);
+            swal("Attendance taken successfully", {
+              icon: "success",
+            });
 
-  //         swal("Attendance taken successfully", {
-  //           icon: "success",
-  //         });
+            // Update the status of the event to "Checked In"
+            setEventList((prevEvents) =>
+              prevEvents.map((event) =>
+                event.eventId === selectedEventId ? { ...event, status: "Checked In" } : event
+              )
+            );
+            setIsSubmitting(false);
+          } else {
+            // Close the popup
+            setIsPopupOpen(false);
 
-  //         // Update the status of the event to "Checked In"
-  //         setEventList((prevEvents) =>
-  //           prevEvents.map((event) =>
-  //             event.eventId === selectedEventId ? { ...event, status: "Checked In" } : event
-  //           )
-  //         );
-  //         setIsSubmitting(false);
-  //       } else {
-  //         // Close the popup
-  //         setIsPopupOpen(false);
-
-  //         swal("Attendance taken unsuccessfully", {
-  //           icon: "error",
-  //         });
-  //         setIsSubmitting(false);
-  //       }
-  //     }
-  //     else {
-  //       swal("Wrong code, please try again", {
-  //         icon: "error",
-  //       });
-  //       setIsSubmitting(false);
-  //     }
-  //   }
-  // };
+            swal("Attendance taken unsuccessfully", {
+              icon: "error",
+            });
+            setIsSubmitting(false);
+          }
+        }
+      }
+      else {
+        swal("Wrong code, please try again", {
+          icon: "error",
+        });
+        setIsSubmitting(false);
+      }
+    }
+  };
 
   return (
     <div className="mt-5 rounded-lg">
@@ -210,32 +202,32 @@ export default function EventStatus({ events, openCancelModal }: EventStatusProp
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentEvents.length === 0 ? (
+            {currentEventRegistrations.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-4 text-center text-lg text-gray-500">
                   No event history available
                 </td>
               </tr>
             ) : (
-              currentEvents.map((event, index) => (
-                <tr key={index} className={`${event.status === "Cancelled By Organiser" ? 'bg-gray-200' : ''}`}>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${event.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{event.name}</td>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${event.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{event.formattedDateTime}</td>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${event.status === "Cancelled By Organiser" ? 'font-black' : ''}`}>
-                    {event.status === "Check In" ? (
+              currentEventRegistrations.map((eventRegistration, index) => (
+                <tr key={index} className={`${eventRegistration.status === "Cancelled By Organiser" ? 'bg-gray-200' : ''}`}>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{eventRegistration.name}</td>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{eventRegistration.formattedDateTime}</td>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'font-black' : ''}`}>
+                    {eventRegistration.status === "Check In" ? (
                       <button
-                        className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[event.status]}`}
-                        onClick={() => handleCheckInClick(event)}
+                        className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[eventRegistration.status]}`}
+                        onClick={() => handleCheckInClick(eventRegistration)}
                       >
-                        {event.status}
+                        {eventRegistration.status}
                       </button>
                     ) : (
-                      <span className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[event.status]}`}>
-                        {event.status === "Cancelled By Organiser" ? "Event\nCancelled" : event.status}
+                      <span className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[eventRegistration.status]}`}>
+                        {eventRegistration.status === "Cancelled By Organiser" ? "Event\nCancelled" : eventRegistration.status}
                       </span>
                     )}
                   </td>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${event.status === "Cancelled By Organiser" ? 'text-gray-400 hidden lg:table-cell' : 'hidden lg:table-cell'}`}>{event.location}</td>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'text-gray-400 hidden lg:table-cell' : 'hidden lg:table-cell'}`}>{eventRegistration.location}</td>
                   <td className="px-3 text-lg py-4 whitespace-nowrap relative">
                     <div ref={(el) => dropdownRefs.current[index] = el}>
                       <button
@@ -247,26 +239,26 @@ export default function EventStatus({ events, openCancelModal }: EventStatusProp
                       </button>
                       {openMenuIndex === index && (
                         <div
-                          className={`absolute right-0 w-40 bg-white shadow-lg rounded-md z-50 ${index >= currentEvents.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'
+                          className={`absolute right-0 w-40 bg-white shadow-lg rounded-md z-50 ${index >= currentEventRegistrations.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'
                             }`}
                         >
                           <ul>
                             <li
-                              className={`px-4 py-2 flex items-center ${event.status === "Cancelled By Organiser"
+                              className={`px-4 py-2 flex items-center ${eventRegistration.status === "Cancelled By Organiser"
                                 ? "text-gray-400 cursor-not-allowed"
                                 : "hover:bg-gray-100 cursor-pointer"
                                 }`}
-                              onClick={() => navigate(`/events/${event.eventId}`)}>
+                              onClick={() => navigate(`/events/${eventRegistration.eventRoleId}`)}>
                               <GrView className="mr-2" /> View
                             </li>
                             <li
-                              className={`px-4 py-2 flex items-center ${event.status === "Completed" || event.status === "Cancelled" || event.status === "Cancelled By Organiser"
+                              className={`px-4 py-2 flex items-center ${eventRegistration.status === "Completed" || eventRegistration.status === "Cancelled" || eventRegistration.status === "Cancelled By Organiser"
                                 ? "text-gray-400 cursor-not-allowed"
                                 : "hover:bg-gray-100 cursor-pointer"
                                 }`}
                               onClick={() => {
-                                if (event.status !== "Completed" && event.status !== "Cancelled" && event.status !== "Cancelled By Organiser") {
-                                  openCancelModal(event.id);
+                                if (eventRegistration.status !== "Completed" && eventRegistration.status !== "Cancelled" && eventRegistration.status !== "Cancelled By Organiser") {
+                                  openCancelModal(eventRegistration.id);
                                 }
                               }}
                             >
@@ -322,7 +314,7 @@ export default function EventStatus({ events, openCancelModal }: EventStatusProp
         />
         <div className="flex justify-center space-x-4">
           <button
-            // onClick={handlePopupSubmit}
+            onClick={handlePopupSubmit}
             className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
             disabled={isSubmitting}
           >
