@@ -83,12 +83,15 @@ export default function Profile() {
     return <Wrapper>
         {!contact || !customFieldData ? <Loading className="h-screen items-center" /> : <>
             <ConfirmationModal showModal={showModal} closeModal={closeModal} image={ResetPassword}>
-                <h1 className="font-semibold text-lg mt-4">Reset Email Sent</h1>
-                <p className="text-gray-500 text-ms mt-2">We have sent an email with a password reset link to <span className="text-gray-600 font-semibold">{email}</span></p>
-                <button className="text-sm font-semibold bg-secondary rounded-md p-2 w-[140px] text-white self-center mt-4" onClick={closeModal}>
-                    Got it
+                <h1 className="font-semibold text-lg mt-4">Reset Password Confirmation</h1>
+                <p className="text-gray-500 text-ms mt-2">Click Confirm to redirect to another page to reset your password</p>
+                <button className="text-sm font-semibold bg-secondary rounded-md p-2 w-[140px] text-white self-center mt-4" onClick={() => {
+                   closeModal();
+                   window.open(`${config.domain}/wp-login.php?action=lostpassword`, "_blank")}
+                }>
+                    Confirm
                 </button>
-                <p className="font-semibold text-sm mt-2 text-gray-400">Send Again</p>
+                <button onClick={closeModal} className="font-semibold text-sm mt-2 text-gray-400">Nevermind</button>
             </ConfirmationModal>
             <div>
                 {/* Header */}
