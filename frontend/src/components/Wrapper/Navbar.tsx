@@ -96,22 +96,21 @@ export default function Navbar(props: NavbarProps) {
                 <hr />
                 <div className="flex flex-col pt-2">
                     <Link to="/">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                        <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             Dashboard
                         </div>
                     </Link>
                     <Link to="/events">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                        <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             All Events
                         </div>
                     </Link>
                     <Link to="/profile">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                        <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             Profile
                         </div>
                     </Link>
-                    <button onClick={openModal} className="hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                        <PiSignOutBold />
+                    <button onClick={openModal} className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                         <span>Sign Out</span>
                     </button>
                 </div>
