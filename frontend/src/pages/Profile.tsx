@@ -36,7 +36,7 @@ export default function Profile() {
     }, []);
 
 
-    const handleContact = function(id: keyof Contact, value: any) {
+    const handleContact = function (id: keyof Contact, value: any) {
         const updated = new Contact(contact!);
         updated[id] = value;
         setContact(updated);
@@ -86,23 +86,38 @@ export default function Profile() {
                 <h1 className="font-semibold text-lg mt-4">Reset Password Confirmation</h1>
                 <p className="text-gray-500 text-ms mt-2">Click Confirm to redirect to another page to reset your password</p>
                 <button className="text-sm font-semibold bg-secondary rounded-md p-2 w-[140px] text-white self-center mt-4" onClick={() => {
-                   closeModal();
-                   window.open(`${config.domain}/wp-login.php?action=lostpassword`, "_blank")}
+                    closeModal();
+                    window.open(`${config.domain}/wp-login.php?action=lostpassword`, "_blank")
+                }
                 }>
                     Confirm
                 </button>
                 <button onClick={closeModal} className="font-semibold text-sm mt-2 text-gray-400">Nevermind</button>
             </ConfirmationModal>
             <div>
-                {/* Header */}
-                <div className="p-4 relative bg-primary/20 h-[140px]">
+                {/* Header PC */}
+                <div className="p-4 relative bg-primary/20 h-[140px] hidden md:block">
                     <div className="flex flex-row items-center absolute -bottom-[44%] lg:left-20">
-                        {/* Profile picture */}
+                        {/* Profile Picture */}
                         <div className="w-[130px] h-[130px] rounded-full bg-gray-300 mr-6 border-[#f4f5fb] border-8">
 
                         </div>
-                        {/* Profile name and address */}
+                        {/* Text */}
                         <div className="grid grid-cols-1 gap-y-6">
+                            <h1 className="font-bold text-2xl">{name}</h1>
+                            <h2 className="font-semibold text-transparent lg:text-black">{contact["address_primary.street_address"]}</h2>
+                        </div>
+                    </div>
+                </div>
+                {/* Header Mobile */}
+                <div className="p-4 bg-primary/20 md:hidden flex justify-center items-center">
+                    <div className="w-full flex flex-col justify-center items-center">
+                        {/* Profile Picture */}
+                        <div className="w-[120px] h-[120px] mx-auto rounded-full bg-gray-300 border-[#f4f5fb] border-8">
+
+                        </div>
+                        {/* Text */}
+                        <div className="text-center mt-4">
                             <h1 className="font-bold text-2xl">{name}</h1>
                             <h2 className="font-semibold">{contact["address_primary.street_address"]}</h2>
                         </div>
@@ -112,20 +127,20 @@ export default function Profile() {
                 <div className="p-4">
                     <form onSubmit={saveChanges} className="max-w-[1000px]">
                         {/* Buttons */}
-                        <div className="flex w-full justify-end mb-20">
-                            <div className="flex gap-x-3">
+                        <div className="flex w-full justify-center md:justify-end mb-10 lg:mb-20">
+                            <div className="flex flex-col sm:flex-row gap-3">
                                 {/* Save Changes */}
-                                {isEditing && <button type="submit" className={`text-white font-semibold text-sm rounded-md py-[6px] px-4 flex justify-between items-center gap-x-3 ${isSaving ? "bg-primary" : "bg-secondary"}`} disabled={isSaving}>
+                                {isEditing && <button type="submit" className={`text-white font-semibold text-sm rounded-md py-[6px] px-4 flex justify-center sm:justify-between items-center gap-x-3 ${isSaving ? "bg-primary" : "bg-secondary"}`} disabled={isSaving}>
                                     <MdSaveAlt />
                                     <span>{isSaving ? "Updating..." : "Save Changes"}</span>
                                 </button>}
                                 {/* Edit */}
-                                {!isEditing && <button onClick={handleView} type="button" className="text-white font-semibold text-sm rounded-md py-[6px] px-4 bg-secondary flex justify-between items-center gap-x-3">
+                                {!isEditing && <button onClick={handleView} type="button" className="text-white font-semibold text-sm rounded-md py-[6px] px-4 bg-secondary flex justify-center sm:justify-between items-center gap-x-3">
                                     <FiEdit />
                                     <span>Edit</span>
                                 </button>}
                                 {/* Reset Password */}
-                                <button type="button" className="text-white font-semibold text-sm rounded-md py-[6px] px-4 bg-secondary flex justify-between items-center gap-x-3" onClick={openModal}>
+                                <button type="button" className="text-white font-semibold text-sm rounded-md py-[6px] px-4 bg-secondary flex justify-center sm:justify-between items-center gap-x-3" onClick={openModal}>
                                     <MdOutlineLockReset size={18} />
                                     <span>Reset Password</span>
                                 </button>
@@ -148,7 +163,7 @@ export default function Profile() {
                                 { label: "Female", value: "1" },
                                 { label: "Others", value: "0" },
                             ]} />
-                            
+
                             {/* Custom Fields */}
                             {customFieldData && Array.from(customFieldData).map(value => {
                                 const [id, field] = value;
