@@ -25,7 +25,8 @@ export default function Event() {
         (async function () {
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setRegistrations(await eventRole.fetchRegistrations());
-            setOptionalFields(await eventRole.event.getOptionalCustomFields());
+            const optionalFields = await eventRole.event.getOptionalCustomFields();
+            setOptionalFields(optionalFields);
             setEventRole(eventRole);
         })();
     }, []);
@@ -55,6 +56,10 @@ export default function Event() {
                         <RegistrationDateRange eventRole={eventRole} />
                     </div>
                 </header>
+                <div className="text-center min-w-[180px] max-w-[180px] lg:hidden mt-6">
+                    <RegistrationButton eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
+                    <RegistrationDateRange eventRole={eventRole} />
+                </div>
                 {/* Information */}
                 <div className="grid grid-cols-4 lg:flex lg:flex-row gap-4 w-full mt-6">
                     {/* Registered */}
@@ -101,7 +106,7 @@ export default function Event() {
                 {/* Custom Fields */}
                 <div className="mt-6">
                     {Object.keys(optionalFields!).map(key => <div className="mb-6">
-                        <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1]}</h1>
+                        <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1].split("-").join(" ")}</h1>
                         <p className="text-black/70">{optionalFields![key]}</p>
                     </div>)}
                 </div>
@@ -133,18 +138,18 @@ function RegistrationButton(props: EventRoleFieldProp) {
         else swal("An error has occurred while registering.\nPlease contact an administrator.", { icon: "error" });
         setIsLoading(false);
     }
-    
+
     // Whether they have already registered
     const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ?? null;
     // Whether they're within the registration date time and it's before the event ends
-    const withinDate =  Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
+    const withinDate = Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
     // If there's even space in the first place
     const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
 
     return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || !(!registered) || !withinDate || !hasSpace} onClick={handleClick}>
-        {isLoading ? "Loading..." : 
+        {isLoading ? "Loading..." :
             registered ? registered["status_id:name"] == RegistrationStatus.Unapproved ? "Unapproved" : registered["status_id:name"] == RegistrationStatus.ApprovalRequired ? "Pending" : "Registered"
-            : (!withinDate || !hasSpace) ? "Closed" : "Sign Up" }
+                : (!withinDate || !hasSpace) ? "Closed" : "Sign Up"}
     </button>
 }
 

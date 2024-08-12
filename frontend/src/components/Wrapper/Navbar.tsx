@@ -110,6 +110,10 @@ export default function Navbar(props: NavbarProps) {
                             Profile
                         </div>
                     </Link>
+                    <button onClick={openModal} className="hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                        <PiSignOutBold />
+                        <span>Sign Out</span>
+                    </button>
                 </div>
             </>}
         </nav>
