@@ -52,7 +52,7 @@ export default function Events() {
                 if (roleFieldName) {
                     // If there isn't already a search query, or if there's a value and the specified query has no value
                     const value = contact[`Volunteer_Contact_Details.${field.name}`] as any[];
-                    if (value.length && (!searchParams.size || !searchParams.get(`Volunteer_Event_Role_Details.${roleFieldName}`))) {
+                    if (value.length && (!searchParams.size || !searchParams.get(`Volunteer_Event_Role_Details.${roleFieldName}`)) && roleFieldName) {
                         updateSearchParams = true;
                         searchParams.set(`Volunteer_Event_Role_Details.${roleFieldName}`, JSON.stringify(value));
                     }
@@ -62,7 +62,7 @@ export default function Events() {
                 if (!searchParams.size || detailFieldName) {
                     // If there isn't alreayd a search query, or if there's a value and the specific query has no value
                     const value = contact[`Volunteer_Contact_Details.${field.name}`] as any[];
-                    if (value?.length && !searchParams.get(`Volunteer_Contact_Details.${detailFieldName}`)) {
+                    if (value?.length && !searchParams.get(`Volunteer_Contact_Details.${detailFieldName}`) && detailFieldName) {
                         updateSearchParams = true;
                         searchParams.set(`Volunteer_Event_Details.${detailFieldName}`, JSON.stringify(value));
                     }
