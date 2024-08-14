@@ -22,17 +22,12 @@ const EventRoleManager = new class EventRoleManager {
         if (options?.id) where.push(["id", "=", options.id]);
         else {
             if (options?.search) where.push(["event.subject", "CONTAINS", options.search]);
-            if (options?.startDate) {
-                const startDate = JSON.parse(options.startDate);
-                where.push(
-                    ["activity_date_time", ">=", `${moment(startDate).format("YYYY-MM-DD")} 00:00:00`],
-                    ["activity_date_time", "<=", `${moment(options.endDate ? JSON.parse(options.endDate) : startDate).format("YYYY-MM-DD")} 23:59:59`]
-                );
-            }
-            else if (options?.endDate) {
-                const endDate = JSON.parse(options.endDate);
-                where.push(["event.activity_date_time", "<=", `${moment(endDate).format("YYYY-MM-DD")} 23:59:59`]);
-            }
+            // If the start date is provided
+            if (options?.startDate) where.push(["activity_date_time", ">=", `${moment(JSON.parse(options.startDate)).format("YYYY-MM-DD")} 00:00:00`]);
+            // Else just make it show all activities that are avialable after today
+            else where.push(["activity_date_time", ">=", `${moment(new Date()).format("YYYY-MM-DD")} 00:00:00`]);
+            // If the end date is provided
+            if (options?.endDate) where.push(["event.activity_date_time", "<=", `${moment(JSON.parse(options.endDate)).format("YYYY-MM-DD")} 23:59:59`]);
         }
 
         for (const key in options) {
@@ -58,7 +53,7 @@ const EventRoleManager = new class EventRoleManager {
                 "event.location",
                 "event.status_id:name",
                 "event.Volunteer_Event_Details.*",
-                
+
                 "thumbnail.uri"
             ],
             join: [
