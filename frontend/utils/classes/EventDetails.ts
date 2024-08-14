@@ -13,7 +13,6 @@ interface MandatoryCustomEventDetailProps {
 
 export interface EventDetailProps extends MandatoryCustomEventDetailProps {
     id: number | null;
-    activity_date_time: string | null;
     subject: string | null;
     duration: number | null;
     details: string | null;
@@ -24,7 +23,6 @@ export interface EventDetailProps extends MandatoryCustomEventDetailProps {
 
 export class EventDetails implements EventDetailProps {
     public id: number | null = null;
-    public activity_date_time: string | null = null;
     public subject: string | null = null;
     public duration: number | null = null;
     public details: string | null = null;
@@ -55,8 +53,10 @@ export class EventDetails implements EventDetailProps {
         
         const result: { [key: string]: any } = {};
         for (const key of customKeys) {
-            const data = datas.find(d => d.name == `Volunteer_Event_Details_${key.split("Volunteer_Event_Details.")[1]}` && d["option.value"] == this[key as keyof EventDetails]);
-            result[key] = data ? data["option.label"] : this[key as keyof EventDetails]
+            if (key.startsWith("Volunteer_Event_Details.")) {
+                const data = datas.find(d => d.name == `Volunteer_Event_Details_${key.split("Volunteer_Event_Details.")[1]}` && d["option.value"] == this[key as keyof EventDetails]);
+                result[key] = data ? data["option.label"] : this[key as keyof EventDetails]    
+            }
         }
         return result;
     }
