@@ -17,7 +17,7 @@ export interface EventDetailProps extends MandatoryCustomEventDetailProps {
     duration: number | null;
     details: string | null;
     location: string | null;
-    thumbnail: string | null;
+    "thumbnail.uri": string | null;
     "status_id:name": null | EventStatus;
 }
 
@@ -27,7 +27,7 @@ export class EventDetails implements EventDetailProps {
     public duration: number | null = null;
     public details: string | null = null;
     public location: string | null = null;
-    public thumbnail: string | null = null;
+    public "thumbnail.uri": string | null = null;
     public "status_id:name": null | EventStatus = null;
 
     public "Volunteer_Event_Details.Attendance_Code": string | null = null;
