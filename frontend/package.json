@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
+    "@types/pluralize": "^0.0.33",
     "@types/progressbar.js": "^1.1.7",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
