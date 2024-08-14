@@ -37,8 +37,8 @@ export default function Event() {
             <div className="bg-white rounded-md mt-4 py-6 px-4 max-w-[1400px]">
                 {/* Image */}
                 <div className="mb-8 h-[200px] rounded-lg relative bg-gray-200">
-                    {eventRole.event.thumbnail ?
-                        <img src={`${config.domain}/wp-content/uploads/civicrm/custom/${eventRole.event.thumbnail}`} className="w-full h-full object-cover rounded-lg" /> :
+                    {eventRole.event["thumbnail.uri"] ?
+                        <img src={`${config.domain}/wp-content/uploads/civicrm/custom/${eventRole.event["thumbnail.uri"]}`} className="w-full h-full object-cover rounded-lg" /> :
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                             <CiFileOff className="text-[80px] text-gray-500" />
                         </div>}
@@ -150,7 +150,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
     const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
    
     // If the event is still ongoing
-    const eventOngoing = Date.now() >= new Date(props.eventRole.activity_date_time!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
+    const eventEnded = Date.now() > new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
 
     let content = "";
     // If they have registered
@@ -161,7 +161,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
             // If they have been unapproved
             if (registered["status_id:name"] == RegistrationStatus.Unapproved) content = "Unapproved";
             // If the event is now closed
-            else if (!eventOngoing) content = "Closed";
+            else if (!eventEnded) content = "Closed";
             else {
                 // If approval is required
                 if (registered["status_id:name"] == RegistrationStatus.ApprovalRequired) content = "Pending";
@@ -171,11 +171,11 @@ function RegistrationButton(props: EventRoleFieldProp) {
     }
     else {
         // If they can still register
-        if (canRegister && hasSpace && eventOngoing) content = "Sign Up";
+        if (canRegister && hasSpace) content = "Sign Up";
         else content = "Closed";
     }
-
-    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || !(!registered) || !canRegister || !hasSpace || !eventOngoing} onClick={handleClick}>
+    
+    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || registered != null || !canRegister || !hasSpace || eventEnded} onClick={handleClick}>
         {isLoading ? "Loading..." : content}
     </button>
 }
