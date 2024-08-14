@@ -175,8 +175,6 @@ function RegistrationButton(props: EventRoleFieldProp) {
         else content = "Closed";
     }
 
-    console.log(registered);
-
     return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || !(!registered) || !canRegister || !hasSpace || !eventOngoing} onClick={handleClick}>
         {isLoading ? "Loading..." : content}
     </button>
