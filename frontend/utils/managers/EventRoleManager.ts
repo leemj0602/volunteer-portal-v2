@@ -12,6 +12,7 @@ export interface FetchOptions {
     page?: number;
     [key: string]: any;
     select?: string[];
+    where?: [string, ComparisonOperator, any][];
 }
 
 const EventRoleManager = new class EventRoleManager {
@@ -19,15 +20,18 @@ const EventRoleManager = new class EventRoleManager {
 
     async fetch(options?: FetchOptions): Promise<EventRole | EventRole[]> {
         const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Event Role"]];
-        if (options?.id) where.push(["id", "=", options.id]);
+        if (options?.where) where.push(...options.where);
         else {
-            if (options?.search) where.push(["event.subject", "CONTAINS", options.search]);
-            // If the start date is provided
-            if (options?.startDate) where.push(["activity_date_time", ">=", `${moment(JSON.parse(options.startDate)).format("YYYY-MM-DD")} 00:00:00`]);
-            // Else just make it show all activities that are avialable after today
-            else where.push(["activity_date_time", ">=", `${moment(new Date()).format("YYYY-MM-DD")} 00:00:00`]);
-            // If the end date is provided
-            if (options?.endDate) where.push(["event.activity_date_time", "<=", `${moment(JSON.parse(options.endDate)).format("YYYY-MM-DD")} 23:59:59`]);
+            if (options?.id) where.push(["id", "=", options.id]);
+            else {
+                if (options?.search) where.push(["event.subject", "CONTAINS", options.search]);
+                // If the start date is provided
+                if (options?.startDate) where.push(["activity_date_time", ">=", `${moment(JSON.parse(options.startDate)).format("YYYY-MM-DD")} 00:00:00`]);
+                // Else just make it show all activities that are avialable after today
+                else where.push(["activity_date_time", ">=", `${moment(new Date()).format("YYYY-MM-DD")} 00:00:00`]);
+                // If the end date is provided
+                if (options?.endDate) where.push(["event.activity_date_time", "<=", `${moment(JSON.parse(options.endDate)).format("YYYY-MM-DD")} 23:59:59`]);
+            }
         }
 
         for (const key in options) {
@@ -69,44 +73,14 @@ const EventRoleManager = new class EventRoleManager {
     }
 
     async fetchUnregistered(registeredEventRoles: number[]) {
-        // console.log(registeredEventRoles);
         const now = new Date();
         const formattedNow = format(now, "yyyy-MM-dd HH:mm:ss");
-        const response = await CRM("Activity", "get", {
-            select: [
-                "activity_date_time",
-                "duration",
-                "status_id:name",
-
-                "Volunteer_Event_Role_Details.*",
-                "Volunteer_Event_Role_Details.Role:label",
-
-                "event.id",
-                "event.activity_date_time",
-                "event.subject",
-                "event.duration",
-                "event.details",
-                "event.location",
-                "event.status_id:name",
-                "event.Volunteer_Event_Details.*",
-
-                "thumbnail.uri"
-            ],
-            join: [
-                ["Activity AS event", "LEFT", ["event.id", "=", "Volunteer_Event_Role_Details.Event"]],
-                ["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "event.Volunteer_Event_Details.Thumbnail"]]
-            ],
+        return await this.fetch({
             where: [
-                ["activity_type_id:name", "=", "Volunteer Event Role"],
-                ['activity_date_time', '>', formattedNow],
-                ['id', 'NOT IN', registeredEventRoles],
-            ],
-            order: [
-                ['activity_date_time', 'ASC'],
-            ],
-            limit: 3,
-        });
-        return response?.data.map((r: EventRoleProps) => new EventRole(r));
+                ["activity_date_time", ">", formattedNow],
+                ["id", "NOT IN", registeredEventRoles]
+            ]
+        }) as EventRole[];
     }
 
 };
