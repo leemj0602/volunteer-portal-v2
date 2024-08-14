@@ -24,7 +24,11 @@ export default function UpcomingEvents({ eventRoles }: UpcomingEventsProps) {
         <a className="text-blue-500 hover:text-blue-700 text-lg font-medium cursor-pointer" onClick={() => { navigate('/events') }}>View All Events &gt;</a>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
-        {eventRoles ? eventRoles.map((event: any) => <EventRoleCard className="flex justify-center" eventRole={event} />) : <p className="text-lg text-gray-500">Looks like there aren't any upcoming events</p>}
+        {eventRoles && eventRoles.length > 0 ? (
+          eventRoles.map((event: any) => <EventRoleCard className="flex justify-center" eventRole={event} />)
+        ) : (
+          <p className="text-lg text-gray-500">Looks like there aren't any upcoming events</p>
+        )}
       </div>
     </div>
   );
