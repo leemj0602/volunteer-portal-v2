@@ -29,7 +29,7 @@ const EventRegistrationManager = new class EventRegistrationManager {
                 ["Contact AS contact", "LEFT", ["target_contact_id", "=", "contact.id"]],
                 ["Activity AS eventRole", "LEFT", ["Volunteer_Event_Registration_Details.Event_Role", "=", "eventRole.id"]],
                 ["Activity AS event", "LEFT", ["eventRole.Volunteer_Event_Role_Details.Event", "=", "event.id"]],
-                ["Activity AS attendance", "LEFT", 
+                ["Activity AS attendance", "LEFT",
                     ["attendance.Volunteer_Event_Attendance_Details.Event_Role", "=", "eventRole.id"],
                     ["attendance.target_contact_id", "=", "contact.id"]
                 ]
@@ -49,10 +49,37 @@ const EventRegistrationManager = new class EventRegistrationManager {
                 ['id', '=', registrationActivityId],
             ]
         });
-    
+
         return cancel?.data.length > 0;
     }
-    
+
+    async checkAttendanceCode(eventId: number, attendanceCode: string) {
+        const check = await CRM('Activity', 'get', {
+            select: [
+                'subject',
+            ],
+            where: [
+                ['id', '=', eventId],
+                ['Volunteer_Event_Details.Attendance_Code', '=', attendanceCode]
+            ],
+        });
+
+        return check?.data;
+    }
+
+    async createAttendance(contactId: number, eventRoleId: number, duration: number) {
+        const response = await CRM("Activity", "create", {
+            values: [
+                ["activity_type_id:name", "Volunteer Event Attendance"],
+                ["target_contact_id", [contactId]],
+                ["source_contact_id", contactId],
+                ["duration", duration],
+                ["Volunteer_Event_Attendance_Details.Event_Role", eventRoleId],
+            ]
+        });
+
+        return response?.data.length > 0;
+    }
 }
 
 export default EventRegistrationManager;
