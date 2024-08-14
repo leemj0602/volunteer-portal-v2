@@ -7,6 +7,7 @@ import moment from "moment";
 import { GrGroup, GrLocation } from "react-icons/gr";
 import { IoBriefcaseOutline } from "react-icons/io5";
 import { Spinner } from "flowbite-react";
+import config from "../../../../config";
 
 interface EventRoleCardProps {
     eventRole: EventRole;
@@ -23,8 +24,8 @@ export default function EventRoleCard(props: EventRoleCardProps) {
 
     return <Card
         className={props.className}
-        thumbnail={props.eventRole.event["thumbnail.uri"]}
-        url={props.url ?? `/v1/events/${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}
+        thumbnail={props.eventRole.event.thumbnail}
+        url={props.url ?? `/v${config.version}/events/${config.version == 1 ? props.eventRole.id : `${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}`}
     >
         <h1 className="font-semibold mb-4">{props.eventRole.event.subject}</h1>
         <div className="grid grid-rows-1 gap-y-2 text-black/70">
@@ -36,6 +37,11 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                     <span className="text-sm mx-1">-</span>
                     {moment(new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60 * 1000)).format("h:mma")}
                 </span>
+            </div>
+            {/* Location */}
+            <div className="gap-x-3 flex items-center">
+                <GrLocation className="text-secondary" />
+                <span className="text-sm font-semibold">{props.eventRole.location ?? props.eventRole.event.location}</span>
             </div>
             {/* Role */}
             <div className="gap-x-3 flex items-center">
