@@ -24,7 +24,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
 
     return <Card
         className={props.className}
-        thumbnail={props.eventRole.event.thumbnail}
+        thumbnail={props.eventRole.event["thumbnail.uri"]}
         url={props.url ?? `/v${config.version}/events/${config.version == 1 ? props.eventRole.id : `${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}`}
     >
         <h1 className="font-semibold mb-4">{props.eventRole.event.subject}</h1>
