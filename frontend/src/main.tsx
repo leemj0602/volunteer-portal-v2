@@ -4,8 +4,8 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import "./main.css";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
-import Events from "./pages/Events";
-import Event from "./pages/Event";
+import Events from "./pages/v1/Events";
+import Event from "./pages/v1/Event";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
@@ -13,8 +13,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 			<Routes>
 				<Route index path="/" element={<Home />} />
 				<Route path="/profile" element={<Profile />} />
-				<Route path="/events" element={<Events />} />
-				<Route path="/events/:id" element={<Event />} />
+				<Route path="/v1/events" element={<Events />} />
+				<Route path="/v1/events/:id" element={<Event />} />
 			</Routes>
 		</HashRouter>
 	</React.StrictMode>

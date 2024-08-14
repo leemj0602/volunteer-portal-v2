@@ -2,7 +2,6 @@ import { useEffect, useState } from "react"
 import ContactManager from "../../utils/managers/ContactManager";
 import EventRoleManager from "../../utils/managers/EventRoleManager";
 import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
-import CustomFieldSetManager, { CustomField } from "../../utils/managers/CustomFieldSetManager";
 import { Contact } from "../../utils/classes/Contact";
 import { EventRole } from "../../utils/classes/EventRole";
 import config from "../../../config";
