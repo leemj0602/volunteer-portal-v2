@@ -105,10 +105,12 @@ export default function Event() {
                 </div>
                 {/* Custom Fields */}
                 <div className="mt-6">
-                    {Object.keys(optionalFields!).map(key => <div className="mb-6">
-                        <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1].split("-").join(" ")}</h1>
-                        <p className="text-black/70">{optionalFields![key]}</p>
-                    </div>)}
+                    {Object.keys(optionalFields!).map(key => {
+                        return <div className="mb-6">
+                            <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1].split("-").join(" ")}</h1>
+                            <p className="text-black/70">{optionalFields![key]}</p>
+                        </div>
+                    })}
                 </div>
             </div>
         </div>}
@@ -142,14 +144,41 @@ function RegistrationButton(props: EventRoleFieldProp) {
     // Whether they have already registered
     const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ?? null;
     // Whether they're within the registration date time and it's before the event ends
-    const withinDate = Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
+    const canRegister = Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime();
+   
     // If there's even space in the first place
     const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
+   
+    // If the event is still ongoing
+    const eventOngoing = Date.now() >= new Date(props.eventRole.activity_date_time!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
 
-    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || !(!registered) || !withinDate || !hasSpace} onClick={handleClick}>
-        {isLoading ? "Loading..." :
-            registered ? registered["status_id:name"] == RegistrationStatus.Unapproved ? "Unapproved" : registered["status_id:name"] == RegistrationStatus.ApprovalRequired ? "Pending" : "Registered"
-                : (!withinDate || !hasSpace) ? "Closed" : "Sign Up"}
+    let content = "";
+    // If they have registered
+    if (registered) {
+        // If they have attended
+        if (registered.attendance) content = "Attended";
+        else {
+            // If they have been unapproved
+            if (registered["status_id:name"] == RegistrationStatus.Unapproved) content = "Unapproved";
+            // If the event is now closed
+            else if (!eventOngoing) content = "Closed";
+            else {
+                // If approval is required
+                if (registered["status_id:name"] == RegistrationStatus.ApprovalRequired) content = "Pending";
+                else content = "Registered";
+            }
+        }
+    }
+    else {
+        // If they can still register
+        if (canRegister && hasSpace && eventOngoing) content = "Sign Up";
+        else content = "Closed";
+    }
+
+    console.log(registered);
+
+    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || !(!registered) || !canRegister || !hasSpace || !eventOngoing} onClick={handleClick}>
+        {isLoading ? "Loading..." : content}
     </button>
 }
 
