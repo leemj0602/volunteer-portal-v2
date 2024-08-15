@@ -107,7 +107,7 @@ export default function Navbar(props: NavbarProps) {
                             Dashboard
                         </div>
                     </Link>
-                    <Link to={`/events`}>
+                    <Link to={`/${config.domain}/events`}>
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             All Events
                         </div>
