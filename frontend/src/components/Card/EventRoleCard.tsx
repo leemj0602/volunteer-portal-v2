@@ -8,6 +8,7 @@ import { GrGroup, GrLocation } from "react-icons/gr";
 import { IoBriefcaseOutline } from "react-icons/io5";
 import { Spinner } from "flowbite-react";
 import config from "../../../../config";
+import { EventStatus } from "../../../utils/classes/EventDetails";
 
 interface EventRoleCardProps {
     eventRole: EventRole;
@@ -26,6 +27,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
         className={props.className}
         thumbnail={props.eventRole.event["thumbnail.uri"]}
         url={props.url ?? `/v${config.version}/events/${config.version == 1 ? props.eventRole.id : `${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}`}
+        cancelled={props.eventRole["status_id:name"] == EventStatus.Cancelled}
     >
         <h1 className="font-semibold mb-4">{props.eventRole.event.subject}</h1>
         <div className="grid grid-rows-1 gap-y-2 text-black/70">
