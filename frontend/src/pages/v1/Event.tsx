@@ -88,9 +88,9 @@ export default function Event() {
                         <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
                             <FiCalendar size={22} />
                             <div className="flex flex-col sm:flex-row gap-x-3">
-                                <span>{moment(eventRole.activity_date_time).format("D MMM YYYY, h:mm A")}</span>
+                                <span>{moment(eventRole.activity_date_time).format("D MMM YYYY, HH:mm")}</span>
                                 <span className="hidden sm:block">-</span>
-                                <span>{moment(new Date(eventRole.activity_date_time!).getTime() + (eventRole.duration! * 60 * 1000)).format("D MMM YYYY, h:mm A")}</span>
+                                <span>{moment(new Date(eventRole.activity_date_time!).getTime() + (eventRole.duration! * 60 * 1000)).format("D MMM YYYY, HH:mm")}</span>
                             </div>
                         </div>
                     </div>
