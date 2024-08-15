@@ -30,7 +30,7 @@ const EventRoleManager = new class EventRoleManager {
                 // Else just make it show all activities that are avialable after today
                 else where.push(["activity_date_time", ">=", `${moment(new Date()).format("YYYY-MM-DD")} 00:00:00`]);
                 // If the end date is provided
-                if (options?.endDate) where.push(["event.activity_date_time", "<=", `${moment(JSON.parse(options.endDate)).format("YYYY-MM-DD")} 23:59:59`]);
+                if (options?.endDate) where.push(["activity_date_time", "<=", `${moment(JSON.parse(options.endDate)).format("YYYY-MM-DD")} 23:59:59`]);
             }
         }
 
