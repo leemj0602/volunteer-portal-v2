@@ -68,12 +68,12 @@ export default function Navbar(props: NavbarProps) {
                             <span>All Events</span>
                         </div>
                     </Link>
-                    {/* <Link to="/trainings">
+                    <Link to="/trainings">
                         <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             <FaChalkboardTeacher />
                             <span>Trainings</span>
                         </div>
-                    </Link> */}
+                    </Link>
                     <Link to="/profile">
                         <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             <CgProfile />
@@ -112,11 +112,11 @@ export default function Navbar(props: NavbarProps) {
                             All Events
                         </div>
                     </Link>
-                    {/* <Link to="/trainings">
+                    <Link to="/trainings">
                         <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             Trainings
                         </div>
-                    </Link> */}
+                    </Link>
                     <Link to="/profile">
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             Profile
