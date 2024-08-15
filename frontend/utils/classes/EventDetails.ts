@@ -1,4 +1,5 @@
-import CRM from "../crm";
+import CRM, { ComparisonOperator } from "../crm";
+import EventRoleManager from "../managers/EventRoleManager";
 
 export enum EventStatus {
     Scheduled = "Scheduled",
@@ -59,6 +60,16 @@ export class EventDetails implements EventDetailProps {
             }
         }
         return result;
+    }
+
+    async fetchEventRoles(roleId: string) {
+        return await EventRoleManager.fetch({
+            where: [
+                ["activity_type_id:name", "=", "Volunteer Event Role"],
+                ["Volunteer_Event_Role_Details.Event", "=", this.id],
+                ["Volunteer_Event_Role_Details.Role", "=", roleId]
+            ],
+        });
     }
 }
 
