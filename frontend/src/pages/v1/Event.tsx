@@ -1,17 +1,17 @@
 import { useParams } from "react-router-dom";
-import Wrapper from "../components/Wrapper";
+import Wrapper from "../../components/Wrapper";
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
-import { EventRole } from "../../utils/classes/EventRole";
-import EventRoleManager from "../../utils/managers/EventRoleManager";
-import Loading from "../components/Loading";
-import config from "../../../config";
+import { EventRole } from "../../../utils/classes/EventRole";
+import EventRoleManager from "../../../utils/managers/EventRoleManager";
+import Loading from "../../components/Loading";
+import config from "../../../../config";
 import { CiFileOff } from "react-icons/ci";
 import moment from "moment";
 import { MdPeopleAlt } from "react-icons/md";
 import { GrLocation } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
 import { IoMdBriefcase } from "react-icons/io";
-import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
+import { EventRegistration, RegistrationStatus } from "../../../utils/classes/EventRegistration";
 import swal from "sweetalert";
 
 export default function Event() {
@@ -37,8 +37,8 @@ export default function Event() {
             <div className="bg-white rounded-md mt-4 py-6 px-4 max-w-[1400px]">
                 {/* Image */}
                 <div className="mb-8 h-[200px] rounded-lg relative bg-gray-200">
-                    {eventRole.event.thumbnail ?
-                        <img src={`${config.domain}/wp-content/uploads/civicrm/custom/${eventRole.event.thumbnail}`} className="w-full h-full object-cover rounded-lg" /> :
+                    {eventRole.event["thumbnail.uri"] ?
+                        <img src={`${config.domain}/wp-content/uploads/civicrm/custom/${eventRole.event["thumbnail.uri"]}`} className="w-full h-full object-cover rounded-lg" /> :
                         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                             <CiFileOff className="text-[80px] text-gray-500" />
                         </div>}
@@ -88,9 +88,9 @@ export default function Event() {
                         <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
                             <FiCalendar size={22} />
                             <div className="flex flex-col sm:flex-row gap-x-3">
-                                <span>{moment(eventRole.activity_date_time).format("D MMM YYYY, h:mm A")}</span>
+                                <span>{moment(eventRole.activity_date_time).format("D MMM YYYY, HH:mm")}</span>
                                 <span className="hidden sm:block">-</span>
-                                <span>{moment(new Date(eventRole.activity_date_time!).getTime() + (eventRole.duration! * 60 * 1000)).format("D MMM YYYY, h:mm A")}</span>
+                                <span>{moment(new Date(eventRole.activity_date_time!).getTime() + (eventRole.duration! * 60 * 1000)).format("D MMM YYYY, HH:mm")}</span>
                             </div>
                         </div>
                     </div>
@@ -105,10 +105,12 @@ export default function Event() {
                 </div>
                 {/* Custom Fields */}
                 <div className="mt-6">
-                    {Object.keys(optionalFields!).map(key => <div className="mb-6">
-                        <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1].split("-").join(" ")}</h1>
-                        <p className="text-black/70">{optionalFields![key]}</p>
-                    </div>)}
+                    {Object.keys(optionalFields!).map(key => {
+                        return <div className="mb-6">
+                            <h1 className="font-bold mb-2 text-black/70">{key.split("Volunteer_Event_Details.")[1].split("-").join(" ")}</h1>
+                            <p className="text-black/70">{optionalFields![key]}</p>
+                        </div>
+                    })}
                 </div>
             </div>
         </div>}
@@ -142,14 +144,39 @@ function RegistrationButton(props: EventRoleFieldProp) {
     // Whether they have already registered
     const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ?? null;
     // Whether they're within the registration date time and it's before the event ends
-    const withinDate = Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime() && Date.now() <= new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
+    const canRegister = Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime();
+   
     // If there's even space in the first place
     const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
+   
+    // If the event is still ongoing
+    const eventEnded = Date.now() > new Date(props.eventRole.activity_date_time!).getTime() + (props.eventRole.duration! * 60_000);
 
-    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || !(!registered) || !withinDate || !hasSpace} onClick={handleClick}>
-        {isLoading ? "Loading..." :
-            registered ? registered["status_id:name"] == RegistrationStatus.Unapproved ? "Unapproved" : registered["status_id:name"] == RegistrationStatus.ApprovalRequired ? "Pending" : "Registered"
-                : (!withinDate || !hasSpace) ? "Closed" : "Sign Up"}
+    let content = "";
+    // If they have registered
+    if (registered) {
+        // If they have attended
+        if (registered.attendance) content = "Attended";
+        else {
+            // If they have been unapproved
+            if (registered["status_id:name"] == RegistrationStatus.Unapproved) content = "Unapproved";
+            // If the event is now closed
+            else if (!eventEnded) content = "Closed";
+            else {
+                // If approval is required
+                if (registered["status_id:name"] == RegistrationStatus.ApprovalRequired) content = "Pending";
+                else content = "Registered";
+            }
+        }
+    }
+    else {
+        // If they can still register
+        if (canRegister && hasSpace) content = "Sign Up";
+        else content = "Closed";
+    }
+    
+    return <button className="text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary" disabled={isLoading || registered != null || !canRegister || !hasSpace || eventEnded} onClick={handleClick}>
+        {isLoading ? "Loading..." : content}
     </button>
 }
 

@@ -1,4 +1,4 @@
-import EventRoleCard from "../components/EventRoleCard";
+import EventRoleCard from "./Card/EventRoleCard";
 import { EventRole, EventRoleProps } from "../../utils/classes/EventRole";
 import { useNavigate } from "react-router-dom";
 

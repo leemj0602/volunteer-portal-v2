@@ -15,9 +15,12 @@ if (is_user_logged_in()) {
   $email = $user -> user_email;
 }
 else {
-    $login_url = wp_login_url('http://localhost/wordpress/portal');
-    wp_redirect($login_url);
-    exit;
+  echo '<script type="text/javascript">
+          var currentUrl = window.location.href;
+          var encodedUrl = encodeURIComponent(currentUrl);
+          window.location.href = "' . wp_login_url() . '?redirect_to=" + encodedUrl;
+        </script>';
+  exit;
 }
 ?>`;
 

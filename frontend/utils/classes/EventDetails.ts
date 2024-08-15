@@ -1,4 +1,5 @@
-import CRM from "../crm";
+import CRM, { ComparisonOperator } from "../crm";
+import EventRoleManager from "../managers/EventRoleManager";
 
 export enum EventStatus {
     Scheduled = "Scheduled",
@@ -13,23 +14,21 @@ interface MandatoryCustomEventDetailProps {
 
 export interface EventDetailProps extends MandatoryCustomEventDetailProps {
     id: number | null;
-    activity_date_time: string | null;
     subject: string | null;
     duration: number | null;
     details: string | null;
     location: string | null;
-    thumbnail: string | null;
+    "thumbnail.uri": string | null;
     "status_id:name": null | EventStatus;
 }
 
 export class EventDetails implements EventDetailProps {
     public id: number | null = null;
-    public activity_date_time: string | null = null;
     public subject: string | null = null;
     public duration: number | null = null;
     public details: string | null = null;
     public location: string | null = null;
-    public thumbnail: string | null = null;
+    public "thumbnail.uri": string | null = null;
     public "status_id:name": null | EventStatus = null;
 
     public "Volunteer_Event_Details.Attendance_Code": string | null = null;
@@ -55,10 +54,22 @@ export class EventDetails implements EventDetailProps {
         
         const result: { [key: string]: any } = {};
         for (const key of customKeys) {
-            const data = datas.find(d => d.name == `Volunteer_Event_Details_${key.split("Volunteer_Event_Details.")[1]}` && d["option.value"] == this[key as keyof EventDetails]);
-            result[key] = data ? data["option.label"] : this[key as keyof EventDetails]
+            if (key.startsWith("Volunteer_Event_Details.")) {
+                const data = datas.find(d => d.name == `Volunteer_Event_Details_${key.split("Volunteer_Event_Details.")[1]}` && d["option.value"] == this[key as keyof EventDetails]);
+                result[key] = data ? data["option.label"] : this[key as keyof EventDetails]    
+            }
         }
         return result;
+    }
+
+    async fetchEventRoles(roleId: string) {
+        return await EventRoleManager.fetch({
+            where: [
+                ["activity_type_id:name", "=", "Volunteer Event Role"],
+                ["Volunteer_Event_Role_Details.Event", "=", this.id],
+                ["Volunteer_Event_Role_Details.Role", "=", roleId]
+            ],
+        });
     }
 }
 
