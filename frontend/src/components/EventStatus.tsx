@@ -248,7 +248,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
                                 ? "text-gray-400 cursor-not-allowed"
                                 : "hover:bg-gray-100 cursor-pointer"
                                 }`}
-                              onClick={() => navigate(`/events/${eventRegistration.eventRoleId}`)}>
+                              onClick={() => navigate(`/v1/events/${eventRegistration.eventRoleId}`)}>
                               <GrView className="mr-2" /> View
                             </li>
                             <li
