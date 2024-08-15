@@ -50,12 +50,18 @@ export default function Profile() {
         updated.first_name = name.split(" ")[0];
         updated.last_name = name.split(" ").splice(1, name.split(" ").length).join(" ");
 
-        const data = await ContactManager.update(email, updated);
-        swal("Successfully updated profile", { icon: "success" });
+        const result = await ContactManager.update(email, updated);
+        if (result) {
+            swal("Successfully updated profile", { icon: "success" });
+            setContact(new Contact(updated));
+            setUnsavedContact(new Contact(updated));
+        }
+        else {
+            swal("An error has occurred. Please try again.", { icon: "error" });
+            setContact(unsavedContact);
+        }
 
         setIsSaving(false);
-        setContact(data);
-        setUnsavedContact(data);
         setIsEditing(false);
     }
 

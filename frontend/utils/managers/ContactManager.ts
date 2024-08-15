@@ -23,11 +23,11 @@ const ContactManager = new class ContactManager {
     }
 
     async update(email: string, props: Partial<Contact>) {
-        const response = await CRM(this.entity, "update", {
+        const result = await CRM(this.entity, "update", {
             where: [["email_primary.email", "=", email]],
             values: Object.keys(props).map((p) => ([p, props[p]]))
-        })
-        return new Contact(response!.data[0]);
+        }).catch(() => null);
+        return result != null;
     }
 }
 
