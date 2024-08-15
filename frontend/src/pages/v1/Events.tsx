@@ -11,6 +11,8 @@ import EventRoleCard from "../../components/Card/EventRoleCard";
 import DropdownButton from "../../components/DropdownButton";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { ComparisonOperator } from "../../../utils/crm";
+import moment from "moment";
 
 const limit = 9;
 export default function Events() {
@@ -86,13 +88,20 @@ export default function Events() {
         searchParams.forEach((v, k) => customFields[k] = v);
 
         // Fetching the total number of event role documents that matches the where query
-        const total = (await EventRoleManager.fetch({
-            ...customFields,
-            search: searchParams.get("search"),
-            startDate: searchParams.get("startDate"),
-            endDate: searchParams.get("endDate"),
-            select: ["id"]
-        })).length;
+        const where: [string, ComparisonOperator, any][] = [];
+        if (searchParams.get("search")) where.push(["event.subject", "CONTAINS", searchParams.get("search")]);
+        if (searchParams.get("startDate")) where.push(["activity_date_time", ">=", moment(JSON.parse(searchParams.get("startDate")!)).format("YYYY-MM-DD 00:00:00")]);
+        else where.push(["activity_date_time", ">=", moment(new Date()).format("YYYY-MM-DD 00:00:00")]);
+        if (searchParams.get("endDate")) where.push(["activity_date_time", "<=", moment(JSON.parse(searchParams.get("endDate")!)).format("YYYY-MM-DD 23:59:59")]);
+
+        for (const key in customFields) {
+            if (!key.includes("undefined")){
+                if (key.startsWith("Volunteer_Event_Details")) where.push([`event.${key}`, "IN", JSON.parse(customFields[key] ?? "[]")]);
+                else if (key.startsWith("Volunteer_Event_Role_Details")) where.push([key, "IN", JSON.parse(customFields[key] ?? "[]")]);    
+            }
+        }
+
+        const total = (await EventRoleManager.fetch({ where, select: ["id"] })).length;
 
         // Get the total number of pages based on the total documents / limit
         const pages = Math.round(total / limit);
@@ -104,13 +113,7 @@ export default function Events() {
         if (page < 1) page = 1;
 
         // Get event roles for the specific page and where query
-        const eventRoles = await EventRoleManager.fetch({
-            ...customFields,
-            search: searchParams.get("search"),
-            startDate: searchParams.get("startDate"),
-            endDate: searchParams.get("endDate"),
-            page, limit,
-        });
+        const eventRoles = await EventRoleManager.fetch({ where, page, limit });
 
         setEventRoles(eventRoles as EventRole[]);
     }

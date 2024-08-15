@@ -5,12 +5,8 @@ import { format } from "date-fns";
 
 export interface FetchOptions {
     id?: string;
-    search?: string | null;
-    startDate?: string | null;
-    endDate?: string | null;
     limit?: number;
     page?: number;
-    [key: string]: any;
     select?: string[];
     where?: [string, ComparisonOperator, any][];
 }
@@ -20,24 +16,8 @@ const EventRoleManager = new class EventRoleManager {
 
     async fetch(options?: FetchOptions): Promise<EventRole | EventRole[]> {
         const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Event Role"]];
+        if (options?.id) where.push(["id", "=", options.id]);
         if (options?.where) where.push(...options.where);
-        else {
-            if (options?.id) where.push(["id", "=", options.id]);
-            else {
-                if (options?.search) where.push(["event.subject", "CONTAINS", options.search]);
-                // If the start date is provided
-                if (options?.startDate) where.push(["activity_date_time", ">=", `${moment(JSON.parse(options.startDate)).format("YYYY-MM-DD")} 00:00:00`]);
-                // Else just make it show all activities that are avialable after today
-                else where.push(["activity_date_time", ">=", `${moment(new Date()).format("YYYY-MM-DD")} 00:00:00`]);
-                // If the end date is provided
-                if (options?.endDate) where.push(["activity_date_time", "<=", `${moment(JSON.parse(options.endDate)).format("YYYY-MM-DD")} 23:59:59`]);
-            }
-        }
-
-        for (const key in options) {
-            if (key.startsWith("Volunteer_Event_Details")) where.push([`event.${key}`, "IN", JSON.parse(options[key]) ?? "[]"]);
-            else if (key.startsWith("Volunteer_Event_Role_Details")) where.push([key, "IN", JSON.parse(options[key]) ?? "[]"]);
-        }
 
         const response = await CRM(this.entity, "get", {
             where,
