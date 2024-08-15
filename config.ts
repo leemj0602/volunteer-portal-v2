@@ -5,7 +5,7 @@ interface ConfigProps {
 }
 
 const config: ConfigProps = {
-    version: 1,
+    version: 2,
     domain: "http://localhost/wordpress",
     email: "casuarina@octopus8.com"
 }
