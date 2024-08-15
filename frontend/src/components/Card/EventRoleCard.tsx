@@ -13,7 +13,6 @@ import { EventStatus } from "../../../utils/classes/EventDetails";
 interface EventRoleCardProps {
     eventRole: EventRole;
     className?: string;
-    url?: string;
 }
 export default function EventRoleCard(props: EventRoleCardProps) {
     const [volunteers, setVolunteers] = useState<EventRegistration[]>();
@@ -26,7 +25,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
     return <Card
         className={props.className}
         thumbnail={props.eventRole.event["thumbnail.uri"]}
-        url={props.url ?? `/v${config.version}/events/${config.version == 1 ? props.eventRole.id : `${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}`}
+        url={`/v${config.version}/events/${config.version == 1 ? props.eventRole.id : `${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}`}
         cancelled={props.eventRole["status_id:name"] == EventStatus.Cancelled}
     >
         <h1 className="font-semibold mb-4">{props.eventRole.event.subject}</h1>
