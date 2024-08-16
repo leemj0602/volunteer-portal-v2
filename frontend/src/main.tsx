@@ -3,12 +3,13 @@ import ReactDOM from "react-dom/client";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import "./main.css";
 import Home from "./pages/Home";
-import Profile from "./pages/Profile";
+import ProfileV1 from "./pages/v1/Profile";
 import EventsV1 from "./pages/v1/Events";
 import EventV1 from "./pages/v1/Event";
 import Trainings from "./pages/Trainings";
 import Training from "./pages/Training";
 import Events from "./pages/v2/Events";
+import Profile from "./pages/v2/Profile";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
