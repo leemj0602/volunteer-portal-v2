@@ -6,8 +6,6 @@ import Home from "./pages/Home";
 import Profile from "./pages/Profile";
 import EventsV1 from "./pages/v1/Events";
 import EventV1 from "./pages/v1/Event";
-import Trainings from "./pages/Trainings";
-import Training from "./pages/Training";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
