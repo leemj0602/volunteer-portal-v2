@@ -4,7 +4,7 @@ import { EventRegistration, RegistrationStatus } from "../../../utils/classes/Ev
 import Card from "./";
 import { FiCalendar } from "react-icons/fi";
 import moment from "moment";
-import { GrGroup, GrLocation } from "react-icons/gr";
+import { GrGroup, GrLocation, GrMoney } from "react-icons/gr";
 import { IoBriefcaseOutline } from "react-icons/io5";
 import { Spinner } from "flowbite-react";
 import config from "../../../../config";
@@ -25,7 +25,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
     return <Card
         className={props.className}
         thumbnail={props.eventRole.event["thumbnail.uri"]}
-        url={`/events/${props.eventRole.id }`}
+        url={`/events/${props.eventRole.id}`}
         cancelled={props.eventRole["status_id:name"] == EventStatus.Cancelled}
     >
         <h1 className="font-semibold mb-4">{props.eventRole.event.subject}</h1>
@@ -44,11 +44,6 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                 <GrLocation className="text-secondary" />
                 <span className="text-sm font-semibold">{props.eventRole.location ?? props.eventRole.event.location}</span>
             </div>
-            {/* Role */}
-            <div className="gap-x-3 flex items-center">
-                <IoBriefcaseOutline className="text-secondary" />
-                <span className="text-sm font-semibold">{props.eventRole["Volunteer_Event_Role_Details.Role:label"]}</span>
-            </div>
             {/* Vacancy */}
             <div className="gap-x-3 flex items-center">
                 <GrGroup className="text-secondary" />
@@ -56,6 +51,11 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                     {volunteers ? volunteers.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}{props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ? ` out of ${props.eventRole["Volunteer_Event_Role_Details.Vacancy"]}` : ""} registered
                 </span>
             </div>
+            {/* Pricing */}
+            {props.eventRole["Volunteer_Event_Role_Details.Pricing"] && <div className="gap-x-3 flex items-center">
+                <GrMoney className="text-secondary" />
+                <span className="text-sm font-semibold">SGD {props.eventRole["Volunteer_Event_Role_Details.Pricing"].toFixed(2)}</span>
+            </div>}
         </div>
     </Card>
 }

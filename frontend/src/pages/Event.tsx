@@ -94,14 +94,6 @@ export default function Event() {
                             </div>
                         </div>
                     </div>
-                    {/* Role */}
-                    <div className="bg-primary/30 text-secondary rounded-md py-2 px-3 col-span-4 lg:col-span-2">
-                        <h3 className="text-sm font-semibold mb-2">Role</h3>
-                        <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
-                            <IoMdBriefcase size={22} />
-                            <span>{eventRole["Volunteer_Event_Role_Details.Role:label"]}</span>
-                        </div>
-                    </div>
                 </div>
                 {/* Custom Fields */}
                 <div className="mt-6">

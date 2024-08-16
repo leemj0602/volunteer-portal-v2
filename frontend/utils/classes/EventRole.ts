@@ -1,18 +1,17 @@
-import CRM, { ComparisonOperator } from "../crm";
+import CRM from "../crm";
 import ContactManager from "../managers/ContactManager";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
 import { EventDetailProps, EventDetails, EventStatus } from "./EventDetails";
-import { EventRegistration, EventRegistrationProps, RegistrationStatus } from "./EventRegistration";
+import { RegistrationStatus } from "./EventRegistration";
 
 interface MandatoryCustomEventRoleProps {
-    "Volunteer_Event_Role_Details.Role": number | null;
-    "Volunteer_Event_Role_Details.Role:label": string | null;
     "Volunteer_Event_Role_Details.Vacancy": number | null;
     "Volunteer_Event_Role_Details.Approval_Required": boolean | null;
     "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
     "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
     "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number | null;
     "Volunteer_Event_Role_Details.Registration_End_Days_Before": number | null;
+    "Volunteer_Event_Role_Details.Pricing": number | null;
     [key: string]: any;
 }
 
@@ -31,14 +30,13 @@ export class EventRole implements EventRoleProps {
     public event: EventDetails;
     public "status_id:name": EventStatus | null;
 
-    public "Volunteer_Event_Role_Details.Role": number | null;
-    public "Volunteer_Event_Role_Details.Role:label": string | null;
     public "Volunteer_Event_Role_Details.Vacancy": number | null;
     public "Volunteer_Event_Role_Details.Approval_Required": boolean;
     public "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
     public "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
     public "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number | null;
     public "Volunteer_Event_Role_Details.Registration_End_Days_Before": number | null;
+    public "Volunteer_Event_Role_Details.Pricing": number | null;
     [key: string]: any;
 
     constructor(props: EventRoleProps) {
@@ -65,7 +63,7 @@ export class EventRole implements EventRoleProps {
                 ["activity_type_id:name", "Volunteer Event Registration"],
                 ["target_contact_id", [contact.id]],
                 ["source_contact_id", contact.id],
-                ["subject", `${this["Volunteer_Event_Role_Details.Role:label"]} - ${this.event.subject}`],
+                ["subject", this.event.subject],
                 ["status_id:name", this["Volunteer_Event_Role_Details.Approval_Required"] ? RegistrationStatus.ApprovalRequired : RegistrationStatus.Approved],
                 ["Volunteer_Event_Registration_Details.Event_Role", this.id]
             ]
