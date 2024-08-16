@@ -10,9 +10,12 @@ import moment from "moment";
 import { MdPeopleAlt } from "react-icons/md";
 import { GrLocation, GrMoney } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
-import { IoMdBriefcase } from "react-icons/io";
 import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
 import swal from "sweetalert";
+import axios from "axios";
+import { loadStripe } from "@stripe/stripe-js";
+
+const promise = loadStripe("pk_test_51PoK8yIWRO1wD2nNRseVeYLNAslyUb1cuRr8H4ZreTTPJAumlZS3Hqp2xKRONDKvKLATBTfvA8JK5vw6Y2vWB3UR00Cmt8K7yO");
 
 export default function Event() {
     const { id } = useParams();
@@ -136,7 +139,15 @@ function RegistrationButton(props: EventRoleFieldProp) {
         if (!props.registrations.find(r => r["contact.email_primary.email"] == email)) {
             const registrations = await props.eventRole.register(email);
             props.setRegistrations(registrations);
-            if (props.eventRole["Volunteer_Event_Role_Details.Pricing"]) navigate(`/checkout/${registrations.find(r => r["contact.email_primary.email"] == email)?.id}`)
+            if (props.eventRole["Volunteer_Event_Role_Details.Pricing"]) {
+                // Getting the client secret
+                const response = await axios.post(`${config.domain}/portal/api/create.php`, 
+                    { items: [{ registrationId: registrations.find(r => r["contact.email_primary.email"] == email)?.id, email, amount: props.eventRole["Volunteer_Event_Role_Details.Pricing"] * 100 }]},
+                    { headers: { "Content-Type": "application/json" }}
+                )
+                const { clientSecret } = response.data;
+                navigate(`/checkout/${clientSecret}`);
+            }
             else swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
         }
         else swal("An error has occurred while registering.\nPlease contact an administrator.", { icon: "error" });
@@ -147,7 +158,6 @@ function RegistrationButton(props: EventRoleFieldProp) {
     const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ?? null;
     // Whether they're within the registration date time and it's before the event ends
     const canRegister = Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime();
-    console.log(props.eventRole); 
     // If there's even space in the first place
     const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
    

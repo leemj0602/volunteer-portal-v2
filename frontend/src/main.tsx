@@ -16,7 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/events" element={<EventsV1 />} />
 				<Route path="/events/:id" element={<EventV1 />} />
-				<Route path="/checkout/:id" element={<Checkout />} />
+				<Route path="/checkout/:secret" element={<Checkout />} />
 			</Routes>
 		</HashRouter>
 	</React.StrictMode>
