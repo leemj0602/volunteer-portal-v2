@@ -1,6 +1,4 @@
-import CRM from "../crm";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
-import { EventRegistration, EventRegistrationProps } from "./EventRegistration";
 
 interface MandatoryContactDetailProps {
     "Volunteer_Contact_Details.Skills_Interests": string[];
