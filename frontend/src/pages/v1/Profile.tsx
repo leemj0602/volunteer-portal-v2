@@ -1,17 +1,17 @@
 import { FormEvent, useEffect, useState } from "react";
-import Wrapper from "../components/Wrapper";
-import ContactManager from "../../utils/managers/ContactManager";
-import { Contact, ContactProps } from "../../utils/classes/Contact";
-import CustomFieldSetManager, { CustomField } from "../../utils/managers/CustomFieldSetManager";
-import config from "../../../config";
-import Loading from "../components/Loading";
-import ConfirmationModal from "../components/ConfirmationModal";
+import Wrapper from "../../components/Wrapper";
+import ContactManager from "../../../utils/managers/ContactManager";
+import { Contact, ContactProps } from "../../../utils/classes/Contact";
+import CustomFieldSetManager, { CustomField } from "../../../utils/managers/CustomFieldSetManager";
+import config from "../../../../config";
+import Loading from "../../components/Loading";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import ResetPassword from "../../assets/ResetPassword.png";
 import { MdOutlineLockReset, MdSaveAlt } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
-import TextField from "../components/Fields/TextField";
-import DropdownField from "../components/Fields/DropdownField";
-import CheckboxField from "../components/Fields/CheckboxField";
+import TextField from "../../components/Fields/TextField";
+import DropdownField from "../../components/Fields/DropdownField";
+import CheckboxField from "../../components/Fields/CheckboxField";
 import swal from "sweetalert";
 
 export default function Profile() {
