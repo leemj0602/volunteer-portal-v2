@@ -1,17 +1,17 @@
 import { useParams } from "react-router-dom";
-import Wrapper from "../../components/Wrapper";
+import Wrapper from "../components/Wrapper";
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
-import { EventRole } from "../../../utils/classes/EventRole";
-import EventRoleManager from "../../../utils/managers/EventRoleManager";
-import Loading from "../../components/Loading";
-import config from "../../../../config";
+import { EventRole } from "../../utils/classes/EventRole";
+import EventRoleManager from "../../utils/managers/EventRoleManager";
+import Loading from "../components/Loading";
+import config from "../../../config";
 import { CiFileOff } from "react-icons/ci";
 import moment from "moment";
 import { MdPeopleAlt } from "react-icons/md";
 import { GrLocation } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
 import { IoMdBriefcase } from "react-icons/io";
-import { EventRegistration, RegistrationStatus } from "../../../utils/classes/EventRegistration";
+import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
 import swal from "sweetalert";
 
 export default function Event() {

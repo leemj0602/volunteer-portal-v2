@@ -4,8 +4,8 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import "./main.css";
 import Home from "./pages/Home";
 import Profile from "./pages/Profile";
-import EventsV1 from "./pages/v1/Events";
-import EventV1 from "./pages/v1/Event";
+import EventsV1 from "./pages/Events";
+import EventV1 from "./pages/Event";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
