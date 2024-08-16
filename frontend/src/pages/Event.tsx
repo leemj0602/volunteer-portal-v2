@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Wrapper from "../components/Wrapper";
 import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
 import { EventRole } from "../../utils/classes/EventRole";
@@ -128,6 +128,7 @@ interface EventRoleFieldProp {
 function RegistrationButton(props: EventRoleFieldProp) {
     const [isLoading, setIsLoading] = useState(false);
     const email = (window as any).email ?? config.email;
+    const navigate = useNavigate();
 
     const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
         setIsLoading(true);
@@ -135,7 +136,8 @@ function RegistrationButton(props: EventRoleFieldProp) {
         if (!props.registrations.find(r => r["contact.email_primary.email"] == email)) {
             const registrations = await props.eventRole.register(email);
             props.setRegistrations(registrations);
-            swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
+            if (props.eventRole["Volunteer_Event_Role_Details.Pricing"]) navigate(`/checkout/${registrations.find(r => r["contact.email_primary.email"] == email)?.id}`)
+            else swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
         }
         else swal("An error has occurred while registering.\nPlease contact an administrator.", { icon: "error" });
         setIsLoading(false);
@@ -145,7 +147,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
     const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ?? null;
     // Whether they're within the registration date time and it's before the event ends
     const canRegister = Date.now() >= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]!).getTime() && Date.now() <= new Date(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]!).getTime();
-   
+    console.log(props.eventRole); 
     // If there's even space in the first place
     const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
    
@@ -161,7 +163,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
             // If they have been unapproved
             if (registered["status_id:name"] == RegistrationStatus.Unapproved) content = "Unapproved";
             // If the event is now closed
-            else if (!eventEnded) content = "Closed";
+            else if (eventEnded) content = "Closed";
             else {
                 // If approval is required
                 if (registered["status_id:name"] == RegistrationStatus.ApprovalRequired) content = "Pending";
