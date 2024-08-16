@@ -8,7 +8,7 @@ import config from "../../../config";
 import { CiFileOff } from "react-icons/ci";
 import moment from "moment";
 import { MdPeopleAlt } from "react-icons/md";
-import { GrLocation } from "react-icons/gr";
+import { GrLocation, GrMoney } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
 import { IoMdBriefcase } from "react-icons/io";
 import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
@@ -94,6 +94,14 @@ export default function Event() {
                             </div>
                         </div>
                     </div>
+                    {/* Role */}
+                    {eventRole["Volunteer_Event_Role_Details.Pricing"] && <div className="bg-primary/30 text-secondary rounded-md py-2 px-3 col-span-4 lg:col-span-2">
+                        <h3 className="text-sm font-semibold mb-2">Pricing</h3>
+                        <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
+                            <GrMoney size={22} />
+                            <span>SGD {eventRole["Volunteer_Event_Role_Details.Pricing"].toFixed(2)}</span>
+                        </div>
+                    </div>}
                 </div>
                 {/* Custom Fields */}
                 <div className="mt-6">
