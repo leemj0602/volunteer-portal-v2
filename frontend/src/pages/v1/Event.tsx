@@ -161,7 +161,7 @@ function RegistrationButton(props: EventRoleFieldProp) {
             // If they have been unapproved
             if (registered["status_id:name"] == RegistrationStatus.Unapproved) content = "Unapproved";
             // If the event is now closed
-            else if (!eventEnded) content = "Closed";
+            else if (eventEnded) content = "Closed";
             else {
                 // If approval is required
                 if (registered["status_id:name"] == RegistrationStatus.ApprovalRequired) content = "Pending";
