@@ -18,6 +18,7 @@ interface EventRegistration {
   eventRoleId: number;
   duration: number;
   eventId: number;
+  pricing: number;
 }
 
 interface EventStatusProps {
@@ -197,6 +198,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">Event Name</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">Date & Time</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/6">Status</th>
+              <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/6">Pricing</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4 hidden lg:table-cell">Location</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/6">Action</th>
             </tr>
@@ -204,7 +206,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
           <tbody className="bg-white divide-y divide-gray-200">
             {currentEventRegistrations.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-4 text-center text-lg text-gray-500">
+                <td colSpan={6} className="px-6 py-4 text-center text-lg text-gray-500">
                   No event history available
                 </td>
               </tr>
@@ -227,6 +229,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
                       </span>
                     )}
                   </td>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled by Organiser" ? "font-black" : ""}`}>{eventRegistration.pricing ? `SGD ${eventRegistration.pricing.toFixed(2)}` : "-"}</td>
                   <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'text-gray-400 hidden lg:table-cell' : 'hidden lg:table-cell'}`}>{eventRegistration.location}</td>
                   <td className="px-3 text-lg py-4 whitespace-nowrap relative">
                     <div ref={(el) => dropdownRefs.current[index] = el}>

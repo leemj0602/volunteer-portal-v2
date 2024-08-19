@@ -84,10 +84,11 @@ export default function Home() {
 
                     return {
                         id: registeredEventRole.id,  // Added this line to include the registration ID
-                        name: eventRole["Volunteer_Event_Role_Details.Role:label"] + ' - ' + eventRole.event.subject,
+                        name: eventRole.event.subject,
                         dateTime: eventRole.activity_date_time, // Store raw date time string for sorting
                         formattedDateTime: eventRole.activity_date_time ? format(parseISO(eventRole.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A", // Formatted date time for display
                         status: eventStatus,
+                        pricing: eventRole["Volunteer_Event_Role_Details.Pricing"],
                         location: eventRole.event.location,
                         eventRoleId: eventRole.id,
                         duration: eventRole.duration,
