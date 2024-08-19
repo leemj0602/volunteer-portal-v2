@@ -27,20 +27,7 @@ function CheckoutForm() {
     useEffect(() => {
         if (!stripe) return;
         if (!secret) return;
-
-        stripe.retrievePaymentIntent(secret).then(({ paymentIntent }) => {
-            switch (paymentIntent?.status) {
-                case "processing":
-                    setMessage("Your payment is processing.");
-                    break;
-                case "requires_payment_method":
-                    setMessage("Your payment was not successful, please try again.");
-                    break;
-                default:
-                    setMessage("Something went wrong.");
-                    break;
-            }
-        });
+        stripe.retrievePaymentIntent(secret);
     }, [stripe]);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -67,7 +54,7 @@ function CheckoutForm() {
                 <button disabled={isLoading || !stripe || !elements} className="cursor-pointer text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary">
                     {isLoading ? <Spinner /> : "Pay Now"}
                 </button>
-                {message && <p className="text-red-500 text-sm">{message}</p>}
+                {message && <p className="text-red-600">{message}</p>}
             </form>
 
         </div>
