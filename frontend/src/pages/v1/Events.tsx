@@ -54,6 +54,7 @@ export default function Events() {
                 if (roleFieldName) {
                     // If there isn't already a search query, or if there's a value and the specified query has no value
                     const value = contact[`Volunteer_Contact_Details.${field.name}`] as any[];
+                    console.log(value);
                     if (value.length && (!searchParams.size || !searchParams.get(`Volunteer_Event_Role_Details.${roleFieldName}`)) && roleFieldName) {
                         updateSearchParams = true;
                         searchParams.set(`Volunteer_Event_Role_Details.${roleFieldName}`, JSON.stringify(value));

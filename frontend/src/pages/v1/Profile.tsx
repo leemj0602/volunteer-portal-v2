@@ -6,7 +6,7 @@ import CustomFieldSetManager, { CustomField } from "../../../utils/managers/Cust
 import config from "../../../../config";
 import Loading from "../../components/Loading";
 import ConfirmationModal from "../../components/ConfirmationModal";
-import ResetPassword from "../../assets/ResetPassword.png";
+import ResetPassword from "../../../assets/ResetPassword.png";
 import { MdOutlineLockReset, MdSaveAlt } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
 import TextField from "../../components/Fields/TextField";

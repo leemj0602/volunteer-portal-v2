@@ -62,7 +62,7 @@ export default function Navbar(props: NavbarProps) {
                             <span>Dashboard</span>
                         </div>
                     </Link>
-                    <Link to={`/v${config.version}/events`}>
+                    <Link to="/events">
                         <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             <LuCalendarRange />
                             <span>All Events</span>
@@ -107,7 +107,7 @@ export default function Navbar(props: NavbarProps) {
                             Dashboard
                         </div>
                     </Link>
-                    <Link to={`/v${config.version}/events`}>
+                    <Link to="/events">
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             All Events
                         </div>

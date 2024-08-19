@@ -32,7 +32,7 @@ export default function GroupedEventRoleCard(props: GroupedEventRoleCardProps) {
 
     return <Card
         className={props.className}
-        url={`/v2/events/${props.event.id}/${props.roleId}`}
+        url={`/events/${props.event.id}/${props.roleId}`}
         thumbnail={props.event["thumbnail.uri"]}
         cancelled={props.event["status_id:name"] == EventStatus.Cancelled}
     >
