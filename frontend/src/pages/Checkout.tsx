@@ -54,7 +54,7 @@ function CheckoutForm() {
                 <button disabled={isLoading || !stripe || !elements} className="cursor-pointer text-white font-semibold bg-secondary rounded-md w-full py-[6px] px-2 mb-2 disabled:bg-primary">
                     {isLoading ? <Spinner /> : "Pay Now"}
                 </button>
-                {message && <p className="text-red-600">{message}</p>}
+                {message && <p className="text-red-500 text-sm">{message}</p>}
             </form>
 
         </div>
