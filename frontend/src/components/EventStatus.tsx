@@ -190,7 +190,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
 
   return (
     <div className="mt-5 rounded-lg">
-      <h2 className="text-3xl font-semibold text-black mt-5 mb-5">Volunteering Event Status</h2>
+      <h2 className="text-3xl font-semibold text-black mt-5 mb-5">Registered Event Status</h2>
       <div className="border-white rounded-lg shadow-md overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 table-fixed">
           <thead className="bg-white">
