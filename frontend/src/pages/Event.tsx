@@ -98,11 +98,11 @@ export default function Event() {
                         </div>
                     </div>
                     {/* Role */}
-                    {eventRole["Volunteer_Event_Role_Details.Pricing"] && <div className="bg-primary/30 text-secondary rounded-md py-2 px-3 col-span-4 lg:col-span-2">
+                    {eventRole["Volunteer_Event_Role_Details.Pricing"]! > 0 && <div className="bg-primary/30 text-secondary rounded-md py-2 px-3 col-span-4 lg:col-span-2">
                         <h3 className="text-sm font-semibold mb-2">Pricing</h3>
                         <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
                             <GrMoney size={22} />
-                            <span>SGD {eventRole["Volunteer_Event_Role_Details.Pricing"].toFixed(2)}</span>
+                            <span>SGD {eventRole["Volunteer_Event_Role_Details.Pricing"]!.toFixed(2)}</span>
                         </div>
                     </div>}
                 </div>

@@ -52,9 +52,9 @@ export default function EventRoleCard(props: EventRoleCardProps) {
                 </span>
             </div>
             {/* Pricing */}
-            {props.eventRole["Volunteer_Event_Role_Details.Pricing"] && <div className="gap-x-3 flex items-center">
+            {props.eventRole["Volunteer_Event_Role_Details.Pricing"]! > 0 && <div className="gap-x-3 flex items-center">
                 <GrMoney className="text-secondary" />
-                <span className="text-sm font-semibold">SGD {props.eventRole["Volunteer_Event_Role_Details.Pricing"].toFixed(2)}</span>
+                <span className="text-sm font-semibold">SGD {props.eventRole["Volunteer_Event_Role_Details.Pricing"]!.toFixed(2)}</span>
             </div>}
         </div>
     </Card>

@@ -30,19 +30,19 @@ export default function Events() {
             const contact = await ContactManager.fetch(email);
             const contactDetailCustomFieldSet = await CustomFieldSetManager.get("Volunteer_Contact_Details");
 
-            const eventRoleCustomFieldSet = await CustomFieldSetManager.get("Volunteer_Event_Role_Details");
-            const eventRoleFieldNames = new Map([...eventRoleCustomFieldSet.values()]
-                .filter(f => f.option_group_id)
-                .map(f => [f.option_group_id!, f.name]));
+            // const eventRoleCustomFieldSet = await CustomFieldSetManager.get("Volunteer_Event_Role_Details");
+            // const eventRoleFieldNames = new Map([...eventRoleCustomFieldSet.values()]
+            //     .filter(f => f.option_group_id)
+            //     .map(f => [f.option_group_id!, f.name]));
             const eventDetailCustomFieldSet = await CustomFieldSetManager.get("Volunteer_Event_Details");
             const eventDetailFieldNames = new Map([...eventDetailCustomFieldSet.values()]
                 .filter(f => f.option_group_id)
                 .map(f => [f.option_group_id!, f.name]));
 
             const filters = new Map<string, CustomField>();
-            eventRoleFieldNames.forEach(name => {
-                filters.set(`Volunteer_Event_Role_Details.${name}`, eventRoleCustomFieldSet.get(`Volunteer_Event_Role_Details.${name}`)!)
-            });
+            // eventRoleFieldNames.forEach(name => {
+            //     filters.set(`Volunteer_Event_Role_Details.${name}`, eventRoleCustomFieldSet.get(`Volunteer_Event_Role_Details.${name}`)!)
+            // });
             eventDetailFieldNames.forEach(name => {
                 filters.set(`Volunteer_Event_Details.${name}`, eventDetailCustomFieldSet.get(`Volunteer_Event_Details.${name}`)!)
             });
@@ -50,15 +50,15 @@ export default function Events() {
             let updateSearchParams = false;
             contactDetailCustomFieldSet.forEach(field => {
                 // If the option group id of the role field is used in the contact custom field set
-                const roleFieldName = eventRoleFieldNames.get(field.option_group_id!);
-                if (roleFieldName) {
-                    // If there isn't already a search query, or if there's a value and the specified query has no value
-                    const value = contact[`Volunteer_Contact_Details.${field.name}`] as any[];
-                    if (value.length && (!searchParams.size || !searchParams.get(`Volunteer_Event_Role_Details.${roleFieldName}`)) && roleFieldName) {
-                        updateSearchParams = true;
-                        searchParams.set(`Volunteer_Event_Role_Details.${roleFieldName}`, JSON.stringify(value));
-                    }
-                }
+                // const roleFieldName = eventRoleFieldNames.get(field.option_group_id!);
+                // if (roleFieldName) {
+                //     // If there isn't already a search query, or if there's a value and the specified query has no value
+                //     const value = contact[`Volunteer_Contact_Details.${field.name}`] as any[];
+                //     if (value.length && (!searchParams.size || !searchParams.get(`Volunteer_Event_Role_Details.${roleFieldName}`)) && roleFieldName) {
+                //         updateSearchParams = true;
+                //         searchParams.set(`Volunteer_Event_Role_Details.${roleFieldName}`, JSON.stringify(value));
+                //     }
+                // }
                 // If the option group id of the event details field is used in the contact custom fiel dset
                 const detailFieldName = eventDetailFieldNames.get(field.option_group_id!);
                 if (!searchParams.size || detailFieldName) {
