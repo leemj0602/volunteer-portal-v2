@@ -4,7 +4,7 @@ import config from "../../config";
 export type ComparisonOperator = "=" | "<=" | ">=" | ">" | "<" | "LIKE" | "<>" | "!=" | "NOT LIKE" | "IN" | "NOT IN" | "BETWEEN" | "NOT BETWEEN" | "IS NOT NULL" | "IS NULL" | "CONTAINS" | "NOT CONTAINS" | "IS EMPTY" | "IS NOT EMPTY" | "REGEXP" | "NOT REGEXP" | "REGEXP BINARY" | "NOT REGEXP BINARY";
 
 type SimpleCondition = [string, ComparisonOperator, any?];
-type LogicalCondition = ["OR" | "NOT", ...SimpleCondition[]];
+type LogicalCondition = ["OR" | "NOT", [...SimpleCondition[]]];
 
 interface ParamProps {
     select?: string[];
@@ -26,5 +26,8 @@ export default async function CRM(entity: string, action: string, params?: Param
     const result = await axios.post(url, {
         entity, action, ...params
     }).catch(() => null);
+
+    console.log(result);
+
     return result;
 }
