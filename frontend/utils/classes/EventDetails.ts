@@ -1,3 +1,4 @@
+import moment from "moment";
 import CRM, { ComparisonOperator } from "../crm";
 import EventRoleManager from "../managers/EventRoleManager";
 
@@ -51,21 +52,24 @@ export class EventDetails implements EventDetailProps {
             where: [["name", "IN", customKeys.map(c => `Volunteer_Event_Details_${c.split("Volunteer_Event_Details.")[1]}`)]]
         });
         const datas = response?.data as OptionalFieldData[];
-        
+
         const result: { [key: string]: any } = {};
         for (const key of customKeys) {
             if (key.startsWith("Volunteer_Event_Details.")) {
                 const data = datas.find(d => d.name == `Volunteer_Event_Details_${key.split("Volunteer_Event_Details.")[1]}` && d["option.value"] == this[key as keyof EventDetails]);
-                result[key] = data ? data["option.label"] : this[key as keyof EventDetails]    
+                result[key] = data ? data["option.label"] : this[key as keyof EventDetails]
             }
         }
         return result;
     }
 
-    async fetchEventRoles(roleId: string) {
+    async fetchRegisterableEventRoles(roleId: string) {
         return await EventRoleManager.fetch({
             where: [
                 ["activity_type_id:name", "=", "Volunteer Event Role"],
+                ["activity_date_time", ">=", moment(new Date()).format("YYYY-MM-DD hh:mm:ss")],
+                ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD")],
+                ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD")],
                 ["Volunteer_Event_Role_Details.Event", "=", this.id],
                 ["Volunteer_Event_Role_Details.Role", "=", roleId]
             ],
