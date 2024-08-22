@@ -15,6 +15,7 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import CancelEvent from "../../assets/undraw_cancel_re_pkdm.svg";
 import { format, parseISO } from "date-fns";
 import swal from 'sweetalert';
+import { EventRegistration } from "../../utils/classes/EventRegistration";
 
 export default function Home() {
     const [contact, setContact] = useState<Contact>();
@@ -50,7 +51,7 @@ export default function Home() {
                 let minsVolunteeredCalc = 0;
                 let numEventsParticipatedCalc = 0;
 
-                const transformedEvents = registeredEventRoles.map((registeredEventRole: any) => {
+                const transformedEvents = registeredEventRoles.map((registeredEventRole: EventRegistration) => {
                     const { eventRole, attendance } = registeredEventRole;
                     let eventStatus = "";
                     const eventDate = eventRole.activity_date_time ? new Date(eventRole.activity_date_time) : null;
@@ -77,7 +78,7 @@ export default function Home() {
                             eventStatus = "No Show";
                         } else {
                             eventStatus = "Completed";
-                            minsVolunteeredCalc += attendance?.duration ?? eventRole.duration;
+                            minsVolunteeredCalc += attendance?.duration ?? eventRole.duration!;
                             numEventsParticipatedCalc++;
                         }
                     }
@@ -89,7 +90,7 @@ export default function Home() {
                         formattedDateTime: eventRole.activity_date_time ? format(parseISO(eventRole.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A", // Formatted date time for display
                         status: eventStatus,
                         location: eventRole.event.location,
-                        eventRoleId: eventRole.id,
+                        eventRoleId: eventRole["Volunteer_Event_Role_Details.Role"],
                         duration: eventRole.duration,
                         eventId: eventRole.event.id,
                     };
@@ -108,10 +109,10 @@ export default function Home() {
                     }
 
                     if ((a.status === "Upcoming" && b.status === "Upcoming") || (a.status === "Check In" && b.status === "Check In") || (a.status === "Checked In" && b.status === "Checked In")) {
-                        return new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
+                        return new Date(a.dateTime!).getTime() - new Date(b.dateTime!).getTime();
                     }
 
-                    return new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime();
+                    return new Date(b.dateTime!).getTime() - new Date(a.dateTime!).getTime();
                 });
 
                 setRegisteredEventRoles(sortedEvents);
