@@ -6,40 +6,43 @@ interface MandatoryContactDetailProps {
 }
 
 export interface ContactProps extends MandatoryContactDetailProps {
-    id: number;
-    "email_primary.email": string;
-    "address_primary.street_address": string;
-    "address_primary.postal_code": string;
-    "phone_primary.phone_numeric": string
-    gender_id: number;
-    first_name: string;
-    last_name: string;
+    id: number | null;
+    "email_primary.email": string | null;
+    "address_primary.street_address": string | null;
+    "address_primary.postal_code": string | null;
+    "phone_primary.phone_numeric": string | null;
+    gender_id: number | null;
+    first_name: string | null;
+    last_name: string | null;
 }
 
 export class Contact implements ContactProps {
-    public "id": number;
-    public "email_primary.email": string;
-    public "address_primary.street_address": string;
-    public "address_primary.postal_code": string;
-    public "phone_primary.phone_numeric": string;
-    public "gender_id": number;
-    public "first_name": string;
-    public "last_name": string;
+    public "id": number | null = null;
+    public "email_primary.email": string | null = null;
+    public "address_primary.street_address": string | null = null;
+    public "address_primary.postal_code": string | null = null;
+    public "phone_primary.phone_numeric": string | null = null;
+    public "gender_id": number | null = null;
+    public "first_name": string | null = null;
+    public "last_name": string | null = null;
 
     public "Volunteer_Contact_Details.Skills_Interests": string[];
     [key: string]: any;
 
-    constructor(props: ContactProps) {
-        this.id = props.id;
-        this["email_primary.email"] = props["email_primary.email"];
-        this["address_primary.street_address"] = props["address_primary.street_address"];
-        this["address_primary.postal_code"] = props["address_primary.postal_code"];
-        this["phone_primary.phone_numeric"] = props["phone_primary.phone_numeric"];
-        this.gender_id = props.gender_id;
-        this.first_name = props.first_name;
-        this.last_name = props.last_name;
+    constructor(props: Partial<ContactProps>) {
+        // this.id = props.id;
+        // this["email_primary.email"] = props["email_primary.email"];
+        // this["address_primary.street_address"] = props["address_primary.street_address"];
+        // this["address_primary.postal_code"] = props["address_primary.postal_code"];
+        // this["phone_primary.phone_numeric"] = props["phone_primary.phone_numeric"];
+        // this.gender_id = props.gender_id;
+        // this.first_name = props.first_name;
+        // this.last_name = props.last_name;
 
-        for (const key in props) if (key.startsWith("Volunteer_Contact_Details")) this[key] = props[key];
+        for (const key in props) {
+            if (key.startsWith("Volunteer_Contact_Details")) this[key] = props[key];
+            else this[key as keyof ContactProps] = props[key];
+        }
     }
 
     getMandatory<K extends keyof MandatoryContactDetailProps>(input: K): MandatoryContactDetailProps[K] {
@@ -59,6 +62,6 @@ export class Contact implements ContactProps {
 
 
     async fetchRegistrations() {
-        return EventRegistrationManager.fetch({ contactId: this.id });
+        return EventRegistrationManager.fetch({ contactId: this.id! });
     }
 }

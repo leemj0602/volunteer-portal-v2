@@ -139,7 +139,7 @@ export default function Home() {
                 swal("Event has been cancelled", {
                     icon: "success",
                 });
-                
+
                 // console.log("currentRegistrationId:", currentRegistrationId);
                 // console.log("volunteeredEvents before update:", registeredEventRoles);
 

@@ -150,7 +150,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
 
         if (selectedEventRoleId !== null && selectedEventDuration !== null) {
           // Creating the Event Attendance Activity
-          const createEventAttendance = await EventRegistrationManager.createAttendance(contact.id, selectedEventRoleId, selectedEventDuration);
+          const createEventAttendance = await EventRegistrationManager.createAttendance(contact.id!, selectedEventRoleId, selectedEventDuration);
 
           if (createEventAttendance) {
             // Close the popup
