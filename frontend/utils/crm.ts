@@ -26,6 +26,5 @@ export default async function CRM(entity: string, action: string, params?: Param
     const result = await axios.post(url, {
         entity, action, ...params
     }).catch(() => null);
-
     return result;
 }

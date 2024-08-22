@@ -9,6 +9,7 @@ export interface FetchOptions {
     page?: number;
     select?: string[];
     where?: [string, ComparisonOperator, any][];
+    group?: string[];
 }
 
 const EventRoleManager = new class EventRoleManager {
@@ -17,11 +18,12 @@ const EventRoleManager = new class EventRoleManager {
     async fetch(options?: FetchOptions): Promise<EventRole | EventRole[]> {
         const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Event Role"]];
         if (options?.id) where.push(["id", "=", options.id]);
-        if (options?.where) where.push(...options.where);
+        else if (options?.where) where.push(...options.where);
 
         const response = await CRM(this.entity, "get", {
             where,
             select: options?.select ?? [
+                "id",
                 "activity_date_time",
                 "duration",
                 "status_id:name",
@@ -45,7 +47,8 @@ const EventRoleManager = new class EventRoleManager {
                 ["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "event.Volunteer_Event_Details.Thumbnail"]]
             ],
             limit: options?.limit,
-            offset: options?.page && options?.limit ? (options?.page - 1) * options?.limit : 0
+            offset: options?.page && options?.limit ? (options?.page - 1) * options?.limit : 0,
+            group: options?.group ?? []
         });
 
         if (options?.id) return new EventRole(response!.data[0]);

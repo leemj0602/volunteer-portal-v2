@@ -8,22 +8,22 @@ import moment from "moment";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { IoBriefcase } from "react-icons/io5";
 
-interface GroupedEventRoleCardProps {
+interface EventCardProps {
     event: EventDetails;
     roleId: string;
     roleLabel: string;
     className?: string;
 }
 
-export default function GroupedEventRoleCard(props: GroupedEventRoleCardProps) {
+export default function EventCard(props: EventCardProps) {
     const [eventRoles, setEventRoles] = useState<EventRole[]>();
     const [minDate, setMinDate] = useState<Date>();
     const [maxDate, setMaxDate] = useState<Date>();
     useEffect(() => {
         (async () => {
-            const eventRoles = await props.event.fetchEventRoles(props.roleId) as EventRole[];
+            const eventRoles = await props.event.fetchRegisterableEventRoles(props.roleId) as EventRole[];
             const min = new Date(Math.min(...eventRoles.map(e => new Date(e.activity_date_time!).getTime() )));
-            const max = new Date(Math.min(...eventRoles.map(e => new Date(e.activity_date_time!).getTime() )));
+            const max = new Date(Math.max(...eventRoles.map(e => new Date(e.activity_date_time!).getTime() )));
             setMinDate(min);
             setMaxDate(max);
             setEventRoles(eventRoles);
@@ -52,9 +52,11 @@ export default function GroupedEventRoleCard(props: GroupedEventRoleCardProps) {
                 </span>
             </div>
             {/* Number of schedules */}
-            <div>
+            <div className="flex gap-x-3 items-center">
                 <RiCalendarScheduleLine className="text-secondary" />
+                <span className="text-sm font-semibold items-center">
                 {eventRoles ? eventRoles.length > 1 ? "Multiple Schedules" : eventRoles.length == 1 ? `${moment(eventRoles[0].activity_date_time).format("hh:mm A")} - ${moment(new Date(eventRoles[0].activity_date_time!).getTime() + (eventRoles[0].duration! * 60 * 1000)).format("hh:mm A")}` : "No Schedules Available" : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}
+                </span>
             </div>
             {/* Role */}
             <div className="gap-x-3 flex items-center">
