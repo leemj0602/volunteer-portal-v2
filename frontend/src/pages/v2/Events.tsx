@@ -96,7 +96,6 @@ export default function Events() {
         // Getting any events where the subject includes the search query
         if (searchQuery) where.push(["event.subject", "CONTAINS", searchQuery]);
         // Filter for any events that may starthh after the provided start date or today
-        console.log(moment(new Date()).format("HH:mm:ss"))
         where.push(["activity_date_time", ">=", moment(startDate ?? new Date()).format("YYYY-MM-DD HH:mm:ss")]);
         // If there is an end date filter, filter for events that may start before or during the provided end date
         if (endDate) where.push(["activity_date_time", "<=", moment(endDate).format("YYYY-MM-DD 23:59:59")]);

@@ -1,6 +1,7 @@
 import moment from "moment";
 import CRM, { ComparisonOperator } from "../crm";
 import EventRoleManager from "../managers/EventRoleManager";
+import { EventRole } from "./EventRole";
 
 export enum EventStatus {
     Scheduled = "Scheduled",
@@ -73,7 +74,7 @@ export class EventDetails implements EventDetailProps {
                 ["Volunteer_Event_Role_Details.Event", "=", this.id],
                 ["Volunteer_Event_Role_Details.Role", "=", roleId]
             ],
-        });
+        }) as EventRole[];
     }
 }
 

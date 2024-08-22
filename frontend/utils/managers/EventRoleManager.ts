@@ -18,7 +18,7 @@ const EventRoleManager = new class EventRoleManager {
     async fetch(options?: FetchOptions): Promise<EventRole | EventRole[]> {
         const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Event Role"]];
         if (options?.id) where.push(["id", "=", options.id]);
-        if (options?.where) where.push(...options.where);
+        else if (options?.where) where.push(...options.where);
 
         const response = await CRM(this.entity, "get", {
             where,

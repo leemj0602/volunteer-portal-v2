@@ -24,8 +24,6 @@ export default function EventCard(props: EventCardProps) {
             const eventRoles = await props.event.fetchRegisterableEventRoles(props.roleId) as EventRole[];
             const min = new Date(Math.min(...eventRoles.map(e => new Date(e.activity_date_time!).getTime() )));
             const max = new Date(Math.max(...eventRoles.map(e => new Date(e.activity_date_time!).getTime() )));
-            console.log(min, max);
-            console.log(eventRoles.map(e => e.activity_date_time));
             setMinDate(min);
             setMaxDate(max);
             setEventRoles(eventRoles);
