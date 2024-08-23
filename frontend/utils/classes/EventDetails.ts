@@ -70,7 +70,7 @@ export class EventDetails implements EventDetailProps {
                 ["activity_type_id:name", "=", "Volunteer Event Role"],
                 ["activity_date_time", ">=", moment(new Date()).format("YYYY-MM-DD hh:mm:ss")],
                 ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD")],
-                ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD")],
+                // ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD")],
                 ["Volunteer_Event_Role_Details.Event", "=", this.id],
                 ["Volunteer_Event_Role_Details.Role", "=", roleId]
             ],
