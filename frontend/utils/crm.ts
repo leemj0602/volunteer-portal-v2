@@ -4,7 +4,7 @@ import config from "../../config";
 export type ComparisonOperator = "=" | "<=" | ">=" | ">" | "<" | "LIKE" | "<>" | "!=" | "NOT LIKE" | "IN" | "NOT IN" | "BETWEEN" | "NOT BETWEEN" | "IS NOT NULL" | "IS NULL" | "CONTAINS" | "NOT CONTAINS" | "IS EMPTY" | "IS NOT EMPTY" | "REGEXP" | "NOT REGEXP" | "REGEXP BINARY" | "NOT REGEXP BINARY";
 
 type SimpleCondition = [string, ComparisonOperator, any?];
-type LogicalCondition = ["OR" | "NOT", [...SimpleCondition[]]];
+type LogicalCondition = ["OR" | "AND" | "NOT", Array<SimpleCondition | LogicalCondition>];
 
 interface ParamProps {
     select?: string[];

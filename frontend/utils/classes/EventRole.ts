@@ -48,13 +48,14 @@ export class EventRole implements EventRoleProps {
         this["status_id:name"] = props["status_id:name"];
 
         const eventDetails: Partial<EventDetailProps> = {};
-        for (const key in props)
+        for (const key in props) {
             if (key.startsWith("Volunteer_Event_Role_Details"))
                 this[key] = props[key];
             else if (key.startsWith("event"))
                 eventDetails[key.split("event.")[1]] = props[key];
             else if (key.startsWith("thumbnail"))
                 eventDetails["thumbnail.uri"] = props[key];
+        }
         this.event = new EventDetails(eventDetails);
     }
 

@@ -25,10 +25,16 @@ const TrainingManager = new class TrainingManager {
                 "location",
 
                 "Volunteer_Training_Details.*",
-                "thumbnail.uri"
+                "thumbnail.uri",
+
+                'contact.first_name',
+                'contact.last_name',
+                'contact.email_primary.email',
+                'contact.phone_primary.phone_numeric',
             ],
             join: [
-                ["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "Volunteer_Training_Details.Thumbnail"]]
+                ["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "Volunteer_Training_Details.Thumbnail"]],
+                ['Contact AS contact', 'LEFT', ['target_contact_id', '=', 'contact.id']],
             ],
             limit: options?.limit,
             offset: options?.page && options?.limit ? (options.page - 1) * options.limit : 0

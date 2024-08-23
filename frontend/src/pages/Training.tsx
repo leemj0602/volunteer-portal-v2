@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import { Spinner } from "flowbite-react";
 import swal from 'sweetalert';
-import { CheckIcon, PencilIcon, LockClosedIcon, ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/solid';
+import { CheckIcon, PencilIcon, LockClosedIcon, ChevronDownIcon, ChevronUpIcon, UserIcon, PhoneIcon, EnvelopeOpenIcon } from '@heroicons/react/24/solid';
 
 
 export default function TrainingPage() {
@@ -27,6 +27,7 @@ export default function TrainingPage() {
         (async () => {
             const training = await TrainingManager.fetch({ id }) as Training;
             setTraining(training);
+            console.log(training.contact);
 
             const trainingSchedules = await training?.fetchSchedules() as TrainingSchedule[];
             console.log(trainingSchedules);
@@ -106,7 +107,12 @@ export default function TrainingPage() {
                     const Expiration_Date = schedule["Volunteer_Training_Schedule_Details.Expiration_Date"] ?? 'N/A';
                     const Location = schedule.location ?? 'N/A';
                     const currentDate = moment();
-                    const isRegistrationOpen = Registration_Start_Date !== 'N/A' && Registration_End_Date !== 'N/A' && currentDate.isBetween(moment(Registration_Start_Date), moment(Registration_End_Date)) && Vacancy !== 'N/A' && (Vacancy - NumRegistrations) > 0;
+
+                    const isRegistrationOpen = (
+                        (Registration_Start_Date === 'N/A' || currentDate.isSameOrAfter(moment(Registration_Start_Date))) &&
+                        (Registration_End_Date === 'N/A' || currentDate.isSameOrBefore(moment(Registration_End_Date))) &&
+                        (Vacancy === 'N/A' || (Vacancy - NumRegistrations) > 0)
+                    );
 
                     const userIsRegistered = isUserRegistered(schedule, email);
                     const isRegistering = loadingScheduleId === schedule.id;
@@ -118,18 +124,18 @@ export default function TrainingPage() {
                                 onClick={() => toggleRowExpansion(schedule.id as number)}
                             >
                                 {/* Training Date Column */}
-                                <td className="px-2 py-3 whitespace-nowrap text-sm font-medium text-gray-800">
+                                <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-800">
                                     {moment(Activity_Date_Time).format('LLL')} - {End_Time.format('LT')}
-                                </td>
-
-                                {/* Registration hidden on md and below */}
-                                <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">
-                                    {`${moment(Registration_Start_Date).format('LLL')} - ${moment(Registration_End_Date).format('LLL')}`}
                                 </td>
 
                                 {/* Participants Column */}
                                 <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-800">
-                                    {NumRegistrations}/{Vacancy}
+                                    {Vacancy === "N/A" ? NumRegistrations : NumRegistrations + "/" + Vacancy}
+                                </td>
+
+                                {/* Registration end hidden on lg and below */}
+                                <td className="hidden lg:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">
+                                    {Registration_End_Date === "N/A" ? moment(Activity_Date_Time).format('LLL') : moment(Registration_End_Date).format('LLL')}
                                 </td>
 
                                 {/* Register hidden on md and below */}
@@ -177,14 +183,14 @@ export default function TrainingPage() {
                                 <tr>
                                     <td colSpan={5} className="px-2 py-4 bg-gray-50 text-sm text-gray-700">
                                         <div><strong>Location:</strong> {Location}</div>
-                                        <div><strong>Valid Through:</strong> {moment(Expiration_Date).format('LLL')}</div>
+                                        <div><strong>Valid Through:</strong> {Expiration_Date === "N/A" ? Expiration_Date : moment(Expiration_Date).format('LLL')}</div>
 
-                                        {/* Registration Period and Register fields visible only on md or smaller screens */}
-                                        <div className="md:hidden">
-                                            <div><strong>Registration Period:</strong> <br />{`${moment(Registration_Start_Date).format('LLL')} - ${moment(Registration_End_Date).format('LLL')}`}</div>
+                                        {/* Registration Period and Register fields visible only on lg and md or smaller screens respectively */}
+                                        <div className="lg:hidden">
+                                            <div><strong>Registration End:</strong> <br />{moment(Registration_End_Date).format('LLL')}</div>
                                             <button
                                                 disabled={!isRegistrationOpen || userIsRegistered || isRegistering}
-                                                className={`mt-2 w-[150px] px-2 py-2 rounded font-semibold ${userIsRegistered ? 'bg-blue-500 text-white cursor-not-allowed' : isRegistrationOpen ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700 cursor-not-allowed'} flex items-center justify-center`}
+                                                className={`md:hidden mt-2 w-[150px] px-2 py-2 rounded font-semibold ${userIsRegistered ? 'bg-blue-500 text-white cursor-not-allowed' : isRegistrationOpen ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700 cursor-not-allowed'} flex items-center justify-center`}
                                                 onClick={(e) => {
                                                     e.stopPropagation(); // Prevent row click event
                                                     handleRegisterClick(schedule);
@@ -242,25 +248,46 @@ export default function TrainingPage() {
                         </div>
                         {/* Header */}
                         <header className="w-full">
-                            <h2 className="text-2xl text-black/90 font-bold">{training.subject}</h2>
+                            <h2 className="text-2xl text-black font-bold">{training.subject}</h2>
                             {training.details && (
-                                <div
-                                    className="max-w-[780px] mt-4 text-black/70"
-                                    dangerouslySetInnerHTML={{ __html: training.details }}
-                                />
+                                <div className="flex flex-col lg:flex-row lg:space-x-[10%] mt-4">
+                                    {/* Details Section */}
+                                    <div
+                                        className="flex-grow lg:max-w-[60%] text-black/70"
+                                        dangerouslySetInnerHTML={{ __html: training.details }}
+                                    />
+                                    {/* Point of Contact Section */}
+                                    <div className="flex-shrink lg:max-w-[30%] mt-4 lg:mt-0">
+                                        <h3 className="text-xl text-black/90 font-semibold">Point Of Contact</h3>
+                                        <div className="flex flex-col space-y-4 mt-4">
+                                            <div className="flex items-center">
+                                                <UserIcon className="w-5 h-5 mr-2 text-black/80" />
+                                                <p className="text-black/70">{training.contact?.first_name + " " + training.contact?.last_name}</p>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <PhoneIcon className="w-5 h-5 mr-2 text-black/80" />
+                                                <p className="text-black/70">{training.contact?.["phone_primary.phone_numeric"]}</p>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <EnvelopeOpenIcon className="w-5 h-5 mr-2 text-black/80" />
+                                                <p className="text-black/70">{training.contact?.["email_primary.email"]}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             )}
                         </header>
                         <br />
                         {/* Schedules */}
-                        <h3 className="text-xl text-black font-semibold">Training Schedule</h3>
+                        <h3 className="text-xl text-black/90 font-semibold">Training Schedule</h3>
                         <br />
                         <div className="overflow-x-auto w-full">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Training Date</strong></th>
-                                        <th className="hidden md:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Registration Period</strong></th>
                                         <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Participants</strong></th>
+                                        <th className="hidden lg:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Registration End</strong></th>
                                         <th className="hidden md:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Register</strong></th>
                                         <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"></th>
                                     </tr>

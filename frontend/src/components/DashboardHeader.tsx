@@ -3,10 +3,10 @@ import { FiEdit } from "react-icons/fi";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
 
 export interface DashboardHeaderProps {
-    name: string;
-    email: string;
-    phone: string;
-    imageUrl: string;
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+    imageUrl: string | null;
 }
 
 export default function DashboardHeader(props: DashboardHeaderProps) {
