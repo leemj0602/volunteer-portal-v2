@@ -17,15 +17,11 @@ interface EventCardProps {
 
 export default function EventCard(props: EventCardProps) {
     const [eventRoles, setEventRoles] = useState<EventRole[]>();
-    const [minDate, setMinDate] = useState<Date>();
-    const [maxDate, setMaxDate] = useState<Date>();
+    const [dates, setDates] = useState<string[]>();
     useEffect(() => {
         (async () => {
             const eventRoles = await props.event.fetchRegisterableEventRoles(props.roleId) as EventRole[];
-            const min = new Date(Math.min(...eventRoles.map(e => new Date(e.activity_date_time!).getTime() )));
-            const max = new Date(Math.max(...eventRoles.map(e => new Date(e.activity_date_time!).getTime() )));
-            setMinDate(min);
-            setMaxDate(max);
+            setDates(eventRoles.map(e => moment(e.activity_date_time!).format("D MMM")).filter(d => !!d));
             setEventRoles(eventRoles);
         })();
     }, []);
@@ -42,20 +38,17 @@ export default function EventCard(props: EventCardProps) {
             <div className="flex items-center">
                 <FiCalendar className="text-secondary mr-3" />
                 <span className="text-sm font-semibold">
-                    {eventRoles ? <span>
-                        {moment(minDate).format("D MMM YYYY")}
-                        {moment(maxDate).format("D MMM YYYY") != moment(minDate).format("D MMM YYYY") && <span>
-                            <span className="text-sm mx-1">-</span>
-                            {moment(maxDate).format("D MMM YYYY")}
-                        </span>}
-                    </span> : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}
+                    {!eventRoles ? <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" /> : <span>
+                       {dates!.slice(0, 3).map((d, i) => <>{d}{(i == dates!.length - 1 || i == 2) ? " " : ", "}</>)}
+                       {dates!.length > 3 ? `... (+${dates!.length - 3})` : ""}
+                    </span>}
                 </span>
             </div>
             {/* Number of schedules */}
             <div className="flex gap-x-3 items-center">
                 <RiCalendarScheduleLine className="text-secondary" />
                 <span className="text-sm font-semibold items-center">
-                {eventRoles ? eventRoles.length > 1 ? "Multiple Schedules" : eventRoles.length == 1 ? `${moment(eventRoles[0].activity_date_time).format("hh:mm A")} - ${moment(new Date(eventRoles[0].activity_date_time!).getTime() + (eventRoles[0].duration! * 60 * 1000)).format("hh:mm A")}` : "No Schedules Available" : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}
+                    {eventRoles ? eventRoles.length > 1 ? "Multiple Schedules" : eventRoles.length == 1 ? `${moment(eventRoles[0].activity_date_time).format("hh:mm A")} - ${moment(new Date(eventRoles[0].activity_date_time!).getTime() + (eventRoles[0].duration! * 60 * 1000)).format("hh:mm A")}` : "No Schedules Available" : <Spinner className="w-[14px] h-[14px] fill-secondary mr-1" />}
                 </span>
             </div>
             {/* Role */}
