@@ -1,10 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Wrapper from "../../components/Wrapper";
-import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { EventDetails } from "../../../utils/classes/EventDetails";
 import { EventRole } from "../../../utils/classes/EventRole";
 import EventDetailManager from "../../../utils/managers/EventDetailManager";
-import swal from "sweetalert";
 import Loading from "../../components/Loading";
 import config from "../../../../config";
 import { CiFileOff } from "react-icons/ci";
@@ -13,7 +12,7 @@ import { FiCalendar } from "react-icons/fi";
 import moment, { Moment } from "moment";
 import { IoMdBriefcase } from "react-icons/io";
 import EventRoleManager from "../../../utils/managers/EventRoleManager";
-import { EventRegistration, RegistrationStatus } from "../../../utils/classes/EventRegistration";
+import { EventRegistration } from "../../../utils/classes/EventRegistration";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import RegistrationButton from "../../components/Buttons/RegistrationButton";
 
@@ -41,7 +40,6 @@ export default function Event() {
             setFields(await event.getOptionalCustomFields());
             setEventRoles(eventRoles);
             setEvent(event);
-            console.log(event, eventRoles);
         })();
     }, []);
 
@@ -159,8 +157,6 @@ function EventRoleDisplay({ eventRole }: EventRoleDisplayProps) {
     let endDate: Moment | string = moment(eventRole.activity_date_time).add(eventRole.duration, "minutes");
     endDate = endDate.format(startDate.format("DD-MM") == endDate.format("DD-MM") ? "LT" : "D MMM H:mm a");
     startDate = startDate.format("D MMM H:mm a");
-
-    const registrationStartDate = moment(eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]).format("D MMM H:mm a");
     const registrationEndDate = moment(eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]).format("D MMM H:mm a");
 
 
@@ -168,7 +164,7 @@ function EventRoleDisplay({ eventRole }: EventRoleDisplayProps) {
         {/* Date */}
         <td className="px-2 py-3 whitespace-nowrap text-sm font-medium text-gray-800">{startDate} - {endDate}</td>
         {/* Registration Period */}
-        <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">{registrationStartDate} - {registrationEndDate}</td>
+        <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">{registrationEndDate}</td>
         {/* Participants */}
         <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-800">
             {registrations ? registrations.length : <Loading className="text-sm" />} / {eventRole["Volunteer_Event_Role_Details.Vacancy"]}
