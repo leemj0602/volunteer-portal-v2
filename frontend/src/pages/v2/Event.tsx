@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import Wrapper from "../../components/Wrapper";
-import { useEffect, useState } from "react";
+import { Dispatch, MouseEvent, SetStateAction, useEffect, useState } from "react";
 import { EventDetails } from "../../../utils/classes/EventDetails";
 import { EventRole } from "../../../utils/classes/EventRole";
 import EventDetailManager from "../../../utils/managers/EventDetailManager";
@@ -9,12 +9,13 @@ import config from "../../../../config";
 import { CiFileOff } from "react-icons/ci";
 import { GrLocation } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
-import moment, { Moment } from "moment";
+import moment from "moment";
 import { IoMdBriefcase } from "react-icons/io";
 import EventRoleManager from "../../../utils/managers/EventRoleManager";
-import { EventRegistration } from "../../../utils/classes/EventRegistration";
-import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import RegistrationButton from "../../components/Buttons/RegistrationButton";
+import { EventRegistration, RegistrationStatus } from "../../../utils/classes/EventRegistration";
+import { CheckIcon, ChevronDownIcon, LockClosedIcon, PencilIcon } from "@heroicons/react/24/solid";
+import { Spinner } from "flowbite-react";
+import swal from "sweetalert";
 
 export default function Event() {
     const navigate = useNavigate();
@@ -25,12 +26,13 @@ export default function Event() {
     const [eventRoles, setEventRoles] = useState<EventRole[]>();
     const [fields, setFields] = useState<{ [key: string]: any }>();
 
+    // #region State initialisation
     useEffect(() => {
         (async () => {
             const event = await EventDetailManager.fetch(eventId!);
             if (!event) return navigate("/events");
 
-            // #region Just getting the role label, this assumes that there is at least 1 EventRole created
+            // #region Getting the role label, this assumes that there is at least 1 EventRole created
             const eventRole = await EventRoleManager.fetch({ where: [["Volunteer_Event_Role_Details.Role", "=", roleId]], limit: 1, select: ["Volunteer_Event_Role_Details.Role:label"] }) as EventRole[];
             if (!eventRole.length) return navigate("/events");
             setRoleLabel(eventRole[0]["Volunteer_Event_Role_Details.Role:label"]!);
@@ -42,7 +44,7 @@ export default function Event() {
             setEvent(event);
         })();
     }, []);
-
+    // #endregion
 
     return <Wrapper>
         {!event ? <Loading className="h-screen items-center" /> : <div className="p-4">
@@ -115,21 +117,19 @@ export default function Event() {
 
                 {/* Event roles */}
                 <section>
-                    <h3 className="text-xl text-black/70 font-semibold mb-2">Event Schedules</h3>
+                    <h3 className="text-xl text-black/70 font-semibold mb-4">Event Schedules</h3>
                     <div className="overflow-x-auto w-full">
                         <table className="min-w-full divide-y divide-gray-200">
                             <thead className="bg-gray-50">
                                 <tr>
                                     <th className="px-2 py-3 text-left text-sm font-semibold text-black/70 uppercase">Date</th>
-                                    <th className="px-2 py-3 text-left text-sm font-semibold text-black/70 uppercase">Registration Period</th>
-                                    <th className="px-2 py-3 text-left text-sm font-semibold text-black/70 uppercase">Participants</th>
-                                    <th className="px-2 py-3 text-left text-sm font-semibold text-black/70 uppercase table-cell">Register</th>
-                                    <th className="px-2 py-3 text-left text-sm font-semibold"></th>
+                                    <th className="px-2 py-3 text-left text-sm font-semibold text-black/70 uppercase hidden lg:table-cell">Registration End</th>
+                                    <th className="px-2 py-3 text-left text-sm font-semibold text-black/70 uppercase hidden sm:table-cell">Participants</th>
+                                    <th className="px-2 py-3 text-left text-sm font-semibold text-black/70 uppercase">Register</th>
+                                    <th className="px-2 py-3 text-left text-sm font-semibold hidden sm:table-cell"></th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {eventRoles?.map(e => <EventRoleDisplay eventRole={e} key={e.id} />)}
-                            </tbody>
+                            <tbody>{eventRoles?.map(e => <EventRoleDisplay eventRole={e} key={e.id} />)}</tbody>
                         </table>
                     </div>
                 </section>
@@ -138,6 +138,7 @@ export default function Event() {
     </Wrapper>
 }
 
+// #region Displaying individual event role
 interface EventRoleDisplayProps {
     eventRole: EventRole;
 }
@@ -146,32 +147,25 @@ function EventRoleDisplay({ eventRole }: EventRoleDisplayProps) {
     const [registrations, setRegistrations] = useState<EventRegistration[]>();
 
     useEffect(() => {
-        (async () => {
-            setRegistrations(await eventRole.fetchRegistrations())
-        })()
+        (async () => setRegistrations(await eventRole.fetchRegistrations()))()
     }, []);
 
-    // LLL full, LT time
-
-    let startDate: Moment | string = moment(eventRole.activity_date_time);
-    let endDate: Moment | string = moment(eventRole.activity_date_time).add(eventRole.duration, "minutes");
-    endDate = endDate.format(startDate.format("DD-MM") == endDate.format("DD-MM") ? "LT" : "D MMM H:mm a");
-    startDate = startDate.format("D MMM H:mm a");
-    const registrationEndDate = moment(eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]).format("D MMM H:mm a");
-
+    const startDate = moment(eventRole.activity_date_time);
+    const endDate = moment(eventRole.activity_date_time).add(eventRole.duration, "minutes");
+    const registrationEndDate = moment(eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]);
 
     return <tr className="hover:bg-gray-100 transition ease-in-out cursor-pointer">
         {/* Date */}
-        <td className="px-2 py-3 whitespace-nowrap text-sm font-medium text-gray-800">{startDate} - {endDate}</td>
+        <td className="px-2 py-3 whitespace-nowrap text-sm font-medium text-gray-800">{startDate.format("D MMM h:mm A").toUpperCase()} - {endDate.format(startDate.format("DD-MM") == endDate.format("DD-MM") ? "LT" : "D MMM h:mm A").toUpperCase()}</td>
         {/* Registration Period */}
-        <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">{registrationEndDate}</td>
+        <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">{registrationEndDate.format("D MMMM").toUpperCase()}</td>
         {/* Participants */}
-        <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-800">
-            {registrations ? registrations.length : <Loading className="text-sm" />} / {eventRole["Volunteer_Event_Role_Details.Vacancy"]}
+        <td className="hidden sm:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">
+            {registrations ? registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length : <Loading className="text-sm" />} / {eventRole["Volunteer_Event_Role_Details.Vacancy"]}
         </td>
         {/* Registration button */}
-        {!registrations ? <Loading className="items-center" /> : <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap">
-            <RegistrationButton className="px-4 py-2 items-center text-sm font-semibold rounded-md" eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
+        {!registrations ? <Loading className="items-center" /> : <td className="px-2 py-3 whitespace-nowrap">
+            <RegistrationButton eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
         </td>}
         {/* Chevron */}
         <td className="px-2 py-3 whitespace-nowrap">
@@ -179,3 +173,57 @@ function EventRoleDisplay({ eventRole }: EventRoleDisplayProps) {
         </td>
     </tr>
 }
+// #endregion
+
+// #region RegistrationButton Component
+interface RegistrationButtonProps {
+    eventRole: EventRole;
+    registrations: EventRegistration[];
+    setRegistrations: Dispatch<SetStateAction<EventRegistration[] | undefined>>;
+}
+function RegistrationButton(props: RegistrationButtonProps) {
+    const [isLoading, setIsLoading] = useState(false);
+    const email = (window as any).email ?? config.email;
+
+    const endDate = moment(props.eventRole.activity_date_time).add(props.eventRole.duration, "minutes");
+    const registrationStartDate = moment(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]);
+    const registrationEndDate = moment(props.eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]);
+
+    const handleClick = async (e: MouseEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+        setIsLoading(true);
+        // If they already registered
+        if (!props.registrations.find(r => r["contact.email_primary.email"] == email)) {
+            const registrations = await props.eventRole.register(email);
+            props.setRegistrations(registrations);
+            swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
+        }
+        else swal("An error has occurred while registering.\nPlease contact an administrator.", { icon: "error" });
+        setIsLoading(false);
+    }
+
+    // Whether they have registered
+    const registered = props.registrations.find(r => r["contact.email_primary.email"] == email) ? true : false;
+    // Whether their registration is pending
+    const pendingRegistration = registered ? props.registrations.find(r => r["contact.email_primary.email"] == email)?.["status_id:name"] == RegistrationStatus.ApprovalRequired ? true : false : false;
+
+    // Whether it's within registration period
+    const withinRegistrationPeriod = moment().isSameOrAfter(registrationStartDate) && moment().isSameOrBefore(registrationEndDate);
+    // Whether there's vacancy
+    const hasSpace = props.eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? Infinity >= props.registrations.filter(r => r["status_id:name"] == RegistrationStatus.Approved).length;
+    // Whether the event has ended
+    const eventEnded = moment().isSameOrAfter(endDate);
+    // Whether it's registerable
+    const registerable = !registered && withinRegistrationPeriod && hasSpace && !eventEnded;
+
+    return <button onClick={handleClick} disabled={!registerable || isLoading} className={`mt-2 w-[100px] px-2 py-2 rounded font-semibold text-sm ${registered ? 'bg-blue-500 text-white cursor-not-allowed' : withinRegistrationPeriod ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700 cursor-not-allowed'} flex items-center justify-center`}>
+        {isLoading ? <Spinner className="w-3 h-3 text-white" /> :
+            registered ? (pendingRegistration ? 
+                <><CheckIcon className="w-5 h-5 mr-2 text-white" />Pending</> : 
+                <><CheckIcon className="w-5 h-5 mr-2 text-white" />Registered</>) :
+            registerable ? <><PencilIcon className="w-5 h-5 mr-2 text-white" />Register</> :
+            !hasSpace ? <><LockClosedIcon className="w-5 h-5 mr-2 text-white" />Full</> :
+            <><LockClosedIcon className="w-5 h-5 mr-2 text-white" />Closed</>}
+    </button>
+}
+// #endregion
