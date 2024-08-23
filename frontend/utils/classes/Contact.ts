@@ -1,5 +1,6 @@
 import CRM from "../crm";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
+import MembershipPurchaseManager from "../managers/MembershipPurchaseManager";
 import { EventRegistration, EventRegistrationProps } from "./EventRegistration";
 
 interface MandatoryContactDetailProps {
@@ -62,5 +63,9 @@ export class Contact implements ContactProps {
 
     async fetchRegistrations() {
         return EventRegistrationManager.fetch({ contactId: this.id });
+    }
+
+    async fetchMemberships() {
+        return MembershipPurchaseManager.fetch({ contactId: this.id });
     }
 }

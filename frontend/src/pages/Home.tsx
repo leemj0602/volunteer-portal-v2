@@ -15,6 +15,7 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import CancelEvent from "../../assets/undraw_cancel_re_pkdm.svg";
 import { format, parseISO } from "date-fns";
 import swal from 'sweetalert';
+import MembershipStatus from "../components/MembershipStatus";
 
 export default function Home() {
     const [contact, setContact] = useState<Contact>();
@@ -140,7 +141,7 @@ export default function Home() {
                 swal("Event has been cancelled", {
                     icon: "success",
                 });
-                
+
                 // console.log("currentRegistrationId:", currentRegistrationId);
                 // console.log("volunteeredEvents before update:", registeredEventRoles);
 
@@ -174,9 +175,12 @@ export default function Home() {
                         <div className="mb-6 flex">
                             {dashboardContact && <DashboardHeader {...dashboardContact} />}
                         </div>
-
                         <DashboardStats {...{ hours: hoursVolunteered, events: numEventsParticipated }} />
 
+
+                        <MembershipStatus contact={contact!} />
+                        
+                        
                         <EventStatus
                             eventRegistrations={registeredEventRoles}
                             openCancelModal={(registrationId: number) => {
@@ -184,7 +188,6 @@ export default function Home() {
                                 setShowCancelModal(true);
                             }}
                         />
-
                         <UpcomingEvents eventRoles={upcomingUnvolunteeredEvents} />
                     </div>
                 )}
