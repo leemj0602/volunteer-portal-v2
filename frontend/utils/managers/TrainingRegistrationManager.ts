@@ -13,8 +13,10 @@ const TrainingRegistrationManager = new class TrainingRegistrationManager {
 
                 'contact.email_primary.email',
 
+                'schedule.id',
                 'schedule.activity_date_time',
                 'schedule.status_id:name',
+                'schedule.location',
                 'schedule.Volunteer_Training_Schedule_Details.Vacancy',
                 'schedule.Volunteer_Training_Schedule_Details.Registration_Start_Date',
                 'schedule.Volunteer_Training_Schedule_Details.Registration_End_Date',
@@ -22,8 +24,7 @@ const TrainingRegistrationManager = new class TrainingRegistrationManager {
 
                 'training.id',
                 'training.subject',
-                'training.status_id',
-                'training.location',
+                'training.status_id:name',
             ],
             where,
             join: [
@@ -33,7 +34,7 @@ const TrainingRegistrationManager = new class TrainingRegistrationManager {
             ],
         })
 
-        return response?.data.map((tr: TrainingRegistrationProps) => new TrainingRegistration(tr));
+        return (response?.data as TrainingRegistrationProps[]).map(d => new TrainingRegistration(d));
     }
 }
 

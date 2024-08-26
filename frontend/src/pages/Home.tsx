@@ -7,7 +7,7 @@ import { EventRole } from "../../utils/classes/EventRole";
 import { EventRegistration } from "../../utils/classes/EventRegistration";
 import config from "../../../config";
 import Wrapper from "../components/Wrapper";
-import EventStatus from "../components/EventStatus";
+import TableStatus from "../components/TableStatus";
 import UpcomingEvents from "../components/UpcomingEvents";
 import Loading from "../components/Loading";
 import ConfirmationModal from "../components/ConfirmationModal";
@@ -17,6 +17,7 @@ import swal from 'sweetalert';
 import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
 import { FiEdit } from "react-icons/fi";
 import { Link } from "react-router-dom";
+import { TrainingRegistration } from "../../utils/classes/TrainingRegistration";
 
 
 interface DashboardHeaderProps {
@@ -42,6 +43,7 @@ export default function Home() {
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [currentRegistrationId, setCurrentRegistrationId] = useState<number | null>(null);
     const [isCancelling, setIsCancelling] = useState(false);
+    const [registeredTrainingSchedules, setRegisteredTrainingSchedules] = useState<any[]>([]);
 
     const email = (window as any).email ?? config.email;
 
@@ -59,7 +61,7 @@ export default function Home() {
                 };
                 setDashboardContact(dashboardContact);
 
-                const registeredEventRoles = await contact.fetchRegistrations();
+                const registeredEventRoles = await contact.fetchEventRegistrations();
 
                 let minsVolunteeredCalc = 0;
                 let numEventsParticipatedCalc = 0;
@@ -103,9 +105,10 @@ export default function Home() {
                         formattedDateTime: eventRole.activity_date_time ? format(parseISO(eventRole.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A",
                         status: eventStatus,
                         location: eventRole.event.location,
-                        eventRoleId: eventRole["Volunteer_Event_Role_Details.Role"],
+                        roleId: eventRole["Volunteer_Event_Role_Details.Role"],
                         duration: eventRole.duration,
-                        eventId: eventRole.event.id,
+                        entityId: eventRole.event.id,
+                        type: "Event",
                     };
                 });
 
@@ -133,6 +136,60 @@ export default function Home() {
                 const unvolunteeredEvents = await EventRoleManager.fetchUnregistered(registeredEventRoleIds);
 
                 setUpcomingUnvolunteeredEvents(unvolunteeredEvents as EventRole[]);
+
+                const registeredTrainingSchedules = await contact.fetchTrainingRegistrations();
+                console.log("registered training schedules: ", registeredTrainingSchedules);
+
+                const transformedTrainings = registeredTrainingSchedules.map((registeredTrainingSchedule: TrainingRegistration) => {
+                    const { trainingSchedule } = registeredTrainingSchedule;
+                    let trainingStatus = "";
+                    const trainingDate = trainingSchedule.activity_date_time ? new Date(trainingSchedule.activity_date_time) : null;
+                    const duration = trainingSchedule.duration ? trainingSchedule.duration : 0;
+                    const endDate = trainingDate ? new Date(trainingDate.getTime() + duration * 60000) : null;
+                    const now = new Date();
+
+                    if (registeredTrainingSchedule['status_id:name'] === 'Cancelled') {
+                        trainingStatus = "Cancelled";
+                    } else if (trainingSchedule['status_id:name'] === 'Cancelled' || trainingSchedule.training["status_id:name"] === 'Cancelled') {
+                        trainingStatus = "Cancelled By Organiser";
+                    } else if (trainingDate && now < trainingDate) {
+                        trainingStatus = "Upcoming";
+                    } else if (trainingDate && endDate && now > endDate) {
+                        if (registeredTrainingSchedule['status_id:name'] === 'Completed') {
+                            trainingStatus = "Completed";
+                        } else {
+                            trainingStatus = "No Show";
+                        }
+                    }
+
+                    return {
+                        id: registeredTrainingSchedule.id,
+                        name: trainingSchedule.training.subject,
+                        dateTime: trainingSchedule.activity_date_time,
+                        formattedDateTime: trainingSchedule.activity_date_time ? format(parseISO(trainingSchedule.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A",
+                        status: trainingStatus,
+                        location: trainingSchedule.location,
+                        duration: trainingSchedule.training.duration,
+                        entityId: trainingSchedule.training.id,
+                        type: "Training",
+                    };
+                });
+
+                const sortedTrainings = transformedTrainings.sort((a, b) => {
+                    const statusOrder = ["Upcoming", "No Show", "Cancelled", "Cancelled By Organiser", "Completed"];
+                    const statusComparison = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
+                    if (statusComparison !== 0) {
+                        return statusComparison;
+                    }
+
+                    if ((a.status === "Upcoming" && b.status === "Upcoming")) {
+                        return new Date(a.dateTime!).getTime() - new Date(b.dateTime!).getTime();
+                    }
+
+                    return new Date(b.dateTime!).getTime() - new Date(a.dateTime!).getTime();
+                });
+
+                setRegisteredTrainingSchedules(sortedTrainings);
             } catch (error) {
                 console.log('Error fetching data: ', error)
             } finally {
@@ -237,8 +294,8 @@ export default function Home() {
 
                             <DashboardStats {...{ hours: hoursVolunteered, events: numEventsParticipated }} />
 
-                            <EventStatus
-                                eventRegistrations={registeredEventRoles}
+                            <TableStatus
+                                registrations={registeredEventRoles}
                                 openCancelModal={(registrationId: number) => {
                                     setCurrentRegistrationId(registrationId);
                                     setShowCancelModal(true);
@@ -246,6 +303,14 @@ export default function Home() {
                             />
 
                             <UpcomingEvents eventRoles={upcomingUnvolunteeredEvents} />
+
+                            <TableStatus
+                                registrations={registeredTrainingSchedules}
+                                openCancelModal={(registrationId: number) => {
+                                    setCurrentRegistrationId(registrationId);
+                                    setShowCancelModal(true);
+                                }}
+                            />
                         </div>
                     )}
                 </div>

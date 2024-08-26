@@ -9,39 +9,24 @@ import swal from "sweetalert";
 import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
 import ContactManager from "../../utils/managers/ContactManager";
 
-interface EventRegistration {
+interface Registration {
   id: number;
   name: string;
   formattedDateTime: string;
   status: string;
   location: string;
-  eventRoleId: number;
+  roleId: number;
   duration: number;
-  eventId: number;
+  entityId: number;
+  type: "Event" | "Training";
 }
 
-interface EventStatusProps {
-  eventRegistrations: EventRegistration[];
+interface TableStatusProps {
+  registrations: Registration[];
   openCancelModal: (registrationId: number) => void;
 }
 
-// Function to check attendance code
-// async function checkAttendanceCode(eventId: number, attendanceCode: string) {
-//   const eventDetail = await CRM('Activity', 'get', {
-//     select: [
-//       'subject',
-//       `${config.EventCustomFieldSetName}.attendance_code`
-//     ],
-//     where: [
-//       ['id', '=', eventId],
-//       [`${config.EventCustomFieldSetName}.attendance_code`, '=', attendanceCode]
-//     ],
-//   });
-
-//   return eventDetail.data;
-// }
-
-export default function EventStatus({ eventRegistrations, openCancelModal }: EventStatusProps) {
+export default function TableStatus({ registrations, openCancelModal }: TableStatusProps) {
   const email = (window as any).email as string ?? config.email;
 
   const statusStyles: { [key: string]: string } = {
@@ -64,15 +49,15 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
   const [selectedEventRoleId, setSelectedEventRoleId] = useState<number | null>(null);
   const [selectedEventDuration, setSelectedEventDuration] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [eventList, setEventList] = useState<EventRegistration[]>(eventRegistrations);
+  const [eventList, setEventList] = useState<Registration[]>(registrations);
   const eventsPerPage = 5;
 
   const dropdownRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   // Update eventList when events prop changes
   useEffect(() => {
-    setEventList(eventRegistrations);
-  }, [eventRegistrations]);
+    setEventList(registrations);
+  }, [registrations]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -102,7 +87,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
   const totalPages = Math.ceil(eventList.length / eventsPerPage);
 
   // Get the events to display on the current page
-  const currentEventRegistrations = eventList.slice(
+  const currentRegistrations = eventList.slice(
     (currentPage - 1) * eventsPerPage,
     currentPage * eventsPerPage
   );
@@ -132,9 +117,9 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
 
   const navigate = useNavigate();
 
-  const handleCheckInClick = (eventRegistration: EventRegistration) => {
-    setSelectedEventId(eventRegistration.eventId);
-    setSelectedEventRoleId(eventRegistration.eventRoleId);
+  const handleCheckInClick = (eventRegistration: Registration) => {
+    setSelectedEventId(eventRegistration.entityId);
+    setSelectedEventRoleId(eventRegistration.roleId);
     setSelectedEventDuration(eventRegistration.duration);
     setIsPopupOpen(true);
   };
@@ -163,7 +148,7 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
             // Update the status of the event to "Checked In"
             setEventList((prevEvents) =>
               prevEvents.map((event) =>
-                event.eventId === selectedEventId ? { ...event, status: "Checked In" } : event
+                event.entityId === selectedEventId ? { ...event, status: "Checked In" } : event
               )
             );
             setIsSubmitting(false);
@@ -188,13 +173,15 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
   };
 
   return (
-    <div className="mt-5 rounded-lg">
-      <h2 className="text-3xl font-semibold text-black mt-5 mb-5">Volunteering Event Status</h2>
+    <div className="mt-8 rounded-lg">
+      <h2 className="text-3xl font-semibold text-black mt-5 mb-5">
+        {registrations[0]?.type === "Event" ? "Volunteering Event Status" : "Training Status"}
+      </h2>
       <div className="border-white rounded-lg shadow-md overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 table-fixed">
           <thead className="bg-white">
             <tr>
-              <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">Event Name</th>
+              <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">{registrations[0]?.type === "Event" ? "Event Name" : "Training Name"}</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">Date & Time</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/6">Status</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4 hidden lg:table-cell">Location</th>
@@ -202,32 +189,34 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {currentEventRegistrations.length === 0 ? (
+            {currentRegistrations.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-4 text-center text-lg text-gray-500">
-                  No event history available
+                  {registrations[0]?.type === "Event"
+                    ? "No event history available"
+                    : "No training registrations available"}
                 </td>
               </tr>
             ) : (
-              currentEventRegistrations.map((eventRegistration, index) => (
-                <tr key={index} className={`${eventRegistration.status === "Cancelled By Organiser" ? 'bg-gray-200' : ''}`}>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{eventRegistration.name}</td>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{eventRegistration.formattedDateTime}</td>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'font-black' : ''}`}>
-                    {eventRegistration.status === "Check In" ? (
+              currentRegistrations.map((registration, index) => (
+                <tr key={index} className={`${registration.status === "Cancelled By Organiser" ? 'bg-gray-200' : ''}`}>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${registration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{registration.name}</td>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${registration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{registration.formattedDateTime}</td>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${registration.status === "Cancelled By Organiser" ? 'font-black' : ''}`}>
+                    {registration.status === "Check In" && registration.type === "Event" ? (
                       <button
-                        className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[eventRegistration.status]}`}
-                        onClick={() => handleCheckInClick(eventRegistration)}
+                        className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[registration.status]}`}
+                        onClick={() => handleCheckInClick(registration)}
                       >
-                        {eventRegistration.status}
+                        {registration.status}
                       </button>
                     ) : (
-                      <span className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[eventRegistration.status]}`}>
-                        {eventRegistration.status === "Cancelled By Organiser" ? "Event\nCancelled" : eventRegistration.status}
+                      <span className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[registration.status]}`}>
+                        {registration.status === "Cancelled By Organiser" ? "Cancelled" : registration.status}
                       </span>
                     )}
                   </td>
-                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${eventRegistration.status === "Cancelled By Organiser" ? 'text-gray-400 hidden lg:table-cell' : 'hidden lg:table-cell'}`}>{eventRegistration.location}</td>
+                  <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${registration.status === "Cancelled By Organiser" ? 'text-gray-400 hidden lg:table-cell' : 'hidden lg:table-cell'}`}>{registration.location}</td>
                   <td className="px-3 text-lg py-4 whitespace-nowrap relative">
                     <div ref={(el) => dropdownRefs.current[index] = el}>
                       <button
@@ -239,26 +228,26 @@ export default function EventStatus({ eventRegistrations, openCancelModal }: Eve
                       </button>
                       {openMenuIndex === index && (
                         <div
-                          className={`absolute right-0 w-40 bg-white shadow-lg rounded-md z-50 ${index >= currentEventRegistrations.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'
+                          className={`absolute right-0 w-40 bg-white shadow-lg rounded-md z-50 ${index >= currentRegistrations.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'
                             }`}
                         >
                           <ul>
                             <li
-                              className={`px-4 py-2 flex items-center ${eventRegistration.status === "Cancelled By Organiser"
+                              className={`px-4 py-2 flex items-center ${registration.status === "Cancelled By Organiser"
                                 ? "text-gray-400 cursor-not-allowed"
                                 : "hover:bg-gray-100 cursor-pointer"
                                 }`}
-                              onClick={() => navigate(`/events/${eventRegistration.eventId}/${eventRegistration.eventRoleId}`)}>
+                              onClick={() => navigate(`/${registration.type.toLowerCase()}s/${registration.entityId}${registration.type === "Event" ? "/" + registration.roleId : ""}`)}>
                               <GrView className="mr-2" /> View
                             </li>
                             <li
-                              className={`px-4 py-2 flex items-center ${eventRegistration.status === "Completed" || eventRegistration.status === "Cancelled" || eventRegistration.status === "Cancelled By Organiser"
+                              className={`px-4 py-2 flex items-center ${registration.status === "Completed" || registration.status === "Cancelled" || registration.status === "Cancelled By Organiser"
                                 ? "text-gray-400 cursor-not-allowed"
                                 : "hover:bg-gray-100 cursor-pointer"
                                 }`}
                               onClick={() => {
-                                if (eventRegistration.status !== "Completed" && eventRegistration.status !== "Cancelled" && eventRegistration.status !== "Cancelled By Organiser") {
-                                  openCancelModal(eventRegistration.id);
+                                if (registration.status !== "Completed" && registration.status !== "Cancelled" && registration.status !== "Cancelled By Organiser") {
+                                  openCancelModal(registration.id);
                                 }
                               }}
                             >

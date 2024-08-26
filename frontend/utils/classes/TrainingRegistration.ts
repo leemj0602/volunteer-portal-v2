@@ -2,7 +2,8 @@ import { TrainingSchedule, TrainingScheduleProps } from "./TrainingSchedule";
 
 export enum RegistrationStatus {
     Scheduled = "Scheduled",
-    Cancelled = "Cancelled"
+    Cancelled = "Cancelled",
+    Completed = "Completed",
 }
 
 export interface TrainingRegistrationProps {
@@ -17,7 +18,7 @@ export class TrainingRegistration implements TrainingRegistrationProps {
     public "status_id:name": RegistrationStatus;
     public "contact.email_primary.email": string;
 
-    // public trainingSchedule: TrainingSchedule;
+    public trainingSchedule: TrainingSchedule;
 
     [key: string]: any;
 
@@ -26,16 +27,16 @@ export class TrainingRegistration implements TrainingRegistrationProps {
         this["status_id:name"] = props["status_id:name"];
         this["contact.email_primary.email"] = props["contact.email_primary.email"];
 
-        // const trainingScheduleDetails: Partial<TrainingScheduleProps> = {}
+        const trainingScheduleDetails: Partial<TrainingScheduleProps> = {}
 
-        // for (const key in props) {
-        //     if (key.startsWith("schedule."))
-        //         trainingScheduleDetails[key.split("schedule.")[1]] = props[key];
-        //     else if (key.startsWith("training."))
-        //         trainingScheduleDetails[key] = props[key];
-        // }
+        for (const key in props) {
+            if (key.startsWith("schedule."))
+                trainingScheduleDetails[key.split("schedule.")[1]] = props[key];
+            else if (key.startsWith("training."))
+                trainingScheduleDetails[key] = props[key];
+        }
 
-        // this.trainingSchedule = new TrainingSchedule(trainingScheduleDetails as TrainingScheduleProps);
+        this.trainingSchedule = new TrainingSchedule(trainingScheduleDetails as TrainingScheduleProps);
     }
 }
 
