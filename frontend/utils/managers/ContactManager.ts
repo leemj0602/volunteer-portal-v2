@@ -14,6 +14,7 @@ const ContactManager = new class ContactManager {
                 "gender_id",
                 "first_name",
                 "last_name",
+                "Membership_Contact_Details.*",
                 "Volunteer_Contact_Details.*"
             ],
             where: [["email_primary.email", "=", email]]

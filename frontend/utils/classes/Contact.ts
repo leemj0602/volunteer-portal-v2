@@ -1,10 +1,11 @@
 import CRM from "../crm";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
-import MembershipPurchaseManager from "../managers/MembershipPurchaseManager";
+import MembershipPurchaseManager, { MembershipPurchaseFetchOptions } from "../managers/MembershipPurchaseManager";
 import { EventRegistration, EventRegistrationProps } from "./EventRegistration";
 
 interface MandatoryContactDetailProps {
     "Volunteer_Contact_Details.Skills_Interests": string[];
+    "Membership_Contact_Details.Membership": number;
     [key: string]: any;
 }
 
@@ -30,6 +31,7 @@ export class Contact implements ContactProps {
     public "last_name": string;
 
     public "Volunteer_Contact_Details.Skills_Interests": string[];
+    public "Membership_Contact_Details.Membership": number;
     [key: string]: any;
 
     constructor(props: ContactProps) {
@@ -42,7 +44,7 @@ export class Contact implements ContactProps {
         this.first_name = props.first_name;
         this.last_name = props.last_name;
 
-        for (const key in props) if (key.startsWith("Volunteer_Contact_Details")) this[key] = props[key];
+        for (const key in props) if (key.startsWith("Volunteer_Contact_Details") || key.startsWith("Membership_Contact_Detail")) this[key] = props[key];
     }
 
     getMandatory<K extends keyof MandatoryContactDetailProps>(input: K): MandatoryContactDetailProps[K] {
@@ -65,7 +67,11 @@ export class Contact implements ContactProps {
         return EventRegistrationManager.fetch({ contactId: this.id });
     }
 
-    async fetchMemberships() {
-        return MembershipPurchaseManager.fetch({ contactId: this.id });
+    async fetchMemberships(options?: MembershipPurchaseFetchOptions) {
+        return MembershipPurchaseManager.fetch({ ...options, contactId: this.id });
+    }
+
+    async renewMembership(pricing: number) {
+        return MembershipPurchaseManager.create(this.id!, pricing);
     }
 }

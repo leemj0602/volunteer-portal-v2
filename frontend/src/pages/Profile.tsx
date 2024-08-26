@@ -22,7 +22,8 @@ export default function Profile() {
 
     const [unsavedContact, setUnsavedContact] = useState<Contact>();
     const [contact, setContact] = useState<Contact>();
-    const [customFieldData, setCustomFieldData] = useState<Map<string, CustomField>>();
+    const [volunteerContactFieldData, setVolunteerContactFieldData] = useState<Map<string, CustomField>>();
+    const [membershipContactFieldData, setMembershipContactFieldData] = useState<Map<string, CustomField>>();
 
     useEffect(() => {
         (async function () {
@@ -31,7 +32,9 @@ export default function Profile() {
             setName(`${data.first_name}${data.last_name?.length ? ` ${data.last_name}` : ""}`);
             setContact(data);
             setUnsavedContact(data);
-            setCustomFieldData(await CustomFieldSetManager.get("Volunteer_Contact_Details"));
+            setVolunteerContactFieldData(await CustomFieldSetManager.get("Volunteer_Contact_Details"));
+            console.log(await CustomFieldSetManager.get("Membership_Contact_Details"));
+            setMembershipContactFieldData(await CustomFieldSetManager.get("Membership_Contact_Details"));
         })();
     }, []);
 
@@ -87,7 +90,7 @@ export default function Profile() {
 
 
     return <Wrapper>
-        {!contact || !customFieldData ? <Loading className="h-screen items-center" /> : <>
+        {!contact || !volunteerContactFieldData || !membershipContactFieldData ? <Loading className="h-screen items-center" /> : <>
             <ConfirmationModal showModal={showModal} closeModal={closeModal} image={ResetPassword}>
                 <h1 className="font-semibold text-lg mt-4">Reset Password Confirmation</h1>
                 <p className="text-gray-500 text-ms mt-2">Click Confirm to redirect to another page to reset your password</p>
@@ -157,6 +160,9 @@ export default function Profile() {
                             <TextField className="flex justify-center" label="Email" id="email_primary.email" fields={contact} disabled={true} showInfo={isEditing} info="Please contact an administrator to have your Email changed" />
                             {/* Phone */}
                             <TextField className="flex justify-center" label="Phone" id="phone_primary.phone_numeric" fields={contact} disabled={true} showInfo={isEditing} info="Please contact an administrator to have your Contact Number changed" />
+                            {/* Membership */}
+                            <TextField className="flex justify-center" label={membershipContactFieldData?.get("Membership_Contact_Details.Membership")?.label!} id="Membership_Contact_Details.Membership" value={membershipContactFieldData?.get("Membership_Contact_Details.Membership")?.options?.find(o => parseInt(o.value) == contact["Membership_Contact_Details.Membership"]!)?.label} disabled={true} showInfo={isEditing} info="Please contact an administrator to change your membership type" />
+                                
                             {/* Name */}
                             <TextField className="flex justify-center" label="Name" id="name" disabled={!isEditing} value={name} handleChange={e => setName(e.target.value)} />
                             {/* Address */}
@@ -171,7 +177,7 @@ export default function Profile() {
                             ]} />
 
                             {/* Custom Fields */}
-                            {customFieldData && Array.from(customFieldData).map(value => {
+                            {volunteerContactFieldData && Array.from(volunteerContactFieldData).map(value => {
                                 const [id, field] = value;
                                 switch (field.html_type) {
                                     case "Text":

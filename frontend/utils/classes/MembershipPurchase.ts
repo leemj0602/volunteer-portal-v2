@@ -1,7 +1,6 @@
 interface MandatoryCustomMembershipProps {
     "Membership_Purchase_Details.Pricing": number | null;
     "Membership_Purchase_Details.Expiration_Date": string | null;
-    [key: string]: any;
 }
 
 export interface MembershipPurchaseProps extends MandatoryCustomMembershipProps {
@@ -19,6 +18,8 @@ export class MembershipPurchase implements MembershipPurchaseProps {
     constructor(props: MembershipPurchaseProps) {
         this.id = props.id;
         this.activity_date_time = props.activity_date_time;
-    }
 
+        this["Membership_Purchase_Details.Pricing"] = props["Membership_Purchase_Details.Pricing"];
+        this["Membership_Purchase_Details.Expiration_Date"] = props["Membership_Purchase_Details.Expiration_Date"];
+    }
 }
