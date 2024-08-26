@@ -4,10 +4,9 @@ import EventRoleManager from "../../utils/managers/EventRoleManager";
 import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
 import { Contact } from "../../utils/classes/Contact";
 import { EventRole } from "../../utils/classes/EventRole";
+import { EventRegistration } from "../../utils/classes/EventRegistration";
 import config from "../../../config";
 import Wrapper from "../components/Wrapper";
-import DashboardHeader, { DashboardHeaderProps } from "../components/DashboardHeader";
-import DashboardStats from "../components/DashboardStats";
 import EventStatus from "../components/EventStatus";
 import UpcomingEvents from "../components/UpcomingEvents";
 import Loading from "../components/Loading";
@@ -15,7 +14,22 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import CancelEvent from "../../assets/undraw_cancel_re_pkdm.svg";
 import { format, parseISO } from "date-fns";
 import swal from 'sweetalert';
-import { EventRegistration } from "../../utils/classes/EventRegistration";
+import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
+import { FiEdit } from "react-icons/fi";
+import { Link } from "react-router-dom";
+
+
+interface DashboardHeaderProps {
+    name: string | null;
+    email: string | null;
+    phone: string | null;
+    imageUrl: string | null;
+}
+
+interface DashboardStatsProps {
+    hours: number,
+    events: number,
+}
 
 export default function Home() {
     const [contact, setContact] = useState<Contact>();
@@ -46,7 +60,6 @@ export default function Home() {
                 setDashboardContact(dashboardContact);
 
                 const registeredEventRoles = await contact.fetchRegistrations();
-                // console.log(registeredEventRoles);
 
                 let minsVolunteeredCalc = 0;
                 let numEventsParticipatedCalc = 0;
@@ -84,10 +97,10 @@ export default function Home() {
                     }
 
                     return {
-                        id: registeredEventRole.id,  // Added this line to include the registration ID
+                        id: registeredEventRole.id,
                         name: eventRole["Volunteer_Event_Role_Details.Role:label"] + ' - ' + eventRole.event.subject,
-                        dateTime: eventRole.activity_date_time, // Store raw date time string for sorting
-                        formattedDateTime: eventRole.activity_date_time ? format(parseISO(eventRole.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A", // Formatted date time for display
+                        dateTime: eventRole.activity_date_time,
+                        formattedDateTime: eventRole.activity_date_time ? format(parseISO(eventRole.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A",
                         status: eventStatus,
                         location: eventRole.event.location,
                         eventRoleId: eventRole["Volunteer_Event_Role_Details.Role"],
@@ -98,9 +111,6 @@ export default function Home() {
 
                 let hoursVolunteered = parseFloat((minsVolunteeredCalc / 60).toFixed(1));
 
-                // console.log(transformedEvents);
-
-                // Sort the events based on status and activity date time
                 const sortedEvents = transformedEvents.sort((a, b) => {
                     const statusOrder = ["Check In", "Checked In", "Upcoming", "Pending", "Unapproved", "No Show", "Cancelled", "Cancelled By Organiser", "Completed"];
                     const statusComparison = statusOrder.indexOf(a.status) - statusOrder.indexOf(b.status);
@@ -141,15 +151,10 @@ export default function Home() {
                     icon: "success",
                 });
 
-                // console.log("currentRegistrationId:", currentRegistrationId);
-                // console.log("volunteeredEvents before update:", registeredEventRoles);
-
-                // Debugging: Log volunteeredEvents after update
                 setRegisteredEventRoles((prevEvents) => {
                     const updatedEvents = prevEvents.map((event) =>
                         event.id === currentRegistrationId ? { ...event, status: "Cancelled" } : event
                     );
-                    // console.log("volunteeredEvents after update:", updatedEvents);
                     return updatedEvents;
                 });
 
@@ -164,55 +169,111 @@ export default function Home() {
         }
     };
 
-    return <Wrapper>
-        <div className="p-4 mb-12">
-            <div className="w-full px-0 md:px-6">
-                {loading ? (
-                    <Loading className="h-screen items-center" />
-                ) : (
-                    <div>
-                        <div className="mb-6 flex">
-                            {dashboardContact && <DashboardHeader {...dashboardContact} />}
-                        </div>
-
-                        <DashboardStats {...{ hours: hoursVolunteered, events: numEventsParticipated }} />
-
-                        <EventStatus
-                            eventRegistrations={registeredEventRoles}
-                            openCancelModal={(registrationId: number) => {
-                                setCurrentRegistrationId(registrationId);
-                                setShowCancelModal(true);
-                            }}
-                        />
-
-                        <UpcomingEvents eventRoles={upcomingUnvolunteeredEvents} />
+    const DashboardHeader = (props: DashboardHeaderProps) => (
+        <div
+            className="relative p-6 md:p-10 shadow-md flex flex-col md:flex-row justify-between items-center rounded-lg w-full"
+            style={{ backgroundColor: "rgba(169, 183, 224, 0.31)" }}
+        >
+            <div className="flex flex-col md:flex-row items-center w-full">
+                <div className="mb-4 md:mb-0 md:mr-6 flex-shrink-0">
+                    <img
+                        src={props.imageUrl || "https://th.bing.com/th/id/R.d995d728def36a40a261e36bab9f9bfe?rik=LDZuJgLPtIzgZw&riu=http%3a%2f%2fromanroadtrust.co.uk%2fwp-content%2fuploads%2f2018%2f01%2fprofile-icon-png-898.png&ehk=WfpwpBbTdOcQK51xzwmVamkbadbdbzi2tYDYnK8V2hM%3d&risl=&pid=ImgRaw&r=0"}
+                        alt="Profile"
+                        className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-white overflow-hidden"
+                    />
+                </div>
+                <div className="flex flex-col md:flex-row items-start md:items-center w-full">
+                    <h1 className="font-semibold text-2xl md:text-3xl lg:text-4xl mb-2 md:mb-0 md:ml-6 lg:ml-10">
+                        {props.name}
+                    </h1>
+                    <div className="flex flex-col items-start md:ml-auto md:mr-10 lg:mr-20 mt-2 md:mt-0">
+                        <p className="text-lg lg:text-xl xl:text-2xl flex items-center font-semibold">
+                            <AiOutlineMail className="text-2xl md:text-2xl mr-2 text-[#5A71B4] hover:text-[#495b92] cursor-pointer" />
+                            {props.email}
+                        </p>
+                        <p className="text-lg lg:text-xl xl:text-2xl flex items-center font-semibold">
+                            <AiOutlinePhone className="text-2xl md:text-2xl mr-2 text-[#5A71B4] hover:text-[#495b92] cursor-pointer" />
+                            {props.phone}
+                        </p>
                     </div>
-                )}
+                </div>
+            </div>
+            <div className="absolute top-5 right-5">
+                <Link to="/profile">
+                    <button className="text-[#5A71B4] hover:text-[#495b92]">
+                        <FiEdit className="w-6 h-6 md:w-8 md:h-8" />
+                    </button>
+                </Link>
             </div>
         </div>
+    );
 
-        <ConfirmationModal
-            showModal={showCancelModal}
-            closeModal={() => setShowCancelModal(false)}
-            image={CancelEvent}
-            imageWidth="w-[260px]"
-            imageHeight="h-[160px]"
-            boxWidth="max-w-[400px]"
-        >
-            <h3 className="text-xl font-semibold text-center mb-4 text-gray-600">
-                Are you sure you want to cancel this event?
-            </h3>
-            <div className="flex flex-col items-center space-y-4">
-                <button className="w-[200px] py-4 text-lg bg-[#5A71B4] text-white rounded-md hover:bg-[#4a77ff]" onClick={handleCancelConfirm} disabled={isCancelling}>
-                    {isCancelling ? "Cancelling..." : "Confirm"}
-                </button>
-                <button
-                    className="w-[200px] py-4 text-lg text-gray-600 rounded-md hover:bg-gray-200"
-                    onClick={() => setShowCancelModal(false)}
-                >
-                    Cancel
-                </button>
+    const DashboardStats = (props: DashboardStatsProps) => (
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="relative bg-white p-6 rounded-lg shadow-md flex flex-col min-h-[120px]">
+                <div className="absolute left-0 top-0 bottom-0 w-3 rounded-tl-lg rounded-bl-lg" style={{ backgroundColor: "#A9B7E0" }}></div>
+                <div className="text-xl font-bold text-black-700 mb-2 mt-2 text-left pl-4">Number of Hours Volunteered</div>
+                <div className="text-4xl font-semibold text-black flex justify-center items-center flex-grow">{props.hours}</div>
             </div>
-        </ConfirmationModal>
-    </Wrapper>
+            <div className="relative bg-white p-6 rounded-lg shadow-md flex flex-col min-h-[120px]">
+                <div className="absolute left-0 top-0 bottom-0 w-3 rounded-tl-lg rounded-bl-lg" style={{ backgroundColor: "#A9B7E0" }}></div>
+                <div className="text-xl font-bold text-black-700 mb-2 mt-2 text-left pl-4">Volunteering Events Participated</div>
+                <div className="text-4xl font-semibold text-black flex justify-center items-center flex-grow">{props.events}</div>
+            </div>
+        </div>
+    );
+
+    return (
+        <Wrapper>
+            <div className="p-4 mb-12">
+                <div className="w-full px-0 md:px-6">
+                    {loading ? (
+                        <Loading className="h-screen items-center" />
+                    ) : (
+                        <div>
+                            <div className="mb-6 flex">
+                                {dashboardContact && <DashboardHeader {...dashboardContact} />}
+                            </div>
+
+                            <DashboardStats {...{ hours: hoursVolunteered, events: numEventsParticipated }} />
+
+                            <EventStatus
+                                eventRegistrations={registeredEventRoles}
+                                openCancelModal={(registrationId: number) => {
+                                    setCurrentRegistrationId(registrationId);
+                                    setShowCancelModal(true);
+                                }}
+                            />
+
+                            <UpcomingEvents eventRoles={upcomingUnvolunteeredEvents} />
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            <ConfirmationModal
+                showModal={showCancelModal}
+                closeModal={() => setShowCancelModal(false)}
+                image={CancelEvent}
+                imageWidth="w-[260px]"
+                imageHeight="h-[160px]"
+                boxWidth="max-w-[400px]"
+            >
+                <h3 className="text-xl font-semibold text-center mb-4 text-gray-600">
+                    Are you sure you want to cancel this event?
+                </h3>
+                <div className="flex flex-col items-center space-y-4">
+                    <button className="w-[200px] py-4 text-lg bg-[#5A71B4] text-white rounded-md hover:bg-[#4a77ff]" onClick={handleCancelConfirm} disabled={isCancelling}>
+                        {isCancelling ? "Cancelling..." : "Confirm"}
+                    </button>
+                    <button
+                        className="w-[200px] py-4 text-lg text-gray-600 rounded-md hover:bg-gray-200"
+                        onClick={() => setShowCancelModal(false)}
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </ConfirmationModal>
+        </Wrapper>
+    );
 }
