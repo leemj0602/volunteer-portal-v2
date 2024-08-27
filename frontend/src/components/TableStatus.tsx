@@ -23,7 +23,7 @@ interface Registration {
 
 interface TableStatusProps {
   registrations: Registration[];
-  openCancelModal: (registrationId: number) => void;
+  openCancelModal: (registrationId: number, type: "Event" | "Training") => void;
 }
 
 export default function TableStatus({ registrations, openCancelModal }: TableStatusProps) {
@@ -247,7 +247,7 @@ export default function TableStatus({ registrations, openCancelModal }: TableSta
                                 }`}
                               onClick={() => {
                                 if (registration.status !== "Completed" && registration.status !== "Cancelled" && registration.status !== "Cancelled By Organiser") {
-                                  openCancelModal(registration.id);
+                                  openCancelModal(registration.id, registration.type);
                                 }
                               }}
                             >

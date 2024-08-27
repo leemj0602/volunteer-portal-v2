@@ -18,6 +18,7 @@ import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
 import { FiEdit } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { TrainingRegistration } from "../../utils/classes/TrainingRegistration";
+import TrainingRegistrationManager from "../../utils/managers/TrainingRegistrationManager";
 
 
 interface DashboardHeaderProps {
@@ -42,6 +43,7 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [showCancelModal, setShowCancelModal] = useState(false);
     const [currentRegistrationId, setCurrentRegistrationId] = useState<number | null>(null);
+    const [currentRegistrationType, setCurrentRegistrationType] = useState<"Event" | "Training" | null>(null);
     const [isCancelling, setIsCancelling] = useState(false);
     const [registeredTrainingSchedules, setRegisteredTrainingSchedules] = useState<any[]>([]);
 
@@ -138,7 +140,6 @@ export default function Home() {
                 setUpcomingUnvolunteeredEvents(unvolunteeredEvents as EventRole[]);
 
                 const registeredTrainingSchedules = await contact.fetchTrainingRegistrations();
-                console.log("registered training schedules: ", registeredTrainingSchedules);
 
                 const transformedTrainings = registeredTrainingSchedules.map((registeredTrainingSchedule: TrainingRegistration) => {
                     const { trainingSchedule } = registeredTrainingSchedule;
@@ -200,25 +201,39 @@ export default function Home() {
 
     const handleCancelConfirm = async () => {
         setIsCancelling(true);
-        if (currentRegistrationId !== null) {
-            const result = await EventRegistrationManager.cancelEvent(currentRegistrationId);
+        if (currentRegistrationId !== null && currentRegistrationType !== null) {
+            let result = false;
+
+            if (currentRegistrationType === "Event") {
+                result = await EventRegistrationManager.cancelEvent(currentRegistrationId);
+            } else if (currentRegistrationType === "Training") {
+                result = await TrainingRegistrationManager.cancelEvent(currentRegistrationId)
+            }
+
             if (result) {
                 setShowCancelModal(false);
-                swal("Event has been cancelled", {
+                swal("Registration has been cancelled", {
                     icon: "success",
                 });
 
-                setRegisteredEventRoles((prevEvents) => {
-                    const updatedEvents = prevEvents.map((event) =>
-                        event.id === currentRegistrationId ? { ...event, status: "Cancelled" } : event
+                if (currentRegistrationType === "Event") {
+                    setRegisteredEventRoles((prevEvents) =>
+                        prevEvents.map((event) =>
+                            event.id === currentRegistrationId ? { ...event, status: "Cancelled" } : event
+                        )
                     );
-                    return updatedEvents;
-                });
+                } else if (currentRegistrationType === "Training") {
+                    setRegisteredTrainingSchedules((prevTrainings) =>
+                        prevTrainings.map((training) =>
+                            training.id === currentRegistrationId ? { ...training, status: "Cancelled" } : training
+                        )
+                    );
+                }
 
                 setIsCancelling(false);
             } else {
                 setShowCancelModal(false);
-                swal("Event cancellation failed", {
+                swal("Registration cancellation failed", {
                     icon: "error",
                 });
                 setIsCancelling(false);
@@ -296,8 +311,9 @@ export default function Home() {
 
                             <TableStatus
                                 registrations={registeredEventRoles}
-                                openCancelModal={(registrationId: number) => {
+                                openCancelModal={(registrationId: number, type: "Event" | "Training") => {
                                     setCurrentRegistrationId(registrationId);
+                                    setCurrentRegistrationType(type);
                                     setShowCancelModal(true);
                                 }}
                             />
@@ -306,8 +322,9 @@ export default function Home() {
 
                             <TableStatus
                                 registrations={registeredTrainingSchedules}
-                                openCancelModal={(registrationId: number) => {
+                                openCancelModal={(registrationId: number, type: "Event" | "Training") => {
                                     setCurrentRegistrationId(registrationId);
+                                    setCurrentRegistrationType(type);
                                     setShowCancelModal(true);
                                 }}
                             />
@@ -325,7 +342,7 @@ export default function Home() {
                 boxWidth="max-w-[400px]"
             >
                 <h3 className="text-xl font-semibold text-center mb-4 text-gray-600">
-                    Are you sure you want to cancel this event?
+                    Are you sure you want to cancel this registration?
                 </h3>
                 <div className="flex flex-col items-center space-y-4">
                     <button className="w-[200px] py-4 text-lg bg-[#5A71B4] text-white rounded-md hover:bg-[#4a77ff]" onClick={handleCancelConfirm} disabled={isCancelling}>

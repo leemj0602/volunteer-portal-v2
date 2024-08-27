@@ -36,6 +36,20 @@ const TrainingRegistrationManager = new class TrainingRegistrationManager {
 
         return (response?.data as TrainingRegistrationProps[]).map(d => new TrainingRegistration(d));
     }
+
+    async cancelEvent(registrationActivityId: number) {
+        const cancel = await CRM("Activity", 'update', {
+            values: [
+                ['status_id:name', 'Cancelled'],
+            ],
+            where: [
+                ['id', '=', registrationActivityId],
+            ]
+        });
+
+        return cancel?.data.length > 0;
+    }
+
 }
 
 export default TrainingRegistrationManager;

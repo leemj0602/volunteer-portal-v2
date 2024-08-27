@@ -27,10 +27,8 @@ export default function TrainingPage() {
         (async () => {
             const training = await TrainingManager.fetch({ id }) as Training;
             setTraining(training);
-            console.log(training.contact);
 
             const trainingSchedules = await training?.fetchSchedules() as TrainingSchedule[];
-            console.log(trainingSchedules);
             setSchedules(trainingSchedules);
         })();
     }, [id]);
