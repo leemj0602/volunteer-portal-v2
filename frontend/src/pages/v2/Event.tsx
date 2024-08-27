@@ -154,7 +154,7 @@ function EventRoleDisplay({ eventRole }: EventRoleDisplayProps) {
     const endDate = moment(eventRole.activity_date_time).add(eventRole.duration, "minutes");
     const registrationEndDate = moment(eventRole["Volunteer_Event_Role_Details.Registration_End_Date"]);
 
-    return <tr className="hover:bg-gray-100 transition ease-in-out cursor-pointer">
+    return <tr>
         {/* Date */}
         <td className="px-2 py-3 whitespace-nowrap text-sm font-medium text-gray-800">{startDate.format("D MMM h:mm A").toUpperCase()} - {endDate.format(startDate.format("DD-MM") == endDate.format("DD-MM") ? "LT" : "D MMM h:mm A").toUpperCase()}</td>
         {/* Registration Period */}
@@ -168,9 +168,9 @@ function EventRoleDisplay({ eventRole }: EventRoleDisplayProps) {
             <RegistrationButton eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
         </td>}
         {/* Chevron */}
-        <td className="px-2 py-3 whitespace-nowrap">
+        {/* <td className="px-2 py-3 whitespace-nowrap">
             <ChevronDownIcon className="w-5 h-5 text-gray-800" />
-        </td>
+        </td> */}
     </tr>
 }
 // #endregion

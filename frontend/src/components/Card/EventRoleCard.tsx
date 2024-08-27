@@ -7,7 +7,6 @@ import moment from "moment";
 import { GrGroup, GrLocation } from "react-icons/gr";
 import { IoBriefcaseOutline } from "react-icons/io5";
 import { Spinner } from "flowbite-react";
-import config from "../../../../config";
 import { EventStatus } from "../../../utils/classes/EventDetails";
 
 interface EventRoleCardProps {
@@ -25,8 +24,7 @@ export default function EventRoleCard(props: EventRoleCardProps) {
     return <Card
         className={props.className}
         thumbnail={props.eventRole.event["thumbnail.uri"]}
-        url={`/events/${props.eventRole.id}`}
-        // url={`/events/${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}
+        url={`/events/${props.eventRole.event.id}/${props.eventRole["Volunteer_Event_Role_Details.Role"]}`}
         cancelled={props.eventRole["status_id:name"] == EventStatus.Cancelled}
     >
         <h1 className="font-semibold mb-4">{props.eventRole.event.subject}</h1>

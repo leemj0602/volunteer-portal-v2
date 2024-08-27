@@ -16,7 +16,11 @@ const EventRoleManager = new class EventRoleManager {
     private entity = "Activity";
 
     async fetch(options?: FetchOptions): Promise<EventRole | EventRole[]> {
-        const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Event Role"]];
+        const where: [string, ComparisonOperator, any][] = [
+            ["activity_type_id:name", "=", "Volunteer Event Role"],
+            ["event.status_id:name", "=", "Available"],
+            ["status_id:name", "!=", "Cancelled"]
+        ];
         if (options?.id) where.push(["id", "=", options.id]);
         else if (options?.where) where.push(...options.where);
 

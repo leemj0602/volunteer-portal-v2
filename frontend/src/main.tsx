@@ -4,8 +4,6 @@ import { HashRouter, Route, Routes } from "react-router-dom";
 import "./main.css";
 import Home from "./pages/Home";
 import ProfileV1 from "./pages/v1/Profile";
-import EventsV1 from "./pages/v1/Events";
-import EventV1 from "./pages/v1/Event";
 import Trainings from "./pages/Trainings";
 import Training from "./pages/Training";
 import EventsV2 from "./pages/v2/Events";
