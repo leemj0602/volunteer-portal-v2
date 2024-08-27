@@ -1,4 +1,5 @@
 import EventRegistrationManager from "../managers/EventRegistrationManager";
+import TrainingRegistrationManager from "../managers/TrainingRegistrationManager";
 
 interface MandatoryContactDetailProps {
     "Volunteer_Contact_Details.Skills_Interests": string[];
@@ -61,7 +62,11 @@ export class Contact implements ContactProps {
     }
 
 
-    async fetchRegistrations() {
+    async fetchEventRegistrations() {
         return EventRegistrationManager.fetch({ contactId: this.id! });
+    }
+
+    async fetchTrainingRegistrations() {
+        return TrainingRegistrationManager.fetch({ contactId: this.id! });
     }
 }

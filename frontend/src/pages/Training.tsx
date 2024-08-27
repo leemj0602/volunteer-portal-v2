@@ -27,10 +27,8 @@ export default function TrainingPage() {
         (async () => {
             const training = await TrainingManager.fetch({ id }) as Training;
             setTraining(training);
-            console.log(training.contact);
 
             const trainingSchedules = await training?.fetchSchedules() as TrainingSchedule[];
-            console.log(trainingSchedules);
             setSchedules(trainingSchedules);
         })();
     }, [id]);
@@ -231,7 +229,6 @@ export default function TrainingPage() {
                 <Loading className="h-screen items-center" />
             ) : (
                 <div className="p-4">
-                    <h1 className="font-semibold text-lg text-gray-600">Training Details</h1>
                     <div className="bg-white rounded-md mt-4 py-6 px-2 max-w-[1400px]">
                         {/* Image */}
                         <div className="mb-8 h-[200px] rounded-lg relative border border-gray-50 bg-gray-200">
