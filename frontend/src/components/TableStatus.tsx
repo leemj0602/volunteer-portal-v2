@@ -228,7 +228,13 @@ export default function TableStatus({ registrations, openCancelModal }: TableSta
                       </button>
                       {openMenuIndex === index && (
                         <div
-                          className={`absolute right-0 w-40 bg-white shadow-lg rounded-md z-50 ${index >= currentRegistrations.length - 2 ? 'bottom-full mb-2' : 'top-full mt-2'
+                          className={`absolute right-0 w-40 bg-white shadow-lg rounded-md z-50 ${currentRegistrations.length > 2
+                            ? index >= currentRegistrations.length - 2
+                              ? 'bottom-full mb-2' // Open upwards for the last two rows
+                              : 'top-full mt-2' // Open downwards for all other rows
+                            : index === currentRegistrations.length - 1
+                              ? 'bottom-full mb-2' // Open upwards for the last row when there are 2 rows
+                              : 'top-full mt-2' // Open downwards for the first row when there are 1 or 2 rows
                             }`}
                         >
                           <ul>
