@@ -123,7 +123,7 @@ export default function TrainingPage() {
                             >
                                 {/* Training Date Column */}
                                 <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-800">
-                                    {moment(Activity_Date_Time).format('LLL')} - {End_Time.format('LT')}
+                                    {moment(Activity_Date_Time).format('D MMM YYYY LT')} - {End_Time.format('LT')}
                                 </td>
 
                                 {/* Participants Column */}
@@ -133,7 +133,7 @@ export default function TrainingPage() {
 
                                 {/* Registration end hidden on lg and below */}
                                 <td className="hidden lg:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">
-                                    {Registration_End_Date === "N/A" ? moment(Activity_Date_Time).format('LLL') : moment(Registration_End_Date).format('LLL')}
+                                    {Registration_End_Date === "N/A" ? moment(Activity_Date_Time).format('D MMM YYYY LT') : moment(Registration_End_Date).format('D MMM YYYY LT')}
                                 </td>
 
                                 {/* Register hidden on md and below */}
@@ -181,11 +181,11 @@ export default function TrainingPage() {
                                 <tr>
                                     <td colSpan={5} className="px-2 py-4 bg-gray-50 text-sm text-gray-700">
                                         <div><strong>Location:</strong> {Location}</div>
-                                        <div><strong>Valid Through:</strong> {Expiration_Date === "N/A" ? Expiration_Date : moment(Expiration_Date).format('LLL')}</div>
+                                        <div><strong>Valid Through:</strong> {Expiration_Date === "N/A" ? Expiration_Date : moment(Expiration_Date).format('D MMM YYYY LT')}</div>
 
                                         {/* Registration Period and Register fields visible only on lg and md or smaller screens respectively */}
                                         <div className="lg:hidden">
-                                            <div><strong>Registration End:</strong> <br />{moment(Registration_End_Date).format('LLL')}</div>
+                                            <div><strong>Registration End:</strong> <br />{moment(Registration_End_Date).format('D MMM YYYY LT')}</div>
                                             <button
                                                 disabled={!isRegistrationOpen || userIsRegistered || isRegistering}
                                                 className={`md:hidden mt-2 w-[150px] px-2 py-2 rounded font-semibold ${userIsRegistered ? 'bg-blue-500 text-white cursor-not-allowed' : isRegistrationOpen ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700 cursor-not-allowed'} flex items-center justify-center`}
