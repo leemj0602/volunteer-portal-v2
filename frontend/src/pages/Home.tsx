@@ -15,7 +15,8 @@ import ConfirmationModal from "../components/ConfirmationModal";
 import CancelEvent from "../../assets/undraw_cancel_re_pkdm.svg";
 import { format, parseISO } from "date-fns";
 import swal from 'sweetalert';
-import MembershipStatus from "../components/MembershipStatus";
+import MembershipHistoryStatus from "../components/MembershipHistoryStatus";
+import MembershipStatusSection from "../components/MembershipStatus";
 
 export default function Home() {
     const [contact, setContact] = useState<Contact>();
@@ -178,7 +179,8 @@ export default function Home() {
                         <DashboardStats {...{ hours: hoursVolunteered, events: numEventsParticipated }} />
 
 
-                        <MembershipStatus contact={contact!} />
+                        <MembershipStatusSection contact={contact!} />
+                        <MembershipHistoryStatus contact={contact!} />
                         
                         
                         <EventStatus

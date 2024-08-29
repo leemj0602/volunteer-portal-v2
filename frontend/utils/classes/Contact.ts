@@ -2,6 +2,8 @@ import CRM from "../crm";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
 import MembershipPurchaseManager, { MembershipPurchaseFetchOptions } from "../managers/MembershipPurchaseManager";
 import { EventRegistration, EventRegistrationProps } from "./EventRegistration";
+import { iMembership, Membership } from "./Membership";
+import { MembershipHistory } from "./MembershipHistory";
 
 interface MandatoryContactDetailProps {
     "Volunteer_Contact_Details.Skills_Interests": string[];
@@ -67,8 +69,32 @@ export class Contact implements ContactProps {
         return EventRegistrationManager.fetch({ contactId: this.id });
     }
 
-    async fetchMemberships(options?: MembershipPurchaseFetchOptions) {
-        return MembershipPurchaseManager.fetch({ ...options, contactId: this.id });
+    async fetchMemberships(): Promise<Membership[] | null> {
+        const response = await CRM("Membership", "get", {
+            select: ["*", "status_id:name", "membership_type_id:name"],
+            where: [["contact_id", "=", this.id]]
+         }).catch(() => null);
+        if (!response?.data.length) return null;
+        return response.data.map((d: iMembership) => new Membership(d));
+    }
+
+    async fetchedMembershipHistory() {
+        const response = await CRM("Activity", "get", {
+            select: [
+                "activity_type_id:name",
+                "activity_date_time",
+                "membership.join_date",
+                "membership.start_date",
+                "membership.end_date",
+                "membership.membership_type_id:label",
+            ],
+            join: [["Membership AS membership", "LEFT", ["source_record_id", "=", "membership.id"]]],
+            where: [["activity_type_id:name", "IN", ["Membership Signup", "Membership Renewal"]]],
+            order: [["activity_date_time", "DESC"]]
+        }).catch(() => null);
+
+        if (!response?.data.length) return null;
+        else return response.data as MembershipHistory[];
     }
 
     async renewMembership(pricing: number) {
