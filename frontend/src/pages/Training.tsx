@@ -97,7 +97,7 @@ export default function TrainingPage() {
                     const isExpanded = expandedRowIds.has(schedule.id as number);
                     const Activity_Date_Time = schedule.activity_date_time ?? 'N/A';
                     const Duration = schedule.training.duration ?? 0;
-                    const End_Time = moment(Activity_Date_Time).add(Duration, 'minutes');
+                    const End_Date_Time = moment(Activity_Date_Time).add(Duration, 'minutes');
                     const Vacancy = schedule["Volunteer_Training_Schedule_Details.Vacancy"] ?? 'N/A';
                     const NumRegistrations = schedule.registrations.length;
                     const Registration_Start_Date = schedule["Volunteer_Training_Schedule_Details.Registration_Start_Date"] ?? 'N/A';
@@ -123,21 +123,21 @@ export default function TrainingPage() {
                             >
                                 {/* Training Date Column */}
                                 <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-800">
-                                    {moment(Activity_Date_Time).format('D MMM YYYY LT')} - {End_Time.format('LT')}
+                                    {moment(Activity_Date_Time).format('D MMM YYYY, LT')} - {End_Date_Time.format(moment(Activity_Date_Time).format('D MMM') === End_Date_Time.format('D MMM') ? 'LT' : 'D MMM YYYY, LT')}
                                 </td>
 
                                 {/* Participants Column */}
-                                <td className="px-2 py-3 whitespace-nowrap text-sm text-gray-800">
+                                <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">
                                     {Vacancy === "N/A" ? NumRegistrations : NumRegistrations + "/" + Vacancy}
                                 </td>
 
                                 {/* Registration end hidden on lg and below */}
                                 <td className="hidden lg:table-cell px-2 py-3 whitespace-nowrap text-sm text-gray-800">
-                                    {Registration_End_Date === "N/A" ? moment(Activity_Date_Time).format('D MMM YYYY LT') : moment(Registration_End_Date).format('D MMM YYYY LT')}
+                                    {Registration_End_Date === "N/A" ? moment(Activity_Date_Time).format('D MMM YYYY, LT') : moment(Registration_End_Date).format('D MMM YYYY, LT')}
                                 </td>
 
                                 {/* Register hidden on md and below */}
-                                <td className="hidden md:table-cell px-2 py-3 whitespace-nowrap">
+                                <td className="px-2 py-3 whitespace-nowrap">
                                     <button
                                         disabled={!isRegistrationOpen || userIsRegistered || isRegistering}
                                         className={`w-[150px] px-2 py-2 rounded font-semibold ${userIsRegistered ? 'bg-blue-500 text-white cursor-not-allowed' : isRegistrationOpen ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-800 cursor-not-allowed'} flex items-center justify-center`}
@@ -181,37 +181,14 @@ export default function TrainingPage() {
                                 <tr>
                                     <td colSpan={5} className="px-2 py-4 bg-gray-50 text-sm text-gray-700">
                                         <div><strong>Location:</strong> {Location}</div>
-                                        <div><strong>Valid Through:</strong> {Expiration_Date === "N/A" ? Expiration_Date : moment(Expiration_Date).format('D MMM YYYY LT')}</div>
+                                        <div><strong>Valid Through:</strong> {Expiration_Date === "N/A" ? Expiration_Date : moment(Expiration_Date).format('D MMM YYYY, LT')}</div>
 
-                                        {/* Registration Period and Register fields visible only on lg and md or smaller screens respectively */}
+                                        {/* Registration Period and Participants fields visible only on lg and md or smaller screens respectively */}
                                         <div className="lg:hidden">
-                                            <div><strong>Registration End:</strong> <br />{moment(Registration_End_Date).format('D MMM YYYY LT')}</div>
-                                            <button
-                                                disabled={!isRegistrationOpen || userIsRegistered || isRegistering}
-                                                className={`md:hidden mt-2 w-[150px] px-2 py-2 rounded font-semibold ${userIsRegistered ? 'bg-blue-500 text-white cursor-not-allowed' : isRegistrationOpen ? 'bg-green-500 text-white' : 'bg-gray-300 text-gray-700 cursor-not-allowed'} flex items-center justify-center`}
-                                                onClick={(e) => {
-                                                    e.stopPropagation(); // Prevent row click event
-                                                    handleRegisterClick(schedule);
-                                                }}>
-                                                {isRegistering ? (
-                                                    <Spinner className="w-5 h-5 mr-2 text-white" />
-                                                ) : userIsRegistered ? (
-                                                    <>
-                                                        <CheckIcon className="w-5 h-5 mr-2 text-white" />
-                                                        Registered
-                                                    </>
-                                                ) : isRegistrationOpen ? (
-                                                    <>
-                                                        <PencilIcon className="w-5 h-5 mr-2 text-white" />
-                                                        Register
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <LockClosedIcon className="w-5 h-5 mr-2 text-gray-500" />
-                                                        Closed
-                                                    </>
-                                                )}
-                                            </button>
+                                            <div><strong>Registration End:</strong> <br />{moment(Registration_End_Date).format('D MMM YYYY, LT')}</div>
+                                        </div>
+                                        <div className="md:hidden">
+                                            <div><strong>Participants:</strong> <br />{Vacancy === "N/A" ? NumRegistrations : NumRegistrations + "/" + Vacancy}</div>
                                         </div>
                                     </td>
                                 </tr>
@@ -283,9 +260,9 @@ export default function TrainingPage() {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Training Date</strong></th>
-                                        <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Participants</strong></th>
+                                        <th className="hidden md:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Participants</strong></th>
                                         <th className="hidden lg:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Registration End</strong></th>
-                                        <th className="hidden md:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Register</strong></th>
+                                        <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Register</strong></th>
                                         <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"></th>
                                     </tr>
                                 </thead>
