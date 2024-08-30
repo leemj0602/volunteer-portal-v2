@@ -1,3 +1,5 @@
+import CRM from "../crm";
+
 export enum MembershipStatus {
     New = 1,
     Current = 2,
@@ -41,5 +43,11 @@ export class Membership implements iMembership {
         this.end_date = props.end_date;
         this.status_id = props.status_id;
         this["status_id:name"] = props["status_id:name"];
+    }
+
+    async update(values: [keyof Membership, any][]) {
+        await CRM("Membership", "update", { where: [["id", "=", this.id]], values });
+        for (const [key, value] of values) (this as any)[key as any] = value;
+        return this;
     }
 }

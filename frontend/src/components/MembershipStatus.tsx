@@ -1,8 +1,13 @@
-import { useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState } from "react";
 import { Contact } from "../../utils/classes/Contact";
 import { Membership, MembershipStatus } from "../../utils/classes/Membership";
 import moment from "moment";
 import { Spinner } from "flowbite-react";
+import swal from "sweetalert";
+import CRM from "../../utils/crm";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import config from "../../../config";
 
 interface MembershipStatusSectionProps {
     contact: Contact;
@@ -11,6 +16,7 @@ interface MembershipStatusSectionProps {
 export default function MembershipStatusSection({ contact }: MembershipStatusSectionProps) {
     const [memberships, setMemberships] = useState<Membership[]>();
     const [isLoading, setIsLoading] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         (async () => {
@@ -21,8 +27,33 @@ export default function MembershipStatusSection({ contact }: MembershipStatusSec
         })();
     }, []);
 
-    const renewMembership = () => {
-    
+    const renewMembership = async (e: MouseEvent<HTMLButtonElement>, membership: Membership) => {
+        e.preventDefault();
+        setIsLoading(true);
+
+        console.log("Update the Membership");
+        await membership.update([
+            ["start_date", moment(Date.now()).format("YYYY-MM-DD")],
+            ["end_date", moment(Date.now() + 6.312e+10).format("YYYY-MM-DD")]
+        ]);
+
+        console.log("Create an activity called Membership Renewal");
+        await CRM("Activity", "create", {
+            values: [
+                ["source_record_id", membership.id],
+                ["source_contact_id", contact.id],
+                ["target_contact_id", contact.id],
+                ["activity_type_id:name", "Membership Renewal"],
+
+            ]
+        });
+
+        const response = await axios.post(`${config.domain}/portal/api/create.php`,
+            { items: [{ email: contact["email_primary.email"], amount: 10 * 100 }] },
+            { headers: { "Content-Type": "application/json" } }
+        );
+        const { clientSecret } = response.data;
+        navigate(`/checkout/${clientSecret}`);
     }
 
     return <div className="my-6">
@@ -51,7 +82,7 @@ export default function MembershipStatusSection({ contact }: MembershipStatusSec
                                 {membership.status_id != MembershipStatus.Expired ? "Ongoing" : "Expired"}
                             </td>
                             <td className="text-end pr-4">
-                                <button onClick={() => renewMembership()} className="bg-secondary py-1 w-[150px] text-white rounded-md disabled:bg-primary disabled:cursor-not-allowed" disabled={isLoading || membership.status_id == MembershipStatus.Expired || Date.now() < new Date(membership.end_date).getTime() - 6.048e+8}>
+                                <button onClick={e => renewMembership(e, membership)} className="bg-secondary py-1 w-[150px] text-white rounded-md disabled:bg-primary disabled:cursor-not-allowed" disabled={isLoading || ![MembershipStatus.Current, MembershipStatus.New, MembershipStatus.Expired].includes(membership.status_id) || Date.now() < new Date(membership.end_date).getTime() - 6.048e+8}>
                                     {isLoading ? <Spinner className="fill-secondary text-primary w-5 h-5" /> : "Renew Membership"}
                                 </button>
                             </td>
