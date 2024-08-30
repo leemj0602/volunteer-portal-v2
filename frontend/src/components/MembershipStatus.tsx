@@ -21,6 +21,10 @@ export default function MembershipStatusSection({ contact }: MembershipStatusSec
         })();
     }, []);
 
+    const renewMembership = () => {
+    
+    }
+
     return <div className="my-6">
         <div className="flex justify-between mb-5">
             <h2 className="text-3xl font-semibold">Membership Status</h2>
@@ -47,7 +51,7 @@ export default function MembershipStatusSection({ contact }: MembershipStatusSec
                                 {membership.status_id != MembershipStatus.Expired ? "Ongoing" : "Expired"}
                             </td>
                             <td className="text-end pr-4">
-                                <button className="bg-secondary py-1 w-[150px] text-white rounded-md disabled:bg-primary disabled:cursor-not-allowed" disabled={isLoading || membership.status_id == MembershipStatus.Expired || Date.now() < new Date(membership.end_date).getTime() - 6.048e+8}>
+                                <button onClick={() => renewMembership()} className="bg-secondary py-1 w-[150px] text-white rounded-md disabled:bg-primary disabled:cursor-not-allowed" disabled={isLoading || membership.status_id == MembershipStatus.Expired || Date.now() < new Date(membership.end_date).getTime() - 6.048e+8}>
                                     {isLoading ? <Spinner className="fill-secondary text-primary w-5 h-5" /> : "Renew Membership"}
                                 </button>
                             </td>
