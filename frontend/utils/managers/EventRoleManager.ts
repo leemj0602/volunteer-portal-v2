@@ -10,6 +10,7 @@ export interface FetchOptions {
     select?: string[];
     where?: [string, ComparisonOperator, any][];
     group?: string[];
+    order?: [string, "ASC" | "DESC"][];
 }
 
 const EventRoleManager = new class EventRoleManager {
@@ -52,7 +53,8 @@ const EventRoleManager = new class EventRoleManager {
             ],
             limit: options?.limit,
             offset: options?.page && options?.limit ? (options?.page - 1) * options?.limit : 0,
-            group: options?.group ?? []
+            group: options?.group ?? [],
+            order: options?.order ?? []
         });
 
         if (options?.id) return new EventRole(response!.data[0]);

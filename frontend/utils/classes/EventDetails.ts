@@ -73,6 +73,7 @@ export class EventDetails implements EventDetailProps {
                 ["Volunteer_Event_Role_Details.Event", "=", this.id],
                 ["Volunteer_Event_Role_Details.Role", "=", roleId]
             ],
+            order: [["activity_date_time", "DESC"]]
         }) as EventRole[];
     }
 }
