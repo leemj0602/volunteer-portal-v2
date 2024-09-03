@@ -229,7 +229,10 @@ export default function Event() {
                             <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
                                 <FiCalendar size={22} />
                                 <div className="flex flex-col sm:flex-row gap-x-3">
-                                    <span>{moment(eventRoles[0].activity_date_time).format("D MMM YYYY, h:mm A")}<span>-</span></span>
+                                    <div className="flex items-center">
+                                        <span>{moment(eventRoles[0].activity_date_time).format("D MMM YYYY, h:mm A")}</span>
+                                        <span className="flex-shrink-0 ml-3.5">-</span>
+                                    </div>
                                     <span>{moment(new Date(eventRoles[0].activity_date_time!).getTime() + (eventRoles[0].duration! * 60 * 1000)).format("D MMM YYYY, h:mm A")}</span>
                                 </div>
                             </div>
