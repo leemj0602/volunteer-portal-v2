@@ -56,7 +56,8 @@ const EventRoleManager = new class EventRoleManager {
         });
 
         if (options?.id) return new EventRole(response!.data[0]);
-        return response?.data.map((r: EventRoleProps) => new EventRole(r));
+        if (!response?.data?.map) return [] as EventRole[];
+        return response.data.map((r: EventRoleProps) => new EventRole(r));
     }
 
     async fetchUnregistered(registeredEventRoles: number[]) {

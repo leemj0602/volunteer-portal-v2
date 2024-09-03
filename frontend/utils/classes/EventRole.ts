@@ -20,6 +20,7 @@ export interface EventRoleProps extends MandatoryCustomEventRoleProps {
     id: number | null;
     activity_date_time: string | null;
     duration: number | null;
+    location: string | null;
     "status_id:name": EventStatus | null;
 }
 
@@ -28,6 +29,7 @@ export class EventRole implements EventRoleProps {
     public id: number | null;
     public activity_date_time: string | null;
     public duration: number | null;
+    public location: string | null;
     public event: EventDetails;
     public "status_id:name": EventStatus | null;
 
@@ -45,6 +47,7 @@ export class EventRole implements EventRoleProps {
         this.id = props.id;
         this.activity_date_time = props.activity_date_time;
         this.duration = props.duration;
+        this.location = props.location;
         this["status_id:name"] = props["status_id:name"];
 
         const eventDetails: Partial<EventDetailProps> = {};
