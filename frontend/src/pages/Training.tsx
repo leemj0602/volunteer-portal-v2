@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import Wrapper from "../components/Wrapper";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Training } from "../../utils/classes/Training";
 import { TrainingSchedule } from "../../utils/classes/TrainingSchedule";
 import TrainingManager from "../../utils/managers/TrainingManager";
@@ -17,7 +17,7 @@ export default function TrainingPage() {
     const [training, setTraining] = useState<Training>();
     const [schedules, setSchedules] = useState<any[]>([]);
     const [loadingScheduleId, setLoadingScheduleId] = useState<number | null>(null);
-    const [vacancy, setVacancy] = useState<number | string>('N/A');
+    const [dataFetched, setDataFetched] = useState<boolean>(false);
     const email = (window as any).email ?? config.email;
 
     useEffect(() => {
@@ -27,31 +27,31 @@ export default function TrainingPage() {
 
             const trainingSchedules = await training?.fetchSchedules() as TrainingSchedule[];
 
+            // #region Parsing data for event roles table
             const trainingSchedulesTable = trainingSchedules.map((trainingSchedule: TrainingSchedule) => {
                 const ID = trainingSchedule.id ?? null;
-                const Start_Date_Time = trainingSchedule.activity_date_time ?? 'N/A';
+                const StartDateTime = trainingSchedule.activity_date_time ?? 'N/A';
                 const Duration = trainingSchedule.training.duration ?? 0;
-                const End_Date_Time = moment(Start_Date_Time).add(Duration, 'minutes');
+                const EndDateTime = moment(StartDateTime).add(Duration, 'minutes');
                 const Vacancy = trainingSchedule["Volunteer_Training_Schedule_Details.Vacancy"] ?? 'N/A';
                 const NumRegistrations = trainingSchedule.registrations.length;
-                const Registration_Start_Date = trainingSchedule["Volunteer_Training_Schedule_Details.Registration_Start_Date"] ?? 'N/A';
-                let Registration_End_Date = trainingSchedule["Volunteer_Training_Schedule_Details.Registration_End_Date"] ?? 'N/A';
-                const Expiration_Date = trainingSchedule["Volunteer_Training_Schedule_Details.Expiration_Date"] ?? 'N/A';
+                const RegistrationStartDate = trainingSchedule["Volunteer_Training_Schedule_Details.Registration_Start_Date"] ?? 'N/A';
+                let RegistrationEndDate = trainingSchedule["Volunteer_Training_Schedule_Detais."] ?? 'N/A';
+                const ExpirationDate = trainingSchedule["Volunteer_Training_Schedule_Details.Expiration_Date"] ?? 'N/A';
                 const Location = trainingSchedule.location ?? 'N/A';
                 const currentDate = moment();
-
-                setVacancy(Vacancy)
 
                 const userIsRegistered = isUserRegistered(trainingSchedule, email);
                 const isRegistering = loadingScheduleId === trainingSchedule.id;
 
-                if (Registration_End_Date === 'N/A') {
-                    Registration_End_Date = Start_Date_Time;
+                if (RegistrationEndDate === 'N/A') {
+                    RegistrationEndDate = StartDateTime;
                 }
 
                 let registerStatus;
                 let disabled;
 
+                // #region Determine button status
                 if (userIsRegistered) {
                     registerStatus = 'Registered';
                     disabled = true;
@@ -59,8 +59,8 @@ export default function TrainingPage() {
                     registerStatus = 'Registering';
                     disabled = true;
                 } else if (
-                    (Registration_Start_Date !== 'N/A' && currentDate.isBefore(moment(Registration_Start_Date))) ||
-                    (Registration_End_Date !== 'N/A' && currentDate.isAfter(moment(Registration_End_Date)))
+                    (RegistrationStartDate !== 'N/A' && currentDate.isBefore(moment(RegistrationStartDate))) ||
+                    (RegistrationEndDate !== 'N/A' && currentDate.isAfter(moment(RegistrationEndDate)))
                 ) {
                     registerStatus = 'Closed';
                     disabled = true;
@@ -71,21 +71,26 @@ export default function TrainingPage() {
                     registerStatus = 'Register';
                     disabled = false;
                 }
+                // #endregion
 
                 return {
                     id: ID,
-                    startDate: Start_Date_Time,
-                    endDate: End_Date_Time,
+                    startDate: StartDateTime,
+                    endDate: EndDateTime,
                     participants: Vacancy === "N/A" ? NumRegistrations : NumRegistrations + "/" + Vacancy,
-                    registrationEndDate: Registration_End_Date,
+                    registrationEndDate: RegistrationEndDate,
                     registerStatus: registerStatus,
                     disabled: disabled,
-                    onClick: () => handleRegisterClick(trainingSchedule),
+                    onClick: () => handleRegisterClick(trainingSchedule, Vacancy),
                     location: Location,
-                    validThrough: Expiration_Date,
+                    validThrough: ExpirationDate,
+                    type: "Training",
                 }
             });
+            // #endregion
+
             setSchedules(trainingSchedulesTable);
+            setDataFetched(true);
         })();
     }, [id]);
 
@@ -95,7 +100,8 @@ export default function TrainingPage() {
         );
     };
 
-    const handleRegisterClick = async (schedule: TrainingSchedule) => {
+    // #region Registration
+    const handleRegisterClick = async (schedule: TrainingSchedule, currentVacancy: number | string) => {
         setLoadingScheduleId(schedule.id);
         setSchedules((prevSchedules) =>
             prevSchedules.map((prevSchedule) =>
@@ -109,7 +115,6 @@ export default function TrainingPage() {
             const register = await schedule.register(email);
             if (register) {
                 const newScheduleRegistrations = await schedule.fetchScheduleRegistrationCount(schedule.id!);
-                console.log(vacancy);
                 setSchedules((prevSchedules) =>
                     prevSchedules.map((prevSchedule) =>
                         prevSchedule.id === schedule.id
@@ -117,12 +122,12 @@ export default function TrainingPage() {
                                 ...prevSchedule,
                                 registerStatus: "Registered",
                                 disabled: true,
-                                participants: vacancy === 'N/A' ? newScheduleRegistrations : newScheduleRegistrations + "/" + vacancy,
+                                participants: currentVacancy === 'N/A' ? newScheduleRegistrations : newScheduleRegistrations + "/" + currentVacancy,
                             }
                             : prevSchedule
                     )
                 );
-                swal(`You have registered for ${schedule.subject}`, {
+                swal('You have successfully registered', {
                     icon: "success",
                 });
             }
@@ -144,6 +149,7 @@ export default function TrainingPage() {
             setLoadingScheduleId(null);
         }
     };
+    // #endregion
 
     return (
         <Wrapper>
@@ -196,7 +202,7 @@ export default function TrainingPage() {
                         </header>
                         <br />
                         {/* Schedules */}
-                        <ScheduleTable schedules={schedules} />
+                        <ScheduleTable schedules={schedules} isLoading={!schedules || schedules.length === 0 && !dataFetched} />
                     </div>
                 </div>
             )}

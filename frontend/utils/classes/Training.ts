@@ -83,6 +83,7 @@ export class Training implements TrainingProps {
                 ['activity_type_id:name', '=', 'Volunteer Training Schedule'],
                 ['Volunteer_Training_Schedule_Details.Training', '=', this.id],
                 ['activity_date_time', '>=', formattedNow],
+                ["status_id:name", "!=", "Cancelled"],
                 ['OR', [
                     // Case 1: Both start and end dates are set and the current time is within the range
                     ['AND', [

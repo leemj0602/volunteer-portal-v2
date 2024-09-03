@@ -92,7 +92,7 @@ export class TrainingSchedule implements TrainingScheduleProps {
             ],
             where: [['Volunteer_Training_Registration_Details.Training_Schedule', '=', trainingSchedule]],
         })
-        console.log(response?.data.length);
+        
         return response?.data.length;
     }
 }
