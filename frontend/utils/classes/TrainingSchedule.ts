@@ -71,7 +71,7 @@ export class TrainingSchedule implements TrainingScheduleProps {
     async register(email: string) {
         const contact = await ContactManager.fetch(email);
 
-        await CRM("Activity", "create", {
+        const register = await CRM("Activity", "create", {
             values: [
                 ["activity_type_id:name", "Volunteer Training Registration"],
                 ["target_contact_id", [contact.id]],
@@ -82,7 +82,17 @@ export class TrainingSchedule implements TrainingScheduleProps {
             ]
         }).catch(() => null);
 
-        // console.log(this.training.fetchSchedules())
-        return this.training.fetchSchedules();
+        return register?.data.length > 0;
+    }
+
+    async fetchScheduleRegistrationCount(trainingSchedule: number) {
+        const response = await CRM('Activity', 'get', {
+            select: [
+                'id',
+            ],
+            where: [['Volunteer_Training_Registration_Details.Training_Schedule', '=', trainingSchedule]],
+        })
+        
+        return response?.data.length;
     }
 }
