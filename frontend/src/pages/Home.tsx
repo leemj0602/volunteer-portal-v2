@@ -110,7 +110,6 @@ export default function Home() {
                         roleId: eventRole["Volunteer_Event_Role_Details.Role"],
                         duration: eventRole.duration,
                         entityId: eventRole.event.id,
-                        type: "Event",
                     };
                 });
 
@@ -172,7 +171,6 @@ export default function Home() {
                         location: trainingSchedule.location,
                         duration: trainingSchedule.training.duration,
                         entityId: trainingSchedule.training.id,
-                        type: "Training",
                     };
                 });
 
@@ -311,6 +309,7 @@ export default function Home() {
 
                             <TableStatus
                                 registrations={registeredEventRoles}
+                                type="Event"
                                 openCancelModal={(registrationId: number, type: "Event" | "Training") => {
                                     setCurrentRegistrationId(registrationId);
                                     setCurrentRegistrationType(type);
@@ -322,6 +321,7 @@ export default function Home() {
 
                             <TableStatus
                                 registrations={registeredTrainingSchedules}
+                                type="Training"
                                 openCancelModal={(registrationId: number, type: "Event" | "Training") => {
                                     setCurrentRegistrationId(registrationId);
                                     setCurrentRegistrationType(type);

@@ -18,15 +18,16 @@ interface Registration {
   roleId: number;
   duration: number;
   entityId: number;
-  type: "Event" | "Training";
+  // type: "Event" | "Training";
 }
 
 interface TableStatusProps {
   registrations: Registration[];
+  type: "Event" | "Training";
   openCancelModal: (registrationId: number, type: "Event" | "Training") => void;
 }
 
-export default function TableStatus({ registrations, openCancelModal }: TableStatusProps) {
+export default function TableStatus({ registrations, type, openCancelModal }: TableStatusProps) {
   const email = (window as any).email as string ?? config.email;
 
   const statusStyles: { [key: string]: string } = {
@@ -175,13 +176,13 @@ export default function TableStatus({ registrations, openCancelModal }: TableSta
   return (
     <div className="mt-8 rounded-lg">
       <h2 className="text-3xl font-semibold text-black mt-5 mb-5">
-        {registrations[0]?.type === "Event" ? "Volunteering Event Status" : "Training Status"}
+        {type === "Event" ? "Volunteering Event Status" : "Training Status"}
       </h2>
       <div className="border-white rounded-lg shadow-md overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 table-fixed">
           <thead className="bg-white">
             <tr>
-              <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">{registrations[0]?.type === "Event" ? "Event Name" : "Training Name"}</th>
+              <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">{type === "Event" ? "Event Name" : "Training Name"}</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4">Date & Time</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/6">Status</th>
               <th className="px-6 py-5 text-left text-xl font-semibold text-black w-1/4 hidden lg:table-cell">Location</th>
@@ -192,7 +193,7 @@ export default function TableStatus({ registrations, openCancelModal }: TableSta
             {currentRegistrations.length === 0 ? (
               <tr>
                 <td colSpan={5} className="px-6 py-4 text-center text-lg text-gray-500">
-                  {registrations[0]?.type === "Event"
+                  {type === "Event"
                     ? "No event history available"
                     : "No training registrations available"}
                 </td>
@@ -203,7 +204,7 @@ export default function TableStatus({ registrations, openCancelModal }: TableSta
                   <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${registration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{registration.name}</td>
                   <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${registration.status === "Cancelled By Organiser" ? 'text-gray-400' : ''}`}>{registration.formattedDateTime}</td>
                   <td className={`px-3 text-lg py-4 whitespace-nowrap pl-6 ${registration.status === "Cancelled By Organiser" ? 'font-black' : ''}`}>
-                    {registration.status === "Check In" && registration.type === "Event" ? (
+                    {registration.status === "Check In" && type === "Event" ? (
                       <button
                         className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[registration.status]}`}
                         onClick={() => handleCheckInClick(registration)}
@@ -243,7 +244,7 @@ export default function TableStatus({ registrations, openCancelModal }: TableSta
                                 ? "text-gray-400 cursor-not-allowed"
                                 : "hover:bg-gray-100 cursor-pointer"
                                 }`}
-                              onClick={() => navigate(`/${registration.type.toLowerCase()}s/${registration.entityId}${registration.type === "Event" ? "/" + registration.roleId : ""}`)}>
+                              onClick={() => navigate(`/${type.toLowerCase()}s/${registration.entityId}${type === "Event" ? "/" + registration.roleId : ""}`)}>
                               <GrView className="mr-2" /> View
                             </li>
                             <li
@@ -253,7 +254,7 @@ export default function TableStatus({ registrations, openCancelModal }: TableSta
                                 }`}
                               onClick={() => {
                                 if (registration.status !== "Completed" && registration.status !== "Cancelled" && registration.status !== "Cancelled By Organiser") {
-                                  openCancelModal(registration.id, registration.type);
+                                  openCancelModal(registration.id, type);
                                 }
                               }}
                             >
