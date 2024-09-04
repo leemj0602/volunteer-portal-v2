@@ -36,7 +36,7 @@ export default function TrainingPage() {
                 const Vacancy = trainingSchedule["Volunteer_Training_Schedule_Details.Vacancy"] ?? 'N/A';
                 const NumRegistrations = trainingSchedule.registrations.length;
                 const RegistrationStartDate = trainingSchedule["Volunteer_Training_Schedule_Details.Registration_Start_Date"] ?? 'N/A';
-                let RegistrationEndDate = trainingSchedule["Volunteer_Training_Schedule_Detais."] ?? 'N/A';
+                let RegistrationEndDate = trainingSchedule["Volunteer_Training_Schedule_Details.Registration_End_Date"] ?? 'N/A';
                 const ExpirationDate = trainingSchedule["Volunteer_Training_Schedule_Details.Expiration_Date"] ?? 'N/A';
                 const Location = trainingSchedule.location ?? 'N/A';
                 const currentDate = moment();

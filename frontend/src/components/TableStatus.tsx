@@ -212,7 +212,7 @@ export default function TableStatus({ registrations, type, openCancelModal }: Ta
                       </button>
                     ) : (
                       <span className={`flex items-center justify-center px-4 text-lg leading-8 font-semibold rounded-md w-[120px] ${statusStyles[registration.status]}`}>
-                        {registration.status === "Cancelled By Organiser" ? "Cancelled" : registration.status}
+                        {registration.status === "Cancelled By Organiser" ? "Organiser Cancelled" : registration.status}
                       </span>
                     )}
                   </td>
