@@ -118,7 +118,11 @@ export default function Events() {
         if (page > totalPages) page = totalPages;
         if (page < 1) page = 1;
 
-        const eventRoles = await EventRoleManager.fetch({ where, page, limit, group: ["Volunteer_Event_Role_Details.Event", "Volunteer_Event_Role_Details.Role"] });
+        const eventRoles = await EventRoleManager.fetch({ 
+            where, page, limit, 
+            group: ["Volunteer_Event_Role_Details.Event", "Volunteer_Event_Role_Details.Role"],
+            order: [["activity_date_time", "ASC"]] 
+        });
 
         setEventRoles(eventRoles as EventRole[]);
     }
