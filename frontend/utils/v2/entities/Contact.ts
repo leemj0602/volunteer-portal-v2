@@ -1,5 +1,5 @@
 import CRM from "../../crm";
-import { Entity } from "./Entity";
+import { Entity } from "./BaseEntity";
 
 export class Contact extends Entity {
     data: {
