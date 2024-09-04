@@ -108,7 +108,6 @@ export default function Event() {
                     disabled: disabled,
                     onClick: () => handleRegisterClick(eventRole, Vacancy),
                     location: Location,
-                    type: "Event",
                 }
             }));
             // #endregion
@@ -250,7 +249,7 @@ export default function Event() {
 
                 <section>
                     {/* Schedules */}
-                    <ScheduleTable schedules={schedules} isLoading={!schedules || schedules.length === 0 && !dataFetched} />
+                    <ScheduleTable schedules={schedules} type="Event" isLoading={!schedules || schedules.length === 0 && !dataFetched} />
                 </section>
             </div>
         </div>}

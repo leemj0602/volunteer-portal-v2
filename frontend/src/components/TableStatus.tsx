@@ -18,7 +18,6 @@ interface Registration {
   roleId: number;
   duration: number;
   entityId: number;
-  // type: "Event" | "Training";
 }
 
 interface TableStatusProps {

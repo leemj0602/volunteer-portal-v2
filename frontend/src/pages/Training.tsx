@@ -84,7 +84,6 @@ export default function TrainingPage() {
                     onClick: () => handleRegisterClick(trainingSchedule, Vacancy),
                     location: Location,
                     validThrough: ExpirationDate,
-                    type: "Training",
                 }
             });
             // #endregion
@@ -202,7 +201,7 @@ export default function TrainingPage() {
                         </header>
                         <br />
                         {/* Schedules */}
-                        <ScheduleTable schedules={schedules} isLoading={!schedules || schedules.length === 0 && !dataFetched} />
+                        <ScheduleTable schedules={schedules} type="Training" isLoading={!schedules || schedules.length === 0 && !dataFetched} />
                     </div>
                 </div>
             )}
