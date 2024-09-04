@@ -194,7 +194,7 @@ export default function TableStatus({ registrations, type, openCancelModal }: Ta
                 <td colSpan={5} className="px-6 py-4 text-center text-lg text-gray-500">
                   {type === "Event"
                     ? "No event history available"
-                    : "No training registrations available"}
+                    : "No training history available"}
                 </td>
               </tr>
             ) : (

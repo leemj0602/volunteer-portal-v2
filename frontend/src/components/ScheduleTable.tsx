@@ -32,6 +32,7 @@ export default function ScheduleTable({ schedules, type, isLoading }: ScheduleTa
         "Pending": "bg-amber-500 text-white cursor-not-allowed",
         "Closed": "bg-gray-300 text-gray-800 cursor-not-allowed",
         "Full": "bg-gray-300 text-gray-800 cursor-not-allowed",
+        "Cancelled": "bg-red-500 text-white cursor-not-allowed",
     };
 
     const toggleRowExpansion = (id: number) => {
