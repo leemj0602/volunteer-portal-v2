@@ -34,14 +34,15 @@ export default function TrainingPage() {
                 const Duration = trainingSchedule.training.duration ?? 0;
                 const EndDateTime = moment(StartDateTime).add(Duration, 'minutes');
                 const Vacancy = trainingSchedule["Volunteer_Training_Schedule_Details.Vacancy"] ?? 'N/A';
-                const NumRegistrations = trainingSchedule.registrations.length;
+                const NumRegistrations = trainingSchedule.registrations.filter((r) => r["status_id:name"] !== "Cancelled").length;
                 const RegistrationStartDate = trainingSchedule["Volunteer_Training_Schedule_Details.Registration_Start_Date"] ?? 'N/A';
-                let RegistrationEndDate = trainingSchedule["Volunteer_Training_Schedule_Detais."] ?? 'N/A';
+                let RegistrationEndDate = trainingSchedule["Volunteer_Training_Schedule_Details.Registration_End_Date"] ?? 'N/A';
                 const ExpirationDate = trainingSchedule["Volunteer_Training_Schedule_Details.Expiration_Date"] ?? 'N/A';
                 const Location = trainingSchedule.location ?? 'N/A';
                 const currentDate = moment();
 
                 const userIsRegistered = isUserRegistered(trainingSchedule, email);
+                const cancelledRegistration = userIsRegistered ? trainingSchedule.registrations.find(r => r["contact.email_primary.email"] == email)?.["status_id:name"] == "Cancelled" ? true : false : false;
                 const isRegistering = loadingScheduleId === trainingSchedule.id;
 
                 if (RegistrationEndDate === 'N/A') {
@@ -52,7 +53,10 @@ export default function TrainingPage() {
                 let disabled;
 
                 // #region Determine button status
-                if (userIsRegistered) {
+                if (userIsRegistered && cancelledRegistration) {
+                    registerStatus = 'Cancelled';
+                    disabled = true;
+                } else if (userIsRegistered) {
                     registerStatus = 'Registered';
                     disabled = true;
                 } else if (isRegistering) {
@@ -84,7 +88,6 @@ export default function TrainingPage() {
                     onClick: () => handleRegisterClick(trainingSchedule, Vacancy),
                     location: Location,
                     validThrough: ExpirationDate,
-                    type: "Training",
                 }
             });
             // #endregion
@@ -202,7 +205,7 @@ export default function TrainingPage() {
                         </header>
                         <br />
                         {/* Schedules */}
-                        <ScheduleTable schedules={schedules} isLoading={!schedules || schedules.length === 0 && !dataFetched} />
+                        <ScheduleTable schedules={schedules} type="Training" isLoading={!schedules || schedules.length === 0 && !dataFetched} />
                     </div>
                 </div>
             )}

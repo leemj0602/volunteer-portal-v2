@@ -14,15 +14,15 @@ interface Schedule {
     onClick: (e: MouseEvent<HTMLButtonElement>) => void;
     location: string;
     validThrough: string;
-    type: "Training" | "Event";
 }
 
 interface ScheduleTableProps {
     schedules: Schedule[];
+    type: "Training" | "Event";
     isLoading: boolean;
 }
 
-export default function ScheduleTable({ schedules, isLoading }: ScheduleTableProps) {
+export default function ScheduleTable({ schedules, type, isLoading }: ScheduleTableProps) {
     const [expandedRowIds, setExpandedRowIds] = useState<Set<number>>(new Set());
 
     const statusStyles: { [key: string]: string } = {
@@ -32,6 +32,8 @@ export default function ScheduleTable({ schedules, isLoading }: ScheduleTablePro
         "Pending": "bg-amber-500 text-white cursor-not-allowed",
         "Closed": "bg-gray-300 text-gray-800 cursor-not-allowed",
         "Full": "bg-gray-300 text-gray-800 cursor-not-allowed",
+        "Cancelled": "bg-red-500 text-white cursor-not-allowed",
+        "Unapproved": "bg-red-300 text-white cursor-not-allowed",
     };
 
     const toggleRowExpansion = (id: number) => {
@@ -125,13 +127,13 @@ export default function ScheduleTable({ schedules, isLoading }: ScheduleTablePro
 
     return (
         <div>
-            <h3 className="text-xl text-black/90 font-semibold">{schedules[0]?.type === "Training" ? "Training" : "Event"} Schedule</h3>
+            <h3 className="text-xl text-black/90 font-semibold">{type === "Training" ? "Training" : "Event"} Schedule</h3>
             <br />
             <div className="overflow-x-auto w-full">
                 <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                         <tr>
-                            <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>{schedules[0]?.type === "Training" ? "Training" : "Event"} Date</strong></th>
+                            <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>{type === "Training" ? "Training" : "Event"} Date</strong></th>
                             <th className="hidden md:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Participants</strong></th>
                             <th className="hidden lg:table-cell px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Registration End</strong></th>
                             <th className="px-2 py-3 text-left text-sm font-medium text-black-500 uppercase tracking-wider"><strong>Register</strong></th>

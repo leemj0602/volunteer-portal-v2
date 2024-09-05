@@ -56,7 +56,7 @@ export default function Event() {
                 const Duration = eventRole.duration ?? 0;
                 const EndDateTime = moment(StartDateTime).add(Duration, 'minutes');
                 const Vacancy = eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? 'N/A';
-                const NumRegistrations = registrations.filter(r => r["status_id:name"] != "Cancelled").length;
+                const NumRegistrations = registrations.filter((r) => r["status_id:name"] !== "Cancelled" && r["status_id:name"] !== "Not Approved" ).length;
                 const RegistrationStartDate = eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"] ?? 'N/A';
                 let RegistrationEndDate = eventRole["Volunteer_Event_Role_Details.Registration_End_Date"] ?? 'N/A';
                 const Location = eventRole.event.location ?? 'N/A';
@@ -64,6 +64,7 @@ export default function Event() {
 
                 const userIsRegistered = isUserRegistered(registrations, email);
                 const pendingRegistration = userIsRegistered ? registrations.find(r => r["contact.email_primary.email"] == email)?.["status_id:name"] == RegistrationStatus.ApprovalRequired ? true : false : false;
+                const cancelledRegistration = userIsRegistered ? registrations.find(r => r["contact.email_primary.email"] == email)?.["status_id:name"] == RegistrationStatus.Cancelled ? true : false : false;
                 const isRegistering = loadingScheduleId === eventRole.id;
 
                 if (RegistrationEndDate === 'N/A') {
@@ -76,6 +77,9 @@ export default function Event() {
                 // #region Determine button status
                 if (userIsRegistered && pendingRegistration) {
                     registerStatus = 'Pending';
+                    disabled = true;
+                } else if (userIsRegistered && cancelledRegistration) {
+                    registerStatus = 'Cancelled';
                     disabled = true;
                 } else if (userIsRegistered) {
                     registerStatus = 'Registered';
@@ -108,7 +112,6 @@ export default function Event() {
                     disabled: disabled,
                     onClick: () => handleRegisterClick(eventRole, Vacancy),
                     location: Location,
-                    type: "Event",
                 }
             }));
             // #endregion
@@ -250,7 +253,7 @@ export default function Event() {
 
                 <section>
                     {/* Schedules */}
-                    <ScheduleTable schedules={schedules} isLoading={!schedules || schedules.length === 0 && !dataFetched} />
+                    <ScheduleTable schedules={schedules} type="Event" isLoading={!schedules || schedules.length === 0 && !dataFetched} />
                 </section>
             </div>
         </div>}
