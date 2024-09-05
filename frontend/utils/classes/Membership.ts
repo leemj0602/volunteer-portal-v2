@@ -20,6 +20,7 @@ export interface iMembership {
     end_date: string;
     status_id: MembershipStatus;
     "status_id:name": string;
+    "membership_type_id.minimum_fee": number | null;
 }
 
 export class Membership implements iMembership {
@@ -32,6 +33,7 @@ export class Membership implements iMembership {
     end_date: string;
     status_id: MembershipStatus;
     "status_id:name": string;
+    "membership_type_id.minimum_fee": number | null;
 
     constructor(props: iMembership) {
         this.id = props.id;
@@ -43,6 +45,7 @@ export class Membership implements iMembership {
         this.end_date = props.end_date;
         this.status_id = props.status_id;
         this["status_id:name"] = props["status_id:name"];
+        this["membership_type_id.minimum_fee"] = props["membership_type_id.minimum_fee"];
     }
 
     async update(values: [keyof Membership, any][]) {

@@ -21,7 +21,11 @@ export enum RegistrationStatus {
     Cancelled = "Cancelled"
 }
 
-export interface EventRegistrationProps {
+interface MandatoryCustomEventRegistrationPRops {
+    "Volunteer_Event_Registration_Details.Paid": number;
+}
+
+export interface EventRegistrationProps extends MandatoryCustomEventRegistrationPRops {
     id: number;
     "status_id:name": RegistrationStatus;
     "contact.email_primary.email": string;
@@ -34,6 +38,7 @@ export class EventRegistration implements EventRegistrationProps {
     public eventRole: EventRole;
     public "status_id:name": RegistrationStatus;
     public "contact.email_primary.email": string;
+    public "Volunteer_Event_Registration_Details.Paid": number;
 
     [key: string]: any;
     
@@ -41,6 +46,7 @@ export class EventRegistration implements EventRegistrationProps {
         this.id = props.id;
         this["status_id:name"] = props["status_id:name"];
         this["contact.email_primary.email"] = props["contact.email_primary.email"];
+        this["Volunteer_Event_Registration_Details.Paid"] = props["Volunteer_Event_Registration_Details.Paid"];
 
         const eventAttendanceDetails: Partial<EventAttendanceProps> = {};
         const eventRoleDetails: Partial<EventRoleProps> = {};

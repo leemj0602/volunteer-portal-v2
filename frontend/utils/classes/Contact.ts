@@ -1,6 +1,6 @@
+import moment from "moment";
 import CRM from "../crm";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
-import MembershipPurchaseManager, { MembershipPurchaseFetchOptions } from "../managers/MembershipPurchaseManager";
 import { EventRegistration, EventRegistrationProps } from "./EventRegistration";
 import { iMembership, Membership } from "./Membership";
 import { MembershipHistory } from "./MembershipHistory";
@@ -71,7 +71,7 @@ export class Contact implements ContactProps {
 
     async fetchMemberships(): Promise<Membership[] | null> {
         const response = await CRM("Membership", "get", {
-            select: ["*", "status_id:name", "membership_type_id:name"],
+            select: ["*", "status_id:name", "membership_type_id:name", "membership_type_id.minimum_fee"],
             where: [["contact_id", "=", this.id]]
          }).catch(() => null);
         if (!response?.data.length) return null;
@@ -97,7 +97,20 @@ export class Contact implements ContactProps {
         else return response.data as MembershipHistory[];
     }
 
-    async renewMembership(pricing: number) {
-        return MembershipPurchaseManager.create(this.id!, pricing);
+    async renewMembership(membership: Membership) {
+        await membership.update([
+            ["start_date", moment(Date.now()).format("YYYY-MM-DD")],
+            ["end_date", moment(Date.now() + 6.312e+10).format("YYYY-MM-DD")]
+        ]);
+
+        await CRM("Activity", "create", {
+            values: [
+                ["source_record_id", membership.id],
+                ["source_contact_id", this.id],
+                ["target_contact_id", this.id],
+                ["activity_type_id:name", "Membership Renewal"],
+
+            ]
+        });
     }
 }

@@ -13,6 +13,8 @@ import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ComparisonOperator } from "../../utils/crm";
 import moment from "moment";
+import { Contact } from "../../utils/classes/Contact";
+import { Membership } from "../../utils/classes/Membership";
 
 const limit = 9;
 export default function Events() {
@@ -21,6 +23,7 @@ export default function Events() {
     const [search, setSearch] = useState("");
     const [searchParams, setSearchParams] = useSearchParams();
     const [customFields, setCustomFields] = useState<Map<string, CustomField>>();
+    const [membership, setMembership] = useState<Membership>();
     const email = (window as any).email ?? config.email;
 
     // Initial phase
@@ -28,6 +31,10 @@ export default function Events() {
     useEffect(() => {
         (async () => {
             const contact = await ContactManager.fetch(email);
+            const memberships = await contact.fetchMemberships() ?? [];
+            const highest = Math.max(...memberships.map(m => m.membership_type_id));
+            for (const membership of memberships) if (membership.membership_type_id == highest) setMembership(membership);
+
             const contactDetailCustomFieldSet = await CustomFieldSetManager.get("Volunteer_Contact_Details");
 
             // const eventRoleCustomFieldSet = await CustomFieldSetManager.get("Volunteer_Event_Role_Details");
@@ -225,7 +232,7 @@ export default function Events() {
                     {!eventRoles.length && <p className="text-lg text-gray-500">Looks like there aren't any events{[...searchParams.entries()].length ? " with the provided filters" : ""}.</p>}
                     {/* If there are events, display */}
                     {eventRoles.length > 0 && <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 mt-6">
-                        {eventRoles.map(eventRole => <EventRoleCard className="flex justify-center" eventRole={eventRole} />)}
+                        {eventRoles.map(eventRole => <EventRoleCard membership={membership!} className="flex justify-center" eventRole={eventRole} />)}
                     </div>}
                     {/* If there is more than 1 page */}
                     {totalPages > 1 && <div className="mt-8 items-center justify-center text-center w-full">

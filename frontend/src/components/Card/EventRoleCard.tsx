@@ -5,17 +5,19 @@ import Card from "./";
 import { FiCalendar } from "react-icons/fi";
 import moment from "moment";
 import { GrGroup, GrLocation, GrMoney } from "react-icons/gr";
-import { IoBriefcaseOutline } from "react-icons/io5";
 import { Spinner } from "flowbite-react";
-import config from "../../../../config";
 import { EventStatus } from "../../../utils/classes/EventDetails";
+import { Membership } from "../../../utils/classes/Membership";
 
 interface EventRoleCardProps {
     eventRole: EventRole;
     className?: string;
+    membership: Membership;
 }
 export default function EventRoleCard(props: EventRoleCardProps) {
     const [volunteers, setVolunteers] = useState<EventRegistration[]>();
+    const email = (window as any).email;
+
     useEffect(() => {
         (async () => {
             setVolunteers(await props.eventRole.fetchRegistrations());
@@ -54,7 +56,10 @@ export default function EventRoleCard(props: EventRoleCardProps) {
             {/* Pricing */}
             {props.eventRole["Volunteer_Event_Role_Details.Pricing"]! > 0 && <div className="gap-x-3 flex items-center">
                 <GrMoney className="text-secondary" />
-                <span className="text-sm font-semibold">SGD {props.eventRole["Volunteer_Event_Role_Details.Pricing"]!.toFixed(2)}</span>
+                <span className="text-sm font-semibold flex">
+                    {!props.membership && `SGD ${props.eventRole["Volunteer_Event_Role_Details.Pricing"]!.toFixed(2)}`}
+                    {props.membership && `SGD ${(props.eventRole["Volunteer_Event_Role_Details.Pricing"]! * (1 - (props.membership.membership_type_id / 100) * 5)).toFixed(2)}`}
+                </span>
             </div>}
         </div>
     </Card>

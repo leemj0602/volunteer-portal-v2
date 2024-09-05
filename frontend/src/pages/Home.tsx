@@ -17,9 +17,12 @@ import { format, parseISO } from "date-fns";
 import swal from 'sweetalert';
 import MembershipHistoryStatus from "../components/MembershipHistoryStatus";
 import MembershipStatusSection from "../components/MembershipStatus";
+import { Membership } from "../../utils/classes/Membership";
+import { EventRegistration } from "../../utils/classes/EventRegistration";
 
 export default function Home() {
     const [contact, setContact] = useState<Contact>();
+    const [membership, setMembership] = useState<Membership>();
     const [dashboardContact, setDashboardContact] = useState<DashboardHeaderProps | null>(null);
     const [registeredEventRoles, setRegisteredEventRoles] = useState<any[]>([]);
     const [hoursVolunteered, setHoursVolunteered] = useState<number>(0);
@@ -38,6 +41,10 @@ export default function Home() {
                 const contact = await ContactManager.fetch(email);
                 setContact(contact);
 
+                const memberships = await contact.fetchMemberships() ?? [];
+                const highest = Math.max(...memberships.map(m => m.membership_type_id));
+                for (const membership of memberships) if (membership.membership_type_id == highest) setMembership(membership);    
+
                 const dashboardContact = {
                     name: contact["first_name"] + " " + contact["last_name"],
                     email: contact["email_primary.email"],
@@ -52,7 +59,7 @@ export default function Home() {
                 let minsVolunteeredCalc = 0;
                 let numEventsParticipatedCalc = 0;
 
-                const transformedEvents = registeredEventRoles.map((registeredEventRole: any) => {
+                const transformedEvents = registeredEventRoles.map((registeredEventRole: EventRegistration) => {
                     const { eventRole, attendance } = registeredEventRole;
                     let eventStatus = "";
                     const eventDate = eventRole.activity_date_time ? new Date(eventRole.activity_date_time) : null;
@@ -79,7 +86,7 @@ export default function Home() {
                             eventStatus = "No Show";
                         } else {
                             eventStatus = "Completed";
-                            minsVolunteeredCalc += attendance?.duration ?? eventRole.duration;
+                            minsVolunteeredCalc += attendance?.duration ?? eventRole.duration!;
                             numEventsParticipatedCalc++;
                         }
                     }
@@ -90,7 +97,7 @@ export default function Home() {
                         dateTime: eventRole.activity_date_time, // Store raw date time string for sorting
                         formattedDateTime: eventRole.activity_date_time ? format(parseISO(eventRole.activity_date_time), "dd/MM/yyyy hh:mm a") : "N/A", // Formatted date time for display
                         status: eventStatus,
-                        pricing: eventRole["Volunteer_Event_Role_Details.Pricing"],
+                        pricing: registeredEventRole["Volunteer_Event_Registration_Details.Paid"] ?? 0,
                         location: eventRole.event.location,
                         eventRoleId: eventRole.id,
                         duration: eventRole.duration,
@@ -111,10 +118,10 @@ export default function Home() {
                     }
 
                     if ((a.status === "Upcoming" && b.status === "Upcoming") || (a.status === "Check In" && b.status === "Check In") || (a.status === "Checked In" && b.status === "Checked In")) {
-                        return new Date(a.dateTime).getTime() - new Date(b.dateTime).getTime();
+                        return new Date(a.dateTime!).getTime() - new Date(b.dateTime!).getTime();
                     }
 
-                    return new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime();
+                    return new Date(b.dateTime!).getTime() - new Date(a.dateTime!).getTime();
                 });
 
                 setRegisteredEventRoles(sortedEvents);
@@ -190,7 +197,7 @@ export default function Home() {
                                 setShowCancelModal(true);
                             }}
                         />
-                        <UpcomingEvents eventRoles={upcomingUnvolunteeredEvents} />
+                        <UpcomingEvents membership={membership!} eventRoles={upcomingUnvolunteeredEvents} />
                     </div>
                 )}
             </div>

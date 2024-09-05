@@ -1,20 +1,14 @@
 import EventRoleCard from "./Card/EventRoleCard";
 import { EventRole, EventRoleProps } from "../../utils/classes/EventRole";
 import { useNavigate } from "react-router-dom";
-
-
-interface Event {
-  name: string,
-  dateTime: string,
-  status: string,
-  location: string,
-}
+import { Membership } from "../../utils/classes/Membership";
 
 interface UpcomingEventsProps {
   eventRoles: EventRole[] | null;
+  membership: Membership;
 }
 
-export default function UpcomingEvents({ eventRoles }: UpcomingEventsProps) {
+export default function UpcomingEvents({ eventRoles, membership }: UpcomingEventsProps) {
   const navigate = useNavigate();
 
   return (
@@ -25,7 +19,7 @@ export default function UpcomingEvents({ eventRoles }: UpcomingEventsProps) {
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
         {eventRoles && eventRoles.length > 0 ? (
-          eventRoles.map((event: any) => <EventRoleCard className="flex justify-center" eventRole={event} />)
+          eventRoles.map((event: any) => <EventRoleCard membership={membership} className="flex justify-center" eventRole={event} />)
         ) : (
           <p className="text-lg text-gray-500">Looks like there aren't any upcoming events</p>
         )}

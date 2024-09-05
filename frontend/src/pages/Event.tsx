@@ -30,11 +30,7 @@ export default function Event() {
             const contact = await ContactManager.fetch(email);
             const memberships = await contact.fetchMemberships() ?? [];
             const highest = Math.max(...memberships.map(m => m.membership_type_id));
-            console.log(highest);
-            for (const membership of memberships) if (membership.membership_type_id == highest) {
-                setMembership(membership);
-                console.log(membership);
-            }
+            setMembership(memberships.find(m => m.membership_type_id == highest));
 
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setRegistrations(await eventRole.fetchRegistrations());
@@ -65,13 +61,13 @@ export default function Event() {
                     </div>
                     {/* Registration Section */}
                     <div className="text-center min-w-[180px] max-w-[180px] hidden lg:block">
-                        <RegistrationButton eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
-                        <RegistrationDateRange eventRole={eventRole} />
+                        <RegistrationButton membership={membership!} eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
+                        <RegistrationDateRange membership={membership!} eventRole={eventRole} />
                     </div>
                 </header>
                 <div className="text-center min-w-[180px] max-w-[180px] lg:hidden mt-6">
-                    <RegistrationButton eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
-                    <RegistrationDateRange eventRole={eventRole} />
+                    <RegistrationButton membership={membership!} eventRole={eventRole} registrations={registrations} setRegistrations={setRegistrations} />
+                    <RegistrationDateRange membership={membership!} eventRole={eventRole} />
                 </div>
                 {/* Information */}
                 <div className="grid grid-cols-4 lg:flex lg:flex-row gap-4 w-full mt-6">
@@ -113,7 +109,7 @@ export default function Event() {
                         <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
                             <GrMoney size={22} />
                             {!membership && <span>SGD {eventRole["Volunteer_Event_Role_Details.Pricing"]!.toFixed(2)}</span>}
-                            {membership && <span>SGD {(eventRole["Volunteer_Event_Role_Details.Pricing"]!).toFixed(2)}</span>}
+                            {membership && <span>SGD {(eventRole["Volunteer_Event_Role_Details.Pricing"]! * (1 - (membership.membership_type_id / 100) * 5)).toFixed(2)}</span>}
                         </div>
                     </div>}
                 </div>
@@ -135,6 +131,7 @@ export default function Event() {
 
 interface EventRoleFieldProp {
     eventRole: EventRole;
+    membership: Membership;
     registrations: EventRegistration[];
     setRegistrations: Dispatch<SetStateAction<EventRegistration[]>>;
 }
@@ -148,18 +145,25 @@ function RegistrationButton(props: EventRoleFieldProp) {
         setIsLoading(true);
         // If they already registered
         if (!props.registrations.find(r => r["contact.email_primary.email"] == email)) {
-            const registrations = await props.eventRole.register(email);
-            props.setRegistrations(registrations);
             if (props.eventRole["Volunteer_Event_Role_Details.Pricing"]) {
+                const paid = props.eventRole["Volunteer_Event_Role_Details.Pricing"] * (1 - (props.membership.membership_type_id / 100) * 5);
+                const registrations = await props.eventRole.register(email, paid);
+                props.setRegistrations(registrations);
+                
                 // Getting the client secret
                 const response = await axios.post(`${config.domain}/portal/api/create.php`, 
-                    { items: [{ registrationId: registrations.find(r => r["contact.email_primary.email"] == email)?.id, email, amount: props.eventRole["Volunteer_Event_Role_Details.Pricing"] * 100 }]},
+                    { items: [{ registrationId: registrations.find(r => r["contact.email_primary.email"] == email)?.id, email, amount: paid * 100 }]},
                     { headers: { "Content-Type": "application/json" }}
                 )
                 const { clientSecret } = response.data;
                 navigate(`/checkout/${clientSecret}`);
             }
-            else swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
+            else {
+                const registrations = await props.eventRole.register(email, 0);
+                props.setRegistrations(registrations);
+    
+                swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
+            }
         }
         else swal("An error has occurred while registering.\nPlease contact an administrator.", { icon: "error" });
         setIsLoading(false);

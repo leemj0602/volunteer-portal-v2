@@ -11,6 +11,8 @@ const EventRegistrationManager = new class EventRegistrationManager {
             select: [
                 "contact.email_primary.email",
                 "status_id:name",
+                "Volunteer_Event_Registration_Details.*",
+
                 "eventRole.id",
                 "eventRole.activity_date_time",
                 "eventRole.duration",
