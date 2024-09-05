@@ -13,19 +13,29 @@ import { FiCalendar } from "react-icons/fi";
 import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
 import swal from "sweetalert";
 import axios from "axios";
-import { loadStripe } from "@stripe/stripe-js";
-
-const promise = loadStripe("pk_test_51PoK8yIWRO1wD2nNRseVeYLNAslyUb1cuRr8H4ZreTTPJAumlZS3Hqp2xKRONDKvKLATBTfvA8JK5vw6Y2vWB3UR00Cmt8K7yO");
+import { Membership } from "../../utils/classes/Membership";
+import ContactManager from "../../utils/managers/ContactManager";
 
 export default function Event() {
     const { id } = useParams();
+    const email = (window as any).email;
 
     const [eventRole, setEventRole] = useState<EventRole>();
     const [registrations, setRegistrations] = useState<EventRegistration[]>([]);
     const [optionalFields, setOptionalFields] = useState<{ [key: string]: any }>();
+    const [membership, setMembership] = useState<Membership>();
 
     useEffect(() => {
         (async function () {
+            const contact = await ContactManager.fetch(email);
+            const memberships = await contact.fetchMemberships() ?? [];
+            const highest = Math.max(...memberships.map(m => m.membership_type_id));
+            console.log(highest);
+            for (const membership of memberships) if (membership.membership_type_id == highest) {
+                setMembership(membership);
+                console.log(membership);
+            }
+
             const eventRole = await EventRoleManager.fetch({ id }) as EventRole;
             setRegistrations(await eventRole.fetchRegistrations());
             const optionalFields = await eventRole.event.getOptionalCustomFields();
@@ -102,7 +112,8 @@ export default function Event() {
                         <h3 className="text-sm font-semibold mb-2">Pricing</h3>
                         <div className="flex flex-row items-center gap-x-3 font-bold text-sm">
                             <GrMoney size={22} />
-                            <span>SGD {eventRole["Volunteer_Event_Role_Details.Pricing"]!.toFixed(2)}</span>
+                            {!membership && <span>SGD {eventRole["Volunteer_Event_Role_Details.Pricing"]!.toFixed(2)}</span>}
+                            {membership && <span>SGD {(eventRole["Volunteer_Event_Role_Details.Pricing"]!).toFixed(2)}</span>}
                         </div>
                     </div>}
                 </div>
