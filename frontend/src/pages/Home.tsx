@@ -82,7 +82,7 @@ export default function Home() {
                         eventStatus = "Cancelled By Organiser";
                     } else if (eventDate && now < eventDate) {
                         if (registeredEventRole["status_id:name"] === "Approval Required") eventStatus = "Pending";
-                        else if (registeredEventRole["status_id:name"] === "Unapproved") eventStatus = "Unapproved";
+                        else if (registeredEventRole["status_id:name"] === "Not Approved") eventStatus = "Unapproved";
                         else eventStatus = "Upcoming";
                     } else if (eventDate && endDate && now >= eventDate && now <= endDate) {
                         if (!attendance) {
@@ -110,6 +110,7 @@ export default function Home() {
                         roleId: eventRole["Volunteer_Event_Role_Details.Role"],
                         duration: eventRole.duration,
                         entityId: eventRole.event.id,
+                        eventRoleId: eventRole.id,
                     };
                 });
 
@@ -205,7 +206,7 @@ export default function Home() {
             if (currentRegistrationType === "Event") {
                 result = await EventRegistrationManager.cancelEvent(currentRegistrationId);
             } else if (currentRegistrationType === "Training") {
-                result = await TrainingRegistrationManager.cancelEvent(currentRegistrationId)
+                result = await TrainingRegistrationManager.cancelTraining(currentRegistrationId)
             }
 
             if (result) {

@@ -18,6 +18,7 @@ interface Registration {
   roleId: number;
   duration: number;
   entityId: number;
+  eventRoleId: number;
 }
 
 interface TableStatusProps {
@@ -119,7 +120,7 @@ export default function TableStatus({ registrations, type, openCancelModal }: Ta
 
   const handleCheckInClick = (eventRegistration: Registration) => {
     setSelectedEventId(eventRegistration.entityId);
-    setSelectedEventRoleId(eventRegistration.roleId);
+    setSelectedEventRoleId(eventRegistration.eventRoleId);
     setSelectedEventDuration(eventRegistration.duration);
     setIsPopupOpen(true);
   };
@@ -247,12 +248,12 @@ export default function TableStatus({ registrations, type, openCancelModal }: Ta
                               <GrView className="mr-2" /> View
                             </li>
                             <li
-                              className={`px-4 py-2 flex items-center ${registration.status === "Completed" || registration.status === "Cancelled" || registration.status === "Cancelled By Organiser"
-                                ? "text-gray-400 cursor-not-allowed"
-                                : "hover:bg-gray-100 cursor-pointer"
+                              className={`px-4 py-2 flex items-center ${registration.status === "Upcoming" || registration.status === "Pending"
+                                ? "hover:bg-gray-100 cursor-pointer"
+                                : "text-gray-400 cursor-not-allowed"
                                 }`}
                               onClick={() => {
-                                if (registration.status !== "Completed" && registration.status !== "Cancelled" && registration.status !== "Cancelled By Organiser") {
+                                if (registration.status === "Upcoming" || registration.status === "Pending") {
                                   openCancelModal(registration.id, type);
                                 }
                               }}
