@@ -12,8 +12,7 @@ export default function MembershipHistoryStatus(props: MembershipHistoryStatus) 
     useEffect(() => {
         (async () => {
             if (props.contact) {
-                console.log(await props.contact.fetchMemberships());
-                const membershipHistories = await props.contact.fetchedMembershipHistory();
+                const membershipHistories = await props.contact.fetchMembershipHistory();
                 setMembershipHistories(membershipHistories ?? []);
             }
         })();

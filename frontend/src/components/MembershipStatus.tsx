@@ -62,14 +62,14 @@ export default function MembershipStatusSection({ contact }: MembershipStatusSec
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                     {!memberships && <tr>
-                        <td colSpan={4} className="px-6 py-4 text-center text-lg text-gray-500">Fetching information...</td>
+                        <td colSpan={5} className="px-6 py-4 text-center text-lg text-gray-500">Fetching information...</td>
                     </tr>}
-                    {!!memberships && !memberships.length ? <tr>
-                        <td colSpan={4} className="px-6 py-4 text-center text-lg text-gray-500">No membership history found</td>
+                    {memberships?.length == 0 ? <tr>
+                        <td colSpan={5} className="px-6 py-4 text-center text-lg text-gray-500">No membership history found</td>
                     </tr> : memberships && memberships.map(membership => {
                         return <tr>
                             <td className="px-3 text-lg py-4 whitespace-nowrap pl-6">{membership["membership_type_id:name"]}</td>
-                            <td className="px-3 text-lg py-4 whitespace-nowrap pl-6">{moment(membership.start_date).format("DD MMM YYYY")} - {moment(membership.end_date).format("DD MMM YYYY")}</td>
+                            <td className="px-3 text-lg py-4 whitespace-nowrap pl-6">{moment(membership.start_date).format("DD MMM YYYY")} - {moment(membership.end_date).format("YYYY")}</td>
                             <td className="px-3 text-lg py-4 whitespace-nowrap pl-6">
                                 {membership.status_id != MembershipStatus.Expired ? "Ongoing" : "Expired"}
                             </td>
@@ -88,23 +88,3 @@ export default function MembershipStatusSection({ contact }: MembershipStatusSec
         </div>
     </div>
 }
-
-{/* renew memberships */ }
-{/* {(!!memberships && !!latest) && <butto n onClick={renewMembership} className="bg-secondary py-1 w-[150px] text-white rounded-md disabled:bg-primary disabled:cursor-not-allowed" disabled={isLoading || (Date.now() < (new Date(latest["Membership_Purchase_Details.Expiration_Date"]!).getTime() - 6.048e+8))}>{isLoading ? <Spinner className="fill-secondary text-primary w-5 h-5" /> : "Renew Membership"}</butto>} */ }
-
-/**
- *     const renewMembership = async () => {
-setIsLoading(true);
-const amount = props.contact["Membership_Contact_Details.Membership"];
-
-await props.contact.renewMembership(amount);
-const response = await axios.post(`${config.domain}/portal/api/create.php`,
-{ items: [{ email: props.contact["email_primary.email"], amount: amount * 100 }] },
-{ headers: { "Content-Type": "application/json" } }
-);
-const { clientSecret } = response.data;
-
-navigate(`/checkout/${clientSecret}`);
-}
-
- */

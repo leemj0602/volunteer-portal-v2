@@ -74,11 +74,11 @@ export class Contact implements ContactProps {
             select: ["*", "status_id:name", "membership_type_id:name", "membership_type_id.minimum_fee"],
             where: [["contact_id", "=", this.id]]
          }).catch(() => null);
-        if (!response?.data.length) return null;
+        if (!response) return null;
         return response.data.map((d: iMembership) => new Membership(d));
     }
 
-    async fetchedMembershipHistory() {
+    async fetchMembershipHistory() {
         const response = await CRM("Activity", "get", {
             select: [
                 "activity_type_id:name",
@@ -89,18 +89,18 @@ export class Contact implements ContactProps {
                 "membership.membership_type_id:label",
             ],
             join: [["Membership AS membership", "LEFT", ["source_record_id", "=", "membership.id"]]],
-            where: [["activity_type_id:name", "IN", ["Membership Signup", "Membership Renewal"]]],
+            where: [["activity_type_id:name", "IN", ["Membership Signup", "Membership Renewal"]], ["membership.id", "IS NOT NULL"]],
             order: [["activity_date_time", "DESC"]]
         }).catch(() => null);
 
-        if (!response?.data.length) return null;
+        if (!response) return null;
         else return response.data as MembershipHistory[];
     }
 
     async renewMembership(membership: Membership) {
         await membership.update([
             ["start_date", moment(Date.now()).format("YYYY-MM-DD")],
-            ["end_date", moment(Date.now() + 6.312e+10).format("YYYY-MM-DD")]
+            ["end_date", moment(Date.now() + 3.156e+10).format("YYYY-MM-DD")]
         ]);
 
         await CRM("Activity", "create", {

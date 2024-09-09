@@ -24,14 +24,12 @@ export default function Profile() {
     const [unsavedContact, setUnsavedContact] = useState<Contact>();
     const [contact, setContact] = useState<Contact>();
     const [volunteerContactFieldData, setVolunteerContactFieldData] = useState<Map<string, CustomField>>();
-    const [membership, setMembership] = useState<Membership | null>();
 
     useEffect(() => {
         (async function () {
             const data = await ContactManager.fetch(email);
             setName(`${data.first_name}${data.last_name?.length ? ` ${data.last_name}` : ""}`);
             setContact(data);
-            setMembership((await data.fetchMemberships())![0]);
             setUnsavedContact(data);
             setVolunteerContactFieldData(await CustomFieldSetManager.get("Volunteer_Contact_Details"));
         })();
@@ -89,7 +87,7 @@ export default function Profile() {
 
 
     return <Wrapper>
-        {!contact || !volunteerContactFieldData || !membership ? <Loading className="h-screen items-center" /> : <>
+        {!contact || !volunteerContactFieldData ? <Loading className="h-screen items-center" /> : <>
             <ConfirmationModal showModal={showModal} closeModal={closeModal} image={ResetPassword}>
                 <h1 className="font-semibold text-lg mt-4">Reset Password Confirmation</h1>
                 <p className="text-gray-500 text-ms mt-2">Click Confirm to redirect to another page to reset your password</p>
@@ -159,8 +157,6 @@ export default function Profile() {
                             <TextField className="flex justify-center" label="Email" id="email_primary.email" fields={contact} disabled={true} showInfo={isEditing} info="Please contact an administrator to have your Email changed" />
                             {/* Phone */}
                             <TextField className="flex justify-center" label="Phone" id="phone_primary.phone_numeric" fields={contact} disabled={true} showInfo={isEditing} info="Please contact an administrator to have your Contact Number changed" />
-                            {/* Membership */}
-                            <TextField className="flex justify-center" label="Membership" id="membership" value={`${membership["membership_type_id:name"]}`} disabled={true} showInfo={isEditing} info="Please contact an administrator to change your membership type" />
                                 
                             {/* Name */}
                             <TextField className="flex justify-center" label="Name" id="name" disabled={!isEditing} value={name} handleChange={e => setName(e.target.value)} />
