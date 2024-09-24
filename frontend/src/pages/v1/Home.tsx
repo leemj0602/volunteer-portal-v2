@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react"
-import ContactManager from "../../utils/managers/ContactManager";
-import EventRoleManager from "../../utils/managers/EventRoleManager";
-import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
-import { Contact } from "../../utils/classes/Contact";
-import { EventRole } from "../../utils/classes/EventRole";
-import { EventRegistration } from "../../utils/classes/EventRegistration";
-import config from "../../../config";
-import Wrapper from "../components/Wrapper";
-import TableStatus from "../components/TableStatus";
-import UpcomingEvents from "../components/UpcomingEvents";
-import Loading from "../components/Loading";
-import ConfirmationModal from "../components/ConfirmationModal";
+import ContactManager from "../../../utils/managers/ContactManager";
+import EventRoleManager from "../../../utils/managers/EventRoleManager";
+import EventRegistrationManager from "../../../utils/managers/EventRegistrationManager";
+import { Contact } from "../../../utils/classes/Contact";
+import { EventRole } from "../../../utils/classes/EventRole";
+import { EventRegistration } from "../../../utils/classes/EventRegistration";
+import config from "../../../../config";
+import Wrapper from "../../components/Wrapper";
+import TableStatus from "../../components/TableStatus";
+import UpcomingEvents from "../../components/UpcomingEvents";
+import Loading from "../../components/Loading";
+import ConfirmationModal from "../../components/ConfirmationModal";
 import CancelEvent from "../../assets/undraw_cancel_re_pkdm.svg";
 import { format, parseISO } from "date-fns";
 import swal from 'sweetalert';
 import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
 import { FiEdit } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { TrainingRegistration } from "../../utils/classes/TrainingRegistration";
-import TrainingRegistrationManager from "../../utils/managers/TrainingRegistrationManager";
+import { TrainingRegistration } from "../../../utils/classes/TrainingRegistration";
+import TrainingRegistrationManager from "../../../utils/managers/TrainingRegistrationManager";
 
 
 interface DashboardHeaderProps {
