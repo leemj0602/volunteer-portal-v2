@@ -11,7 +11,7 @@ import TableStatus from "../../components/TableStatus";
 import UpcomingEvents from "../../components/UpcomingEvents";
 import Loading from "../../components/Loading";
 import ConfirmationModal from "../../components/ConfirmationModal";
-import CancelEvent from "../../assets/undraw_cancel_re_pkdm.svg";
+import CancelEvent from "../../../assets/undraw_cancel_re_pkdm.svg";
 import { format, parseISO } from "date-fns";
 import swal from 'sweetalert';
 import { AiOutlinePhone, AiOutlineMail } from "react-icons/ai";
