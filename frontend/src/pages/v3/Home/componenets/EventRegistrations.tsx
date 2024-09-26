@@ -1,0 +1,249 @@
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { EventRegistration } from "../../../../../utils/classes/EventRegistration";
+import Table from "./Table";
+import Body from "./Table/Body";
+import Cell from "./Table/Cell";
+import Header from "./Table/Header";
+import moment from "moment";
+import Status from "./Table/Status";
+import { useNavigate } from "react-router-dom";
+import { AiOutlineStop } from "react-icons/ai";
+import CancelEvent from "../../../../../assets/undraw_cancel_re_pkdm.svg";
+import Swal from "sweetalert2";
+import EventRegistrationManager from "../../../../../utils/managers/EventRegistrationManager";
+import { Contact } from "../../../../../utils/classes/Contact";
+import { inflect } from "inflection";
+
+/**
+ * THINGS TO CONSIDER
+ * Is it possible to fetch registrations per page rather than fetching every registration?
+ */
+
+interface EventRegistrationsProps {
+    contact: Contact;
+    registrations: EventRegistration[];
+    setRegistrations: Dispatch<SetStateAction<EventRegistration[] | undefined>>;
+}
+
+const limit = 5;
+
+const order = ["Check In", "Checked In", "Upcoming", "Pending", "Unapproved", "No Show", "Cancelled", "Cancelled By Organiser", "Completed"];
+
+const statusColor: { [key: string]: string } = {
+    "Upcoming": "bg-[#FFB656]",
+    "Pending": "bg-[#F0D202]",
+    "Check In": "bg-[#57D5FF]",
+    "No Show": "bg-gray-400",
+    "Cancelled": "bg-[#f26a6a]",
+    "Completed": "bg-[#7bcf72]",
+    "Cancelled By Organiser": "bg-gray-200 text-[#f26a6a]",
+    "Checked In": "bg-[#5a71b4]",
+    "Unapproved": "bg-[#efb7c0]"
+};
+
+
+export default function EventRegistrations(props: EventRegistrationsProps) {
+    const [currRegistrations, setCurrRegistrations] = useState<EventRegistration[]>();
+
+    const navigate = useNavigate();
+    const [page, setPage] = useState(0);
+    const pages = Math.ceil(props.registrations.length / limit) - 1;
+    const previousPage = () => {
+        if (page - 1 <= 0) setPage(0);
+        else setPage(page - 1);
+    }
+    const nextPage = () => {
+        if (page >= pages) setPage(pages);
+        else setPage(page + 1);
+    }
+
+    useEffect(() => {
+        // #region Adding "status" per registration based on conditions
+        const currRegistrations = props.registrations.map(registration => {
+            registration.status = "Logic Incorrect";
+            const start = new Date(registration.eventRole.activity_date_time!);
+            const end = new Date(start.getTime() + registration.eventRole.duration!);
+            const now = new Date();
+
+            // If the reigstration is cancelled
+            if (registration["status_id:name"] == "Cancelled") registration.status = "Cancelled";
+            // If either the event role or the event is cancelled by the organisation
+            else if (registration.eventRole["status_id:name"] == "Cancelled" || registration.eventRole.event["status_id:name"] == "Cancelled") registration.status == "Cancelled by Organiser";
+            // If the event hasn't started yet
+            else if (now < start) {
+                // If the user hasn't been approved yet
+                if (registration["status_id:name"] == "Approval Required") registration.status == "Pending";
+                // or the user has been unapproved
+                else if (registration["status_id:name"] == "Not Approved") registration.status == "Unapproved";
+                else registration.status = "Upcoming";
+            }
+            // IF the event has started and it's currently ongoing
+            else if (now >= start && now <= end) {
+                if (!registration.attendance) {
+                    // If the user hasn't been approved yet, they can't check in
+                    if (["Approval Required", "Not Approved"].includes(registration["status_id:name"])) registration.status == "Unapproved";
+                    // otherwise, allow them to
+                    else registration.status = "Check In";
+                }
+                else registration.status = "Checked In";
+            }
+            // If the event is over
+            else if (now > end) {
+                // and they haven't showed up
+                if (!registration.attendance) registration.status = "No Show";
+                else registration.status = "Completed";
+            }
+
+            return registration;
+        });
+        // #endregion
+        // #region Sorting each registration based on "status"
+        currRegistrations.sort((a, b) => {
+            if (order.indexOf(a.status) - order.indexOf(b.status) != 0) return order.indexOf(a.status) - order.indexOf(b.status);
+
+            if (a.status == "Upcoming" && b.status == "Upcoming" || a.status == "Check In" && b.status == "Check In" || a.status == "Checked In" && b.status == "Checked In") return new Date(a.eventRole.activity_date_time!).getTime() - new Date(b.eventRole.activity_date_time!).getTime();
+
+            return new Date(b.eventRole.activity_date_time!).getTime() - new Date(a.eventRole.activity_date_time!).getTime();
+        });
+        // #endregion
+        setCurrRegistrations(currRegistrations);
+    }, [props.registrations]);
+
+    const openModal = async (registration: EventRegistration) => {
+        if (registration.eventRole["Volunteer_Event_Role_Details.Cancellation_Date"]) {
+            // If it's past the cancellation period, the admin needs to approve
+            const date = new Date(registration.eventRole["Volunteer_Event_Role_Details.Cancellation_Date"]);
+            if (new Date() > date) {
+                const result = await Swal.fire({
+                    icon: "question",
+                    imageHeight: 200,
+                    imageWidth: 320,
+                    width: 400,
+                    title: "Are you sure?",
+                    text: "An administrator will have to manually approve your cancellation request.",
+                    showCancelButton: true,
+                    showCloseButton: true,
+                    confirmButtonText: "Confirm",
+                    confirmButtonColor: "#5a71b4"
+                });
+
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Your request has been sent",
+                        text: "You will receive an email when your cancellation requestion has been approved.",
+                        showCloseButton: true,
+                        confirmButtonText: "OK",
+                        confirmButtonColor: "#5a71b4",
+                        showCancelButton: false,
+                        timer: 5000,
+                        timerProgressBar: true
+                    })
+                }
+
+                return;
+            }
+        }   
+        
+        const result = await Swal.fire({
+            imageUrl: CancelEvent,
+            imageHeight: 200,
+            imageWidth: 320,
+            width: 350,
+            text: "Are you sure you want to cancel this registration?",
+            showCancelButton: true,
+            showCloseButton: true,
+            confirmButtonText: "Confirm",
+            confirmButtonColor: "#5a71b4",
+        });
+
+        if (result.isConfirmed) {
+            await EventRegistrationManager.cancelEvent(registration.id);
+            props.setRegistrations(await props.contact.fetchEventRegistrations());
+
+            Swal.fire({
+                title: "Your registration has been successfully cancelled.",
+                icon: "success",
+                confirmButtonText: "OK",
+                timer: 5000,
+                timerProgressBar: true
+            });
+        }
+    }
+
+    return <div>
+        <Table header="Volunteering Event Status">
+            <Header>
+                <Cell className="text-lg font-semibold w-1/4">Subject</Cell>
+                <Cell className="text-lg font-semibold w-1/4">Date & Time</Cell>
+                <Cell className="text-lg font-semibold w-1/6">Status</Cell>
+                <Cell className="text-lg font-semibold w-1/4 hidden lg:table-cell">Location</Cell>
+                <Cell className="text-lg font-semibold w-1/6">Action</Cell>
+            </Header>
+            <Body>
+                {!currRegistrations?.length ? <tr>
+                    <Cell colSpan={5} className="text-center text-lg text-gray-500">No event history available</Cell>
+                    {/* Slices and shows only 5 entities per page */}
+                </tr> : currRegistrations.slice(page * limit, page + ((page + 1) * limit)).map((registration, index) => {
+                    const { eventRole } = registration;
+                    
+                    // Setting the subject
+                    let subject = `${eventRole["Volunteer_Event_Role_Details.Role:label"] ? `${eventRole["Volunteer_Event_Role_Details.Role:label"]} - ` : ""}${eventRole.event.subject}`;
+                    if (subject.length > 37) subject = `${subject.slice(0, 37)}...`;
+                    
+                    // Checks whether the organisation has cancelled the event role or the event itself
+                    const cancelledByOrganisation = [eventRole.event["status_id:name"], eventRole["status_id:name"]].some(e => e == "Cancelled");
+                   
+                    // Checks whether the registration can be cancelled
+                    const cancellable = ["Upcoming", "Pending"].includes(registration.status);
+
+                    return <tr key={index} className={cancelledByOrganisation ? "bg-gray-200" : ""}>
+                        {/* Subject */}
+                        <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
+                            <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/events/${eventRole.event.id}/${registration.eventRole["Volunteer_Event_Role_Details.Role"]}`)}>
+                                {subject}
+                            </button>
+                        </Cell>
+                        {/* Date and Time */}
+                        <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
+                            {moment(eventRole.activity_date_time!).format("DD/MM/yyyy hh:mm A")}
+                        </Cell>
+                        {/* Status */}
+                        <Cell>
+                            <Status className={statusColor[registration.status]}>
+                                {registration.status}
+                            </Status>
+                        </Cell>
+                        {/* Location */}
+                        <Cell className={`whitespace-nowrap hidden lg:table-cell ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
+                            {eventRole.event.location}
+                        </Cell>
+                        {/* Action */}
+                        <Cell>
+                            <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => openModal(registration)}>
+                                <AiOutlineStop className="mr-2" /> Cancel
+                            </button>
+                        </Cell>
+                    </tr>
+                })}
+            </Body>
+        </Table>
+        {/* Navigation */}
+        <div className="flex justify-between items-center mt-4">
+            <span className="text-gray-500">Showing {page + (page * limit) + 1} - {page + ((page + 1) * limit) > props.registrations.length ? props.registrations.length : page + ((page + 1) * limit)} of {props.registrations.length} {inflect("entries", props.registrations.length)} </span>
+            <div className="flex items-center space-x-2">
+                {/* Previous Page */}
+                <button className={`px-2 text-2xl font-medium rounded ${page == 0 ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:text-black"}`} onClick={previousPage} disabled={page == 0}>
+                    &laquo;
+                </button>
+                <span className="text-lg font-medium text-gray-700">
+                    {page + 1}
+                </span>
+                {/* Next Page */}
+                <button className={`px-2 text-2xl font-medium rounded ${page >= pages ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:text-black"}`} onClick={nextPage} disabled={page >= pages}>
+                    &raquo;
+                </button>
+            </div>
+        </div>
+    </div>
+}

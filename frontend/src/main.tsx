@@ -16,8 +16,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
 		<HashRouter>
 			<Routes>
-				<Route index path="/" element={<Home />} />
-				<Route index path="/home" element={<Home3 /> } />
+				<Route index path="/home-beta" element={<Home />} />
+				<Route index path="/" element={<Home3 /> } />
 				<Route path="/profile" element={<Profile />} />
 				<Route path="/events" element={<Events />} />
 				<Route path="/events/:eventId/:roleId" element={<EventV3 />} />

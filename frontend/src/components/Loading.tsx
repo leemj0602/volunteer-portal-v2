@@ -1,7 +1,7 @@
 import { Spinner } from "flowbite-react";
 
 interface LoadingProps {
-    className: string;
+    className?: string;
 }
 export default function Loading({ className }: LoadingProps) {
     return <div className={`flex justify-center text-center ${className}`}>

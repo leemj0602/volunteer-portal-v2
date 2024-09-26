@@ -62,17 +62,15 @@ const EventRoleManager = new class EventRoleManager {
         return response.data.map((r: EventRoleProps) => new EventRole(r));
     }
 
-    async fetchUnregistered(registeredEventRoles: number[]) {
+    async fetchUnregistered(eventRegistrationIds: number[], limit?: number) {
         return await this.fetch({
+            limit,
             where: [
                 ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD")],
                 ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD")],
-                ["id", "NOT IN", registeredEventRoles],
-                ["activity_type_id:name", "=", "Volunteer Event Role"],
-                ["event.status_id:name", "=", "Available"],
-                ["status_id:name", "!=", "Cancelled"],
+                ["activity_date_time", ">", moment(new Date()).format("YYYY-MM-DD hh:mm:ss")],
+                ["id", "NOT IN", eventRegistrationIds],
             ],
-            limit: 3,
         }) as EventRole[];
     }
 

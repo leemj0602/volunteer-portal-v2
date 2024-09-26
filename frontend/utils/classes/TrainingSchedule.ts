@@ -19,6 +19,7 @@ interface MandatoryCustomTrainingScheduleProps {
 
 export interface TrainingScheduleProps extends MandatoryCustomTrainingScheduleProps {
     id: number | null;
+    duration: number | null;
     activity_date_time: string | null;
     "status_id:name": TrainingScheduleStatus | null;
     subject: string | null;
@@ -28,6 +29,7 @@ export interface TrainingScheduleProps extends MandatoryCustomTrainingSchedulePr
 
 export class TrainingSchedule implements TrainingScheduleProps {
     public id: number | null = null;
+    public duration: number | null = null;
     public activity_date_time: string | null = null;
     public "status_id:name": TrainingScheduleStatus | null = null;
     public subject: string | null = null;

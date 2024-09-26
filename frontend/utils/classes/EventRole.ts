@@ -11,8 +11,10 @@ interface MandatoryCustomEventRoleProps {
     "Volunteer_Event_Role_Details.Approval_Required": boolean | null;
     "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
     "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
+    "Volunteer_Event_Role_Details.Cancellation_Date": string | null;
     "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number | null;
     "Volunteer_Event_Role_Details.Registration_End_Days_Before": number | null;
+    "Volunteer_Event_Role_Details.Cancellation_Days_Before": number | null;
     [key: string]: any;
 }
 
@@ -39,8 +41,10 @@ export class EventRole implements EventRoleProps {
     public "Volunteer_Event_Role_Details.Approval_Required": boolean;
     public "Volunteer_Event_Role_Details.Registration_Start_Date": string | null;
     public "Volunteer_Event_Role_Details.Registration_End_Date": string | null;
+    public "Volunteer_Event_Role_Details.Cancellation_Date": string | null;
     public "Volunteer_Event_Role_Details.Registration_Start_Days_Before": number | null;
     public "Volunteer_Event_Role_Details.Registration_End_Days_Before": number | null;
+    public "Volunteer_Event_Role_Details.Cancellation_Days_Before": number | null;
     [key: string]: any;
 
     constructor(props: EventRoleProps) {
