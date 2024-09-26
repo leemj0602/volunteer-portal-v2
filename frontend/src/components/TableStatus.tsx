@@ -5,7 +5,7 @@ import { GrView } from "react-icons/gr";
 import { AiOutlineStop } from "react-icons/ai";
 import ConfirmationModal from "./ConfirmationModal";
 import config from "../../../config";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
 import ContactManager from "../../utils/managers/ContactManager";
 
@@ -142,8 +142,9 @@ export default function TableStatus({ registrations, type, openCancelModal }: Ta
             // Close the popup
             setIsPopupOpen(false);
 
-            swal("Attendance taken successfully", {
-              icon: "success",
+            Swal.fire({
+              title: "Attendance taken successfully",
+              icon: "success"
             });
 
             // Update the status of the event to "Checked In"
@@ -157,17 +158,21 @@ export default function TableStatus({ registrations, type, openCancelModal }: Ta
             // Close the popup
             setIsPopupOpen(false);
 
-            swal("Attendance taken unsuccessfully", {
-              icon: "error",
-            });
+            Swal.fire({
+              title: "Attendance taken unsuccessfully",
+              icon: "error"
+            })
             setIsSubmitting(false);
           }
         }
       }
       else {
-        swal("Wrong code, please try again", {
-          icon: "error",
+        Swal.fire({
+          title: "Wrong code",
+          text: "Please try again",
+          icon: "error"
         });
+
         setIsSubmitting(false);
       }
     }

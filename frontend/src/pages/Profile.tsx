@@ -12,7 +12,7 @@ import { FiEdit } from "react-icons/fi";
 import TextField from "../components/Fields/TextField";
 import DropdownField from "../components/Fields/DropdownField";
 import CheckboxField from "../components/Fields/CheckboxField";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 
 export default function Profile() {
     const email = (window as any).email ?? config.email;
@@ -52,12 +52,20 @@ export default function Profile() {
 
         const result = await ContactManager.update(email, updated);
         if (result) {
-            swal("Successfully updated profile", { icon: "success" });
+            Swal.fire({
+                title: "Profile successfully updated",
+                icon: "success"
+            });
             setContact(new Contact(updated));
             setUnsavedContact(new Contact(updated));
         }
         else {
-            swal("An error has occurred. Please try again.", { icon: "error" });
+            Swal.fire({
+                title: "An error occurred",
+                text: "Please try again at a later time.",
+                icon: "error"
+            });
+
             setContact(unsavedContact);
         }
 

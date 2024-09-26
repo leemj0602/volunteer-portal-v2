@@ -15,7 +15,7 @@ import EventRoleManager from "../../../utils/managers/EventRoleManager";
 import { EventRegistration, RegistrationStatus } from "../../../utils/classes/EventRegistration";
 import { CheckIcon, ChevronDownIcon, LockClosedIcon, PencilIcon } from "@heroicons/react/24/solid";
 import { Spinner } from "flowbite-react";
-import swal from "sweetalert";
+import Swal from "sweetalert2";
 
 export default function Event() {
     const navigate = useNavigate();
@@ -196,9 +196,17 @@ function RegistrationButton(props: RegistrationButtonProps) {
         if (!props.registrations.find(r => r["contact.email_primary.email"] == email)) {
             const registrations = await props.eventRole.register(email);
             props.setRegistrations(registrations);
-            swal(props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", { icon: "success" });
+            Swal.fire({
+                icon: "success",
+                title: props.eventRole["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted" : "You have successfully registered",
+                text: "Please wait for an Administrator to approve"
+            })
         }
-        else swal("An error has occurred while registering.\nPlease contact an administrator.", { icon: "error" });
+        else Swal.fire({
+            icon: "error",
+            title: "An error has occurred",
+            text: "Please contact an Administrator."
+        })
         setIsLoading(false);
     }
 

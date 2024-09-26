@@ -13,8 +13,8 @@ import moment from "moment";
 import { IoMdBriefcase } from "react-icons/io";
 import EventRoleManager from "../../../utils/managers/EventRoleManager";
 import { EventRegistration, RegistrationStatus } from "../../../utils/classes/EventRegistration";
-import swal from "sweetalert";
 import ScheduleTable from "../../components/ScheduleTable";
+import Swal from "sweetalert2";
 
 export default function Event() {
     const navigate = useNavigate();
@@ -156,15 +156,18 @@ export default function Event() {
                             : prevSchedule
                     )
                 );
-                swal(schedule["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted.\nPlease wait for an administrator to approve." : "You have successfully registered.", {
+                Swal.fire({
                     icon: "success",
+                    title: schedule["Volunteer_Event_Role_Details.Approval_Required"] ? "Your request has been submitted" : "You have successfully registered",
+                    text: schedule["Volunteer_Event_Role_Details.Approval_Required"] ? "Please wait for an Administrator to approve." : ""
                 });
             }
         } catch (error) {
             console.error('Error during registration:', error);
-            swal(`Registration failed`, {
-                icon: "error"
-            });
+            Swal.fire({
+                icon: "error",
+                title: "Registration Failed"
+            })
 
             setSchedules((prevSchedules) =>
                 prevSchedules.map((prevSchedule) =>

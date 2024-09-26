@@ -8,7 +8,7 @@ import Loading from "../components/Loading";
 import config from "../../../config";
 import { CiFileOff } from "react-icons/ci";
 import moment from "moment";
-import swal from 'sweetalert';
+import Swal from "sweetalert2";
 import { UserIcon, PhoneIcon, EnvelopeOpenIcon } from '@heroicons/react/24/solid';
 import ScheduleTable from "../components/ScheduleTable";
 
@@ -130,15 +130,19 @@ export default function TrainingPage() {
                             : prevSchedule
                     )
                 );
-                swal('You have successfully registered', {
+
+                Swal.fire({
                     icon: "success",
+                    title: "You have successfully registered"
                 });
             }
         } catch (error) {
             console.error('Error during registration:', error);
-            swal(`Registration failed`, {
-                icon: "error"
-            });
+
+            Swal.fire({
+                icon: "error",
+                title: "Registration Failed"
+            })
 
             setSchedules((prevSchedules) =>
                 prevSchedules.map((prevSchedule) =>
