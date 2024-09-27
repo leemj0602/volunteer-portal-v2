@@ -24,7 +24,7 @@ export default function Events() {
     const [searchQuery, setSearchQuery] = useState<string>();
     const [searchParams, setSearchParams] = useSearchParams();
     const [customFields, setCustomFields] = useState<Map<string, CustomField>>();
-    const email = (window as any).email ?? config.email;
+    const email = (window as any).email;
 
     // #region Apply profile filters on page load
     useEffect(() => {

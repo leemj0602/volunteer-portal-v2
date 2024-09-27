@@ -183,7 +183,7 @@ interface RegistrationButtonProps {
 }
 function RegistrationButton(props: RegistrationButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
-    const email = (window as any).email ?? config.email;
+    const email = (window as any).email;
 
     const endDate = moment(props.eventRole.activity_date_time).add(props.eventRole.duration, "minutes");
     const registrationStartDate = moment(props.eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"]);

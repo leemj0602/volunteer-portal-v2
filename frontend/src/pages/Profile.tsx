@@ -14,7 +14,7 @@ import CheckboxField from "../components/Fields/CheckboxField";
 import Swal from "sweetalert2";
 
 export default function Profile() {
-    const email = (window as any).email ?? config.email;
+    const email = (window as any).email;
     const [name, setName] = useState("");
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);

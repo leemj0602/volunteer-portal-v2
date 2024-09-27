@@ -18,8 +18,8 @@ export default function TrainingPage() {
     const [schedules, setSchedules] = useState<any[]>([]);
     const [loadingScheduleId, setLoadingScheduleId] = useState<number | null>(null);
     const [dataFetched, setDataFetched] = useState<boolean>(false);
-    const email = (window as any).email ?? config.email;
-
+    const email = (window as any).email;
+    
     useEffect(() => {
         (async () => {
             const training = await TrainingManager.fetch({ id }) as Training;

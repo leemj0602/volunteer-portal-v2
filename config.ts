@@ -1,13 +1,5 @@
-interface ConfigProps {
-    version: number;
-    domain: string;
-    email?: string;
-}
-
-const config: ConfigProps = {
-    version: 2,
+const config = {
     domain: "http://localhost/wordpress",
-    email: "casuarina@octopus8.com"
 }
 
 export default config;

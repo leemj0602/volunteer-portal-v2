@@ -27,7 +27,7 @@ export default function Event() {
     const [schedules, setSchedules] = useState<any[]>([]);
     const [loadingScheduleId, setLoadingScheduleId] = useState<number | null>(null);
     const [dataFetched, setDataFetched] = useState<boolean>(false);
-    const email = (window as any).email ?? config.email;
+    const email = (window as any).email;
 
     // #region State initialisation
     useEffect(() => {
