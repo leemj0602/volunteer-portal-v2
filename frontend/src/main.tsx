@@ -10,7 +10,6 @@ import Trainings from "./pages/Trainings";
 import Training from "./pages/Training";
 import Events from "./pages/Events";
 import EventV3 from "./pages/v3/Event";
-import Donations from "./pages/Donations";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
@@ -22,7 +21,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 				<Route path="/events/:eventId/:roleId" element={<EventV3 />} />
 				<Route path="/trainings" element={<Trainings />} />
 				<Route path="/trainings/:id" element={<Training />} />
-				<Route path="/donations" element={<Donations />} />
 			</Routes>
 		</HashRouter>
 	</React.StrictMode>
