@@ -37,7 +37,7 @@ const EventRegistrationManager = new class EventRegistrationManager {
             where
         });
 
-        return (response?.data as EventRegistrationProps[]).map(d => new EventRegistration(d));
+        return ((response?.data ?? []) as EventRegistrationProps[]).map(d => new EventRegistration(d));
     }
 
     async cancelEvent(registrationActivityId: number) {

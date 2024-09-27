@@ -33,7 +33,6 @@ const TrainingRegistrationManager = new class TrainingRegistrationManager {
                 ['Activity AS training', 'LEFT', ['schedule.Volunteer_Training_Schedule_Details.Training', '=', 'training.id']],
             ],
         })
-
         return (response?.data as TrainingRegistrationProps[]).map(d => new TrainingRegistration(d));
     }
 
