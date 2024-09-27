@@ -1,8 +1,8 @@
-import { MouseEvent, PropsWithChildren } from "react";
+import { PropsWithChildren } from "react";
 
 interface StatusProps extends PropsWithChildren {
     className?: string;
-    onClick?: (event: MouseEvent) => void;
+    onClick?: any;
 }
 
 export default function Status(props: StatusProps) {

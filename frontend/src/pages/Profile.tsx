@@ -5,7 +5,6 @@ import { Contact, ContactProps } from "../../utils/classes/Contact";
 import CustomFieldSetManager, { CustomField } from "../../utils/managers/CustomFieldSetManager";
 import config from "../../../config";
 import Loading from "../components/Loading";
-import ConfirmationModal from "../components/ConfirmationModal";
 import ResetPassword from "../../assets/ResetPassword.png";
 import { MdOutlineLockReset, MdSaveAlt } from "react-icons/md";
 import { FiEdit } from "react-icons/fi";
@@ -73,14 +72,22 @@ export default function Profile() {
         setIsEditing(false);
     }
 
-    const [showModal, setShowModal] = useState(false);
-    const openModal = () => {
-        setShowModal(true);
-        document.body.style.overflow = "hidden";
-    }
-    const closeModal = () => {
-        setShowModal(false);
-        document.body.style.overflow = "";
+    const openModal = async () => {
+        const result = await Swal.fire({
+            imageUrl: ResetPassword,
+            imageHeight: 120,
+            imageWidth: 180,
+            width: 420,
+            title: "Reset Password",
+            text: "Are you sure you want to reset your password? You will be redirected to another page.",
+            confirmButtonText: "Redirect",
+            confirmButtonColor: "#5a71b4",
+            cancelButtonText: "Nevermind",
+            showCloseButton: true,
+            showCancelButton: true
+        })
+        
+        if (result.isConfirmed) window.open(`${config.domain}/wp-login.php?action=lostpassword`, "_blank");
     }
 
     // Responsible for switching the view
@@ -96,18 +103,6 @@ export default function Profile() {
 
     return <Wrapper>
         {!contact || !customFieldData ? <Loading className="h-screen items-center" /> : <>
-            <ConfirmationModal showModal={showModal} closeModal={closeModal} image={ResetPassword}>
-                <h1 className="font-semibold text-lg mt-4">Reset Password Confirmation</h1>
-                <p className="text-gray-500 text-ms mt-2">Click Confirm to redirect to another page to reset your password</p>
-                <button className="text-sm font-semibold bg-secondary rounded-md p-2 w-[140px] text-white self-center mt-4" onClick={() => {
-                    closeModal();
-                    window.open(`${config.domain}/wp-login.php?action=lostpassword`, "_blank")
-                }
-                }>
-                    Confirm
-                </button>
-                <button onClick={closeModal} className="font-semibold text-sm mt-2 text-gray-400">Nevermind</button>
-            </ConfirmationModal>
             <div>
                 {/* Header PC */}
                 <div className="p-4 relative bg-primary/20 h-[140px] hidden md:block">

@@ -6,48 +6,41 @@ import { PiSignOutBold } from "react-icons/pi";
 import { LuCalendarRange } from "react-icons/lu";
 import axios from "axios";
 import { useState } from "react";
-import ConfirmationModal from "../ConfirmationModal";
 import SignOut from "../../../assets/SignOut.png";
 import config from "../../../../config";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaChalkboardTeacher } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 interface NavbarProps {
     className: string;
 }
 
 export default function Navbar(props: NavbarProps) {
-    const [isSigningOut, setIsSigningOut] = useState(false);
-    const signOut = async () => {
-        setIsSigningOut(true);
-        await axios.get(`${config.domain}/portal/api/logout.php`);
-        window.location.href = `${config.domain}/wp-login.php?redirect_to=${encodeURIComponent(window.location.href)}`;
-    }
+    const openModal = async () => {
+        const result = await Swal.fire({
+            imageUrl: SignOut,
+            imageWidth: 240,
+            imageHeight: 160,
+            width: 400,
+            text: "Are you sure you want to sign out?",
+            confirmButtonColor: "#5a71b4",
+            confirmButtonText: "Sign Out",
+            cancelButtonText: "Cancel",
+            showCloseButton: true,
+            showCancelButton: true
+        });
 
-    const [showModal, setShowModal] = useState(false);
-
-    // Open modal
-    const openModal = () => {
-        setShowModal(true);
-        document.body.style.overflow = 'hidden';
+        if (result.isConfirmed) {
+            Swal.fire({ title: "Signing out...", timer: 3000, timerProgressBar: true, showConfirmButton: false });
+            await axios.get(`${config.domain}/portal/api/logout.php`);
+            window.location.href = `${config.domain}/wp-login.php?redirect_to=${encodeURIComponent(window.location.href)}`;
+        }
     }
-    // Close modal
-    const closeModal = () => {
-        setShowModal(false);
-        document.body.style.overflow = '';
-    };
 
     const [menuOpen, setMenuOpen] = useState(false);
 
-
     return <>
-        <ConfirmationModal showModal={showModal} closeModal={closeModal} image={SignOut} imageWidth="max-w-[260px]" imageHeight="h-[160px]">
-            <h1 className="font-semibold text-[16px] mt-4 text-gray-400">Are you sure you want to sign out?</h1>
-            <button className="text-sm font-semibold bg-secondary disabled:bg-primary rounded-md p-2 w-[180px] text-white self-center mt-4" onClick={signOut} disabled={isSigningOut}>
-                {isSigningOut ? "Signing Out..." : "Sign Out"}
-            </button>
-            <p className="font-semibold mt-3 text-gray-400 cursor-pointer" onClick={closeModal}>Cancel</p>
-        </ConfirmationModal>
         <nav className={`h-full fixed bg-white flex-col hidden md:flex z-[11] ${props.className}`}>
             {/* Responsible for the image */}
             <div className="p-4 flex items-center">
