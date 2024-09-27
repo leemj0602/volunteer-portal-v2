@@ -11,6 +11,7 @@ import config from "../../../../config";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { BiDonateHeart } from "react-icons/bi";
 
 interface NavbarProps {
     className: string;
@@ -73,6 +74,12 @@ export default function Navbar(props: NavbarProps) {
                             <span>Profile</span>
                         </div>
                     </Link>
+                    <Link to="/donations">
+                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-1-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                            <BiDonateHeart />
+                            <span>Donations</span>
+                        </div>
+                    </Link>
                 </div>
                 <button onClick={openModal} className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                     <PiSignOutBold />
@@ -81,7 +88,7 @@ export default function Navbar(props: NavbarProps) {
             </div>
         </nav>
         {menuOpen && <div className="h-full w-screen bg-black opacity-30 z-[11] fixed md:hidden" onClick={() => setMenuOpen(false)} />}
-        <nav className="w-full fixed bg-white flex flex-col z-20 md:hidden">
+        <nav className="w-full fixed bg-white rounded-b-lg flex flex-col z-20 md:hidden">
             <div className="flex justify-between h-20 items-center px-6">
                 {/* Responsible for the image */}
                 <div className="p-4 w-[220px] flex items-center">
@@ -94,28 +101,39 @@ export default function Navbar(props: NavbarProps) {
             </div>
             {menuOpen && <>
                 <hr />
-                <div className="flex flex-col pt-2">
+                <div className="flex flex-col pt-2 max-h-[200px] overflow-y-scroll">
                     <Link to="/">
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                            <RxDashboard />
                             Dashboard
                         </div>
                     </Link>
                     <Link to="/events">
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                            All Events
+                            <LuCalendarRange />
+                            Events
                         </div>
                     </Link>
                     <Link to="/trainings">
                         <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                            <FaChalkboardTeacher />
                             Trainings
                         </div>
                     </Link>
                     <Link to="/profile">
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                            <CgProfile />
                             Profile
                         </div>
                     </Link>
+                    <Link to="/donations">
+                        <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                            <BiDonateHeart />
+                            Donations
+                        </div>
+                    </Link>
                     <button onClick={openModal} className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
+                        <PiSignOutBold />
                         <span>Sign Out</span>
                     </button>
                 </div>
