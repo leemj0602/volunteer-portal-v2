@@ -109,7 +109,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         setCurrRegistrations(currRegistrations);
     }, [props.registrations]);
 
-    const openModal = async (registration: EventRegistration) => {
+    const promptCancelModal = async (registration: EventRegistration) => {
         if (registration.eventRole["Volunteer_Event_Role_Details.Cancellation_Date"]) {
             // If it's past the cancellation period, the admin needs to approve
             const date = new Date(registration.eventRole["Volunteer_Event_Role_Details.Cancellation_Date"]);
@@ -171,6 +171,44 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         }
     }
 
+    // #region Responsible for taking their attendance
+    const promptCheckInModal = async (registration: EventRegistration) => {
+        const result = await Swal.fire({
+            icon: "question",
+            input: "text",
+            title: "Enter the Attendance Code",
+            confirmButtonColor: "#5a71b4",
+            confirmButtonText: "Verify",
+            showCloseButton: true,
+            inputValidator: (value) => {
+                if (value != registration.eventRole.event["Volunteer_Event_Details.Attendance_Code"]) return "Invalid code. Please try again.";
+            }
+        });
+
+        if (result.isConfirmed) {
+            const attendance = await EventRegistrationManager.createAttendance(props.contact.id!, registration.eventRole.id!, registration.eventRole.event.duration!).catch(() => null);
+        ``
+            if (attendance) {
+                props.setRegistrations(await props.contact.fetchEventRegistrations());
+
+                Swal.fire({ 
+                    icon: "success", 
+                    title: "Attendance successfully taken", 
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+            else {
+                Swal.fire({
+                    icon: "error",
+                    title: "An error has occurred",
+                    text: "Please try again at a later time"
+                })
+            }
+        }
+    }
+    // #endregion
+
     return <div>
         <Table header="Volunteering Event Status">
             <Header>
@@ -210,7 +248,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                         </Cell>
                         {/* Status */}
                         <Cell>
-                            <Status className={statusColor[registration.status]}>
+                            <Status className={statusColor[registration.status]} onClick={registration.status != "Check In" ? () => promptCheckInModal(registration) : undefined}>
                                 {registration.status}
                             </Status>
                         </Cell>
@@ -220,7 +258,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                         </Cell>
                         {/* Action */}
                         <Cell>
-                            <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => openModal(registration)}>
+                            <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => promptCancelModal(registration)}>
                                 <AiOutlineStop className="mr-2" /> Cancel
                             </button>
                         </Cell>

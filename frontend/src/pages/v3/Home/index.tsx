@@ -3,12 +3,12 @@ import Wrapper from "../../../components/Wrapper";
 import { Contact } from "../../../../utils/classes/Contact";
 import ContactManager from "../../../../utils/managers/ContactManager";
 import Loading from "../../../components/Loading";
-import Header from "./componenets/Header";
-import Statistics from "./componenets/Statistics";
+import Header from "./components/Header";
+import Statistics from "./components/Statistics";
 import { EventRegistration } from "../../../../utils/classes/EventRegistration";
-import EventRegistrations from "./componenets/EventRegistrations";
-import TrainingRegistrations from "./componenets/TrainingRegistrations";
-import UpcomingEvents from "./componenets/UpcomingEvents";
+import EventRegistrations from "./components/EventRegistrations";
+import TrainingRegistrations from "./components/TrainingRegistrations";
+import UpcomingEvents from "./components/UpcomingEvents";
 import { TrainingRegistration } from "../../../../utils/classes/TrainingRegistration";
 
 export default function Home3() {
