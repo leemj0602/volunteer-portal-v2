@@ -31,6 +31,7 @@ export default function History(props: HistoryProps) {
     return <div className={props.className}>
         <Table header="History">
             <Header>
+                <Cell className="text-lg font-semibold w-1/6">Type</Cell>
                 <Cell className="text-lg font-semibold w-1/5">Amount {"(S$)"}</Cell>
                 <Cell className="text-lg font-semibold">Date</Cell>
             </Header>
@@ -39,8 +40,10 @@ export default function History(props: HistoryProps) {
                     <Cell colSpan={2} className="text-center text-lg text-gray-500">No donations can be found</Cell>
                 </tr> : props.donations.slice(page * limit, page + ((page + 1) * limit)).map((donation, index) => {
                     return <tr key={index}>
+                        {/* Type */}
+                        <Cell>{donation.data["financial_type_id:label"]}</Cell>
                         {/* Amount */}
-                        <Cell>S$ {numeral(donation.data.currency).format('0,0.00')}</Cell>
+                        <Cell>S$ {numeral(donation.data.total_amount).format('0,0.00')}</Cell>
                         {/* Date */}
                         <Cell>{moment(donation.data.receive_date!).format('DD/MM/yyyy hh:mm a')}</Cell>
                     </tr>

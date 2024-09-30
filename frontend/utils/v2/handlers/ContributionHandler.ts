@@ -11,10 +11,12 @@ class ContributionHandler {
                 "source",
                 "currency",
                 "total_amount",
-                "receive_date"
+                "receive_date",
+                "financial_type_id:label"
             ],
             where: [...where, ["contact.email_primary.email", "=", email]],
-            join: [["Contact AS contact", "LEFT", ["contact.id", "=", "contact_id"]]]
+            join: [["Contact AS contact", "LEFT", ["contact.id", "=", "contact_id"]]],
+            order: [["receive_date", "DESC"]]
         }).catch(console.log);
 
         if (!response) return [];

@@ -12,7 +12,7 @@ export default function Donations() {
 
     useEffect(() => {
         (async () => {
-            const donations = await ContributionHandler.fetch(email, [["financial_type_id:name", "=", "Donation"]]);
+            const donations = await ContributionHandler.fetch(email, [["financial_type_id:label", "NOT IN", ["Campaign Contribtuion", "Event Fees", "Member Dues"]]]);
             setDonations(donations);
         })();
     }, []);

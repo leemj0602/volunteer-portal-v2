@@ -8,6 +8,7 @@ export class Contribution extends Entity {
         source?: string;
         total_amount?: number;
         receive_date?: string;
+        "financial_type_id:label"?: string;
     } = {};
 
     constructor(data: obj) {
