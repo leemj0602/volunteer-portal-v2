@@ -1,19 +1,20 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Contact } from "../../../../../utils/classes/Contact";
 import { TrainingRegistration } from "../../../../../utils/classes/TrainingRegistration";
-import Table from "./Table";
-import Body from "./Table/Body";
-import Cell from "./Table/Cell";
-import Header from "./Table/Header";
+import Table from "../../../../components/Table";
+import Body from "../../../../components/Table/Body";
+import Cell from "../../../../components/Table/Cell";
+import Header from "../../../../components/Table/Header";
 import { useNavigate } from "react-router-dom";
 import { TrainingStatus } from "../../../../../utils/classes/Training";
 import moment from "moment";
 import { AiOutlineStop } from "react-icons/ai";
-import Status from "./Table/Status";
+import Status from "../../../../components/Table/Status";
 import Swal from "sweetalert2";
 import CancelEvent from "../../../../../assets/undraw_cancel_re_pkdm.svg";
 import TrainingRegistrationManager from "../../../../../utils/managers/TrainingRegistrationManager";
 import { inflect } from "inflection";
+import PageNavigation from "../../../../components/PageNavigation";
 
 interface TrainingRegistrationsProps {
     contact: Contact;
@@ -160,22 +161,6 @@ export default function TrainingRegistrations(props: TrainingRegistrationsProps)
                 })}
             </Body>
         </Table>
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-4">
-            <span className="text-gray-500">Showing {page + (page * limit) + 1} - {page + ((page + 1) * limit) > props.registrations.length ? props.registrations.length : page + ((page + 1) * limit)} of {props.registrations.length} {inflect("entries", props.registrations.length)} </span>
-            <div className="flex items-center space-x-2">
-                {/* Previous Page */}
-                <button className={`px-2 text-2xl font-medium rounded ${page == 0 ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:text-black"}`} onClick={previousPage} disabled={page == 0}>
-                    &laquo;
-                </button>
-                <span className="text-lg font-medium text-gray-700">
-                    {page + 1}
-                </span>
-                {/* Next Page */}
-                <button className={`px-2 text-2xl font-medium rounded ${page >= pages ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:text-black"}`} onClick={nextPage} disabled={page >= pages}>
-                    &raquo;
-                </button>
-            </div>
-        </div>
+        <PageNavigation page={page} pages={pages} limit={limit} array={props.registrations} previousPage={previousPage} nextPage={nextPage} />
     </div>
 }

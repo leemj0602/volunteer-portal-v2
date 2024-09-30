@@ -1,11 +1,11 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { EventRegistration } from "../../../../../utils/classes/EventRegistration";
-import Table from "./Table";
-import Body from "./Table/Body";
-import Cell from "./Table/Cell";
-import Header from "./Table/Header";
+import Table from "../../../../components/Table";
+import Body from "../../../../components/Table/Body";
+import Cell from "../../../../components/Table/Cell";
+import Header from "../../../../components/Table/Header";
 import moment from "moment";
-import Status from "./Table/Status";
+import Status from "../../../../components/Table/Status";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineStop } from "react-icons/ai";
 import CancelEvent from "../../../../../assets/undraw_cancel_re_pkdm.svg";
@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import EventRegistrationManager from "../../../../../utils/managers/EventRegistrationManager";
 import { Contact } from "../../../../../utils/classes/Contact";
 import { inflect } from "inflection";
+import PageNavigation from "../../../../components/PageNavigation";
 
 /**
  * THINGS TO CONSIDER
@@ -57,6 +58,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         else setPage(page + 1);
     }
 
+    // #region Mapping the registrations everytime it's updated
     useEffect(() => {
         // #region Adding "status" per registration based on conditions
         const currRegistrations = props.registrations.map(registration => {
@@ -108,7 +110,9 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         // #endregion
         setCurrRegistrations(currRegistrations);
     }, [props.registrations]);
+    // #endregion
 
+    // #region Cancel Modal
     const promptCancelModal = async (registration: EventRegistration) => {
         if (registration.eventRole["Volunteer_Event_Role_Details.Cancellation_Date"]) {
             // If it's past the cancellation period, the admin needs to approve
@@ -170,6 +174,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
             });
         }
     }
+    // #endregion
 
     // #region Responsible for taking their attendance
     const promptCheckInModal = async (registration: EventRegistration) => {
@@ -198,13 +203,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                     timerProgressBar: true
                 });
             }
-            else {
-                Swal.fire({
-                    icon: "error",
-                    title: "An error has occurred",
-                    text: "Please try again at a later time"
-                })
-            }
+            else Swal.fire({ icon: "error", title: "An error has occurred", text: "Please try again at a later time" });
         }
     }
     // #endregion
@@ -237,13 +236,13 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
 
                     return <tr key={index} className={cancelledByOrganisation ? "bg-gray-200" : ""}>
                         {/* Subject */}
-                        <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
+                        <Cell className={cancelledByOrganisation ? "text-gray-400" : ""}>
                             <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/events/${eventRole.event.id}/${registration.eventRole["Volunteer_Event_Role_Details.Role"]}`)}>
                                 {subject}
                             </button>
                         </Cell>
                         {/* Date and Time */}
-                        <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
+                        <Cell className={cancelledByOrganisation ? "text-gray-400" : ""}>
                             {moment(eventRole.activity_date_time!).format("DD/MM/yyyy hh:mm A")}
                         </Cell>
                         {/* Status */}
@@ -253,7 +252,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                             </Status>
                         </Cell>
                         {/* Location */}
-                        <Cell className={`whitespace-nowrap hidden lg:table-cell ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
+                        <Cell className={cancelledByOrganisation ? "text-gray-400" : ""}>
                             {eventRole.event.location}
                         </Cell>
                         {/* Action */}
@@ -266,22 +265,6 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                 })}
             </Body>
         </Table>
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-4">
-            <span className="text-gray-500">Showing {page + (page * limit) + 1} - {page + ((page + 1) * limit) > props.registrations.length ? props.registrations.length : page + ((page + 1) * limit)} of {props.registrations.length} {inflect("entries", props.registrations.length)} </span>
-            <div className="flex items-center space-x-2">
-                {/* Previous Page */}
-                <button className={`px-2 text-2xl font-medium rounded ${page == 0 ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:text-black"}`} onClick={previousPage} disabled={page == 0}>
-                    &laquo;
-                </button>
-                <span className="text-lg font-medium text-gray-700">
-                    {page + 1}
-                </span>
-                {/* Next Page */}
-                <button className={`px-2 text-2xl font-medium rounded ${page >= pages ? "text-gray-400 cursor-not-allowed" : "text-gray-700 hover:text-black"}`} onClick={nextPage} disabled={page >= pages}>
-                    &raquo;
-                </button>
-            </div>
-        </div>
+        <PageNavigation page={page} pages={pages} limit={limit} array={props.registrations} previousPage={previousPage} nextPage={nextPage} />
     </div>
 }

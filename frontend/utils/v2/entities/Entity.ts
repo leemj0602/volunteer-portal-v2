@@ -1,6 +1,16 @@
-import { PiKeyholeThin } from "react-icons/pi";
+export type obj = { [key: string]: any };
 
-export class Entity {
+export default class Entity {
+    data: obj = {};
+
+    constructor(data: obj) {
+        this.data = data;
+    }
+
+    get flat() {
+        return this.flatten(this.data) as obj;
+    }
+
     public setNestedValue(obj: any, key: string, value: any) {
         const args = key.split(".");
         let current = obj;
@@ -22,14 +32,11 @@ export class Entity {
                 const value = obj[key];
                 const newKey = prefix ? `${prefix}.${key}` : key;
     
-                if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-                    Object.assign(result, this.flatten(value, newKey));
-                } else {
-                    result[newKey] = value;
-                }
+                if (typeof value === 'object' && value !== null && !Array.isArray(value)) Object.assign(result, this.flatten(value, newKey));
+                else result[newKey] = value;
             }
         }
-    
+
         return result;
     }
 }

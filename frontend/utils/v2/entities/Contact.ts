@@ -1,5 +1,6 @@
 import CRM from "../../crm";
-import { Entity } from "./BaseEntity";
+import ContactHandler from "../handlers/ContactHandler";
+import Entity, { obj } from "./Entity";
 
 export class Contact extends Entity {
     data: {
@@ -24,21 +25,22 @@ export class Contact extends Entity {
         }
     } = {};
 
-    get flat() {
-        return this.flatten(this.data);
-    }
-
-    constructor(data: { [key: string]: any }) {
-        super();
+    constructor(data: obj) {
+        super(data);
         for (const key in data)
             this.setNestedValue(this.data, key, data[key]);
     }
 
-    async update(data?: any): Promise<Contact | null> {
-        const result = await CRM("Contact", "update", {
-            where: [["email_primary.email", "=", this.data.email_primary?.email]],
-            values: Object.keys(data ?? this.flat).map(k => ([k, data ?? this.flat[k]]))
+    async update(values: [string, any][]): Promise<Contact | null> {
+        const response = await CRM("Contact", "update", {
+            values,
+            where: [["email_primary.email", "=", this.data.email_primary?.email]]
         }).catch(() => null);
-        return result ? this : null;
+        if (!response) return null;
+
+        const contact = await ContactHandler.fetch(this.data.email_primary!.email!);
+        for (const key in contact) this.setNestedValue(this.data, key, (this.data as any)[key]);
+        
+        return this;
     }
 }

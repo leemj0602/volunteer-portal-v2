@@ -6,7 +6,7 @@ interface TableCellProps extends PropsWithChildren {
 }
 
 export default function Cell(props: TableCellProps) {
-    return <td colSpan={props.colSpan} className={`px-6 py-2 ${props.className}`}>
+    return <td colSpan={props.colSpan} className={`whitespace-nowrap px-6 py-2 ${props.className}`}>
         {props.children}
     </td>
 }
