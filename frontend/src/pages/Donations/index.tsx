@@ -16,6 +16,7 @@ export default function Donations() {
             setDonations(donations);
         })();
     }, []);
+    
     return <Wrapper>
         {!donations ? <Loading className="h-screen items-center" /> : <div className="p-4 mb-12">
             <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
