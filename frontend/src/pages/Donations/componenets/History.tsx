@@ -6,8 +6,11 @@ import Cell from "../../../components/Table/Cell";
 import Header from "../../../components/Table/Header";
 import numeral from "numeral";
 import moment from "moment";
-import { inflect } from "inflection";
 import PageNavigation from "../../../components/PageNavigation";
+import { HiOutlineMail } from "react-icons/hi";
+import CRM from "../../../../utils/crm";
+import Swal from "sweetalert2";
+import ContactManager from "../../../../utils/managers/ContactManager";
 
 interface HistoryProps {
     donations: Contribution[];
@@ -17,6 +20,7 @@ interface HistoryProps {
 const limit = 10;
 
 export default function History(props: HistoryProps) {
+    const email = (window as any).email;
     const [page, setPage] = useState(0);
     const pages = Math.ceil(props.donations.length / limit) - 1;
     const previousPage = () => {
@@ -28,12 +32,28 @@ export default function History(props: HistoryProps) {
         else setPage(page + 1);
     }
 
+    const createRequest = async () => {
+        const contact = await ContactManager.fetch(email);
+        const response = await CRM("Activity", "create", { 
+            values: [
+                ["source_contact_id", contact.id],
+                ["target_contact_id", contact.id],
+                ["activity_type_id:name", "Contribution Receipt"]
+            ]
+        });
+        console.log(response);
+
+        if (response) await Swal.fire({ icon: "success", title: "A receipt has been sent to your email" });
+        else await Swal.fire({ icon: "error", title: "An error occurred", text: "Please try again later." });
+    }
+
     return <div className={props.className}>
         <Table header="History">
             <Header>
                 <Cell className="text-lg font-semibold w-1/6">Type</Cell>
                 <Cell className="text-lg font-semibold w-1/5">Amount {"(S$)"}</Cell>
                 <Cell className="text-lg font-semibold">Date</Cell>
+                <Cell className="text-lg font-semibold text-right">Receipt</Cell>
             </Header>
             <Body>
                 {!props.donations.length ? <tr>
@@ -46,6 +66,12 @@ export default function History(props: HistoryProps) {
                         <Cell>S$ {numeral(donation.data.total_amount).format('0,0.00')}</Cell>
                         {/* Date */}
                         <Cell>{moment(donation.data.receive_date!).format('DD/MM/yyyy hh:mm a')}</Cell>
+                        {/* Receipt */}
+                        <Cell className="text-right">
+                            <button className="text-secondary hover:text-primary" onClick={createRequest}>
+                                Send Receipt
+                            </button>
+                        </Cell>
                     </tr>
                 })}
             </Body>
