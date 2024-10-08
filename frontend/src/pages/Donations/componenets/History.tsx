@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Contribution } from "../../../../utils/v2/entities/Contribution"
 import Table from "../../../components/Table";
 import Body from "../../../components/Table/Body";

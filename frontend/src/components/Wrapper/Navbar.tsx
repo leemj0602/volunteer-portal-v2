@@ -5,19 +5,29 @@ import O8Logo from "../../../assets/O8Logo.png";
 import { PiSignOutBold } from "react-icons/pi";
 import { LuCalendarRange } from "react-icons/lu";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SignOut from "../../../assets/SignOut.png";
 import config from "../../../../config";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { BiDonateHeart } from "react-icons/bi";
+import { System } from "../../../utils/v2/entities/System";
+import SystemHandler from "../../../utils/v2/handlers/SystemHandler";
 
 interface NavbarProps {
     className: string;
 }
 
 export default function Navbar(props: NavbarProps) {
+    const [system, setSystem] = useState<System>();
+    useEffect(() => {
+        (async () => {
+            const system = await SystemHandler.fetch();
+            setSystem(system!);
+        })();
+    }, []);
+
     const openModal = async () => {
         const result = await Swal.fire({
             imageUrl: SignOut,
@@ -74,12 +84,12 @@ export default function Navbar(props: NavbarProps) {
                             <span>Profile</span>
                         </div>
                     </Link>
-                    <Link to="/donations">
+                    {system?.data.civi?.components.includes("CiviContribute") && <Link to="/donations">
                         <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-1-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             <BiDonateHeart />
                             <span>Donations</span>
                         </div>
-                    </Link>
+                    </Link>}
                 </div>
                 <button onClick={openModal} className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                     <PiSignOutBold />
@@ -126,12 +136,12 @@ export default function Navbar(props: NavbarProps) {
                             Profile
                         </div>
                     </Link>
-                    <Link to="/donations">
+                    {system?.data.civi?.components.includes("CiviContribute") && <Link to="/donations">
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             <BiDonateHeart />
                             Donations
                         </div>
-                    </Link>
+                    </Link>}
                     <button onClick={openModal} className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                         <PiSignOutBold />
                         <span>Sign Out</span>

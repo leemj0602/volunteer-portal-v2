@@ -6,13 +6,20 @@ import Loading from "../../components/Loading";
 import Summarisation from "./componenets/Summarisation";
 import History from "./componenets/History";
 import numeral from "numeral";
+import SystemHandler from "../../../utils/v2/handlers/SystemHandler";
+import { useNavigate } from "react-router-dom";
 
 export default function Donations() {
     const email = (window as any).email;
     const [donations, setDonations] = useState<Contribution[]>();
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         (async () => {
+            const system = await SystemHandler.fetch()!;
+            if (!system?.data.civi?.components.includes("CiviContribute")) navigate("/");
+
             const donations = await ContributionHandler.fetch(email, [["financial_type_id:label", "NOT IN", ["Campaign Contribtuion", "Event Fee", "Member Dues"]], ["contribution_status_id:name", "=", "Completed"]]);
             setDonations(donations);
         })();
