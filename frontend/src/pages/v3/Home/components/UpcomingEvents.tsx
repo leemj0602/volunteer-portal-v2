@@ -14,7 +14,7 @@ export default function UpcomingEvents({ registrations }: UpcomingEventsProps) {
     const [eventRoles, setEventRoles] = useState<EventRole[]>();
     useEffect(() => {
         (async () => {
-            setEventRoles(await EventRoleManager.fetchUnregistered(registrations.map(r => r.eventRole.id!)));
+            setEventRoles(await EventRoleManager.fetchUnregistered(registrations.map(r => r.eventRole.id!), 3));
         })();
     })
     
