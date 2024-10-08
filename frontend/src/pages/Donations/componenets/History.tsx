@@ -59,7 +59,7 @@ export default function History(props: HistoryProps) {
                 <Cell className="text-lg font-semibold w-1/6">Amount {"(S$)"}</Cell>
                 <Cell className="text-lg font-semibold">Date</Cell>
                 <Cell className="text-lg font-semibold w-2/5">Source</Cell>
-                <Cell className="text-lg font-semibold">Type</Cell>
+                <Cell className="text-lg font-semibold">Payment</Cell>
                 <Cell className="text-lg font-semibold text-right">Receipt</Cell>
             </Header>
             <Body>
@@ -75,7 +75,7 @@ export default function History(props: HistoryProps) {
                         <Cell>{moment(donation.data.receive_date!).format('DD/MM/yyyy hh:mm a')}</Cell>
                         {/* Source */}
                         <Cell>{donation.data.source}</Cell>
-                        {/* Type */}
+                        {/* Payment */}
                         <Cell>{donation.data["payment_instrument_id:label"]}</Cell>
                         {/* Receipt */}
                         <Cell className="text-right">
