@@ -12,7 +12,8 @@ class ContributionHandler {
                 "currency",
                 "total_amount",
                 "receive_date",
-                "financial_type_id:label"
+                "financial_type_id:label",
+                "payment_instrument_id:label",
             ],
             where: [...where, ["contact.email_primary.email", "=", email]],
             join: [["Contact AS contact", "LEFT", ["contact.id", "=", "contact_id"]]],
