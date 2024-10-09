@@ -6,7 +6,7 @@ export type ComparisonOperator = "=" | "<=" | ">=" | ">" | "<" | "LIKE" | "<>" |
 type SimpleCondition = [string, ComparisonOperator, any?];
 type LogicalCondition = ["OR" | "AND" | "NOT", Array<SimpleCondition | LogicalCondition>];
 
-interface ParamProps {
+export interface CRMParamProps {
     select?: string[];
     limit?: number;
     where?: Array<SimpleCondition | LogicalCondition>;
@@ -16,11 +16,11 @@ interface ParamProps {
     join?: [string, string, ...[string, ComparisonOperator, any?][]][];
     group?: string[];
     chain?: {
-        [key: string]: [string, string, ParamProps];
+        [key: string]: [string, string, CRMParamProps];
     }
 }
 
-export default async function CRM(entity: string, action: string, params?: ParamProps) {
+export default async function CRM(entity: string, action: string, params?: CRMParamProps) {
 
     const url = `${config.domain}/portal/api/crm.php`;
     const result = await axios.post(url, {
