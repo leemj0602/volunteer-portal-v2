@@ -18,7 +18,7 @@ try {
     $result = civicrm_api3('Email', 'send', [
         'contact_id' => $contactId,
         'template_id' => $templateId,
-        'contribution_id' => $contributionId,
+        'from_email_option' => 2,
         'check_permissions' => FALSE
     ]);
 
