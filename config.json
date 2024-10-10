@@ -1,4 +1,3 @@
 {
-    "domain": "http://localhost/wordpress",
-    "stripe_secret_key": "sk_test_51MPGQtKYbFmGi644nIDwNr4SpbgdCG2FOkJwtRnfcAQ7qpDNcMAKbdbY3jjjPLpl6eTI5G9kFtJo8SlaHPW18K1i00OfcXShCM"
+    "domain": "http://localhost/wordpress"
 }
