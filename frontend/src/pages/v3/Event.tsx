@@ -5,7 +5,7 @@ import { EventDetails } from "../../../utils/classes/EventDetails";
 import { EventRole } from "../../../utils/classes/EventRole";
 import EventDetailManager from "../../../utils/managers/EventDetailManager";
 import Loading from "../../components/Loading";
-import config from "../../../../config";
+import config from "../../../../config.json";
 import { CiFileOff } from "react-icons/ci";
 import { GrLocation } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
