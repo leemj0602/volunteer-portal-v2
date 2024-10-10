@@ -10,7 +10,7 @@ import PageNavigation from "../../../components/PageNavigation";
 import CRM from "../../../../utils/crm";
 import Swal from "sweetalert2";
 import ContactManager from "../../../../utils/managers/ContactManager";
-import config from "../../../../../config";
+import config from "../../../../../config.json";
 import axios from "axios";
 import { MdOutlineMail } from "react-icons/md";
 
@@ -59,28 +59,23 @@ export default function History(props: HistoryProps) {
                 <Cell className="text-lg font-semibold w-1/6">Amount {"(S$)"}</Cell>
                 <Cell className="text-lg font-semibold">Date</Cell>
                 <Cell className="text-lg font-semibold w-2/5">Source</Cell>
-                <Cell className="text-lg font-semibold">Payment</Cell>
                 <Cell className="text-lg font-semibold text-right">Receipt</Cell>
             </Header>
             <Body>
-                {!props.donations.length ? <tr>
-                    <Cell colSpan={6} className="text-center text-lg text-gray-500">No donations can be found</Cell>
-                </tr> : props.donations.slice(page * limit, page + ((page + 1) * limit)).map((donation, index) => {
+                {!props.donations.length ? <Cell colSpan={6} className="text-center text-lg text-gray-500">No donations can be found</Cell> : props.donations.slice(page * limit, page + ((page + 1) * limit)).map((donation, index) => {
                     return <tr key={index}>
                         {/* Type */}
                         <Cell>{donation.data["financial_type_id:label"]}</Cell>
                         {/* Amount */}
                         <Cell>S$ {numeral(donation.data.total_amount).format('0,0.00')}</Cell>
                         {/* Date */}
-                        <Cell>{moment(donation.data.receive_date!).format('DD/MM/yyyy hh:mm a')}</Cell>
+                        <Cell>{moment(donation.data.receive_date!).format('DD/MM/yyyy hh:mm A')}</Cell>
                         {/* Source */}
                         <Cell>{donation.data.source}</Cell>
-                        {/* Payment */}
-                        <Cell>{donation.data["payment_instrument_id:label"]}</Cell>
                         {/* Receipt */}
-                        <Cell className="text-right">
-                            <button className="text-secondary hover:text-primary" onClick={() => createRequest(donation)}>
-                                <MdOutlineMail />
+                        <Cell className="flex justify-end">
+                            <button className="text-secondary hover:text-primary flex items-center gap-x-2" onClick={() => createRequest(donation)}>
+                                <MdOutlineMail /> Mail Receipt
                             </button>
                         </Cell>
                     </tr>

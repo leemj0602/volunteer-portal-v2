@@ -4,7 +4,6 @@ import Wrapper from "../components/Wrapper";
 import { createSearchParams, useSearchParams } from "react-router-dom";
 import { EventRole } from "../../utils/classes/EventRole";
 import CustomFieldSetManager, { CustomField, CustomFieldOptions } from "../../utils/managers/CustomFieldSetManager";
-import config from "../../../config";
 import ContactManager from "../../utils/managers/ContactManager";
 import DropdownButton from "../components/DropdownButton";
 import ReactDatePicker from "react-datepicker";

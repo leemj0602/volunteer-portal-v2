@@ -7,7 +7,7 @@ import { LuCalendarRange } from "react-icons/lu";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import SignOut from "../../../assets/SignOut.png";
-import config from "../../../../config";
+import config from "../../../../config.json";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import Swal from "sweetalert2";

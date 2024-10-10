@@ -3,7 +3,7 @@ import Wrapper from "../components/Wrapper";
 import ContactManager from "../../utils/managers/ContactManager";
 import { Contact, ContactProps } from "../../utils/classes/Contact";
 import CustomFieldSetManager, { CustomField } from "../../utils/managers/CustomFieldSetManager";
-import config from "../../../config";
+import config from "../../../config.json";
 import Loading from "../components/Loading";
 import ResetPassword from "../../assets/ResetPassword.png";
 import { MdOutlineLockReset, MdSaveAlt } from "react-icons/md";

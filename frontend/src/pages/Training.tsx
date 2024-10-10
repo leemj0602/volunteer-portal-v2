@@ -5,7 +5,7 @@ import { Training } from "../../utils/classes/Training";
 import { TrainingSchedule } from "../../utils/classes/TrainingSchedule";
 import TrainingManager from "../../utils/managers/TrainingManager";
 import Loading from "../components/Loading";
-import config from "../../../config";
+import config from "../../../config.json";
 import { CiFileOff } from "react-icons/ci";
 import moment from "moment";
 import Swal from "sweetalert2";

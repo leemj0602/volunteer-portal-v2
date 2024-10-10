@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import config from "../../../../config";
+import config from "../../../../config.json";
 import { CiFileOff } from "react-icons/ci";
 import { PropsWithChildren } from "react";
 
