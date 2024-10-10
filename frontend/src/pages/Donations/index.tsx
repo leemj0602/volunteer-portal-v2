@@ -8,6 +8,7 @@ import History from "./componenets/History";
 import numeral from "numeral";
 import SystemHandler from "../../../utils/v2/handlers/SystemHandler";
 import { useNavigate } from "react-router-dom";
+import RecurringDonations from "./componenets/RecurringDonations";
 
 export default function Donations() {
     const email = (window as any).email;
@@ -20,7 +21,10 @@ export default function Donations() {
             const system = await SystemHandler.fetch()!;
             if (!system?.data.civi?.components.includes("CiviContribute")) navigate("/");
 
-            const donations = await ContributionHandler.fetch(email, [["financial_type_id:label", "NOT IN", ["Campaign Contribtuion", "Event Fee", "Member Dues"]], ["contribution_status_id:name", "=", "Completed"]]);
+            const donations = await ContributionHandler.fetch(email, [
+                ["financial_type_id:label", "NOT IN", ["Campaign Contribution", "Event Fee", "Member Dues"]], 
+                ["contribution_status_id:name", "=", "Completed"]
+            ]);
             setDonations(donations);
         })();
     }, []);
@@ -36,6 +40,7 @@ export default function Donations() {
                     </div>
                     <Summarisation donations={donations} />
                 </div>
+                <RecurringDonations className="mt-12" />
                 <History className="mt-12" donations={donations} />
             </div>
         </div>}
