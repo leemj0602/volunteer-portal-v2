@@ -80,6 +80,21 @@ const EventRegistrationManager = new class EventRegistrationManager {
 
         return response?.data.length > 0;
     }
+
+    // async createAttendance(targetContactId: number, sourceContactId: number, eventRoleId: number, duration: number) {
+    //     const response = await CRM("Activity", "create", {
+    //         values: [
+    //             ["activity_type_id:name", "Volunteer Event Attendance"],
+    //             ["target_contact_id", [targetContactId]],
+    //             ["source_contact_id", sourceContactId],
+    //             ["duration", duration],
+    //             ["Volunteer_Event_Attendance_Details.Event_Role", eventRoleId],
+    //         ]
+    //     });
+
+    //     return response?.data.length > 0;
+    // }
+
 }
 
 export default EventRegistrationManager;
