@@ -9,17 +9,22 @@ import numeral from "numeral";
 import SystemHandler from "../../../utils/v2/handlers/SystemHandler";
 import { useNavigate } from "react-router-dom";
 import RecurringDonations from "./componenets/RecurringDonations";
+import { useSystemContext } from "../../contexts/System";
 
 export default function Donations() {
     const email = (window as any).email;
     const [donations, setDonations] = useState<Contribution[]>();
+    const { setSystem } = useSystemContext()!;
 
     const navigate = useNavigate();
 
     useEffect(() => {
         (async () => {
             const system = await SystemHandler.fetch()!;
-            if (!system?.data.civi?.components.includes("CiviContribute")) navigate("/");
+            if (!system?.data.civi?.components.includes("CiviContribute")) {
+                setSystem(system);
+                return navigate("/");
+            }
 
             const donations = await ContributionHandler.fetch(email, [
                 ["financial_type_id:label", "NOT IN", ["Campaign Contribution", "Event Fee", "Member Dues"]], 
