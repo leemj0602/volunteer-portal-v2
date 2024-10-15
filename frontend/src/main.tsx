@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 				<Route path="/trainings" element={<Trainings />} />
 				<Route path="/trainings/:id" element={<Training />} />
 				<Route path="/donations" element={<Donations />} />
-				<Route path="/checkin/:eventRoleId/:contactId/:duration" element={<QRCheckIn />} />
+				<Route path="/checkin/:encryptedString" element={<QRCheckIn />} />
 			</Routes>
 		</HashRouter>
 	</React.StrictMode>

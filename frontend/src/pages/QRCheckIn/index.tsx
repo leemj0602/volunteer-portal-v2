@@ -1,53 +1,89 @@
 import { useEffect, useState } from "react";
 import Wrapper from "../../components/Wrapper";
-import ContributionHandler from "../../../utils/v2/handlers/ContributionHandler";
-import { Contribution } from "../../../utils/v2/entities/Contribution";
 import Loading from "../../components/Loading";
-import numeral from "numeral";
 import Swal from "sweetalert2";
-import SystemHandler from "../../../utils/v2/handlers/SystemHandler";
 import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import config from "../../../../config.json";
+import EventRegistrationManager from "../../../utils/managers/EventRegistrationManager";
+import moment from "moment";
 
 export default function QRCheckIn() {
     const navigate = useNavigate();
 
-    const { eventRoleId, contactId, duration } = useParams();
-    const [donations, setDonations] = useState<Contribution[]>();
-    const email = (window as any).email;
+    const { encryptedString } = useParams();
+    const [attendanceTaken, setAttendanceTaken] = useState<boolean>(false);
+    const [attendanceAlreadyTaken, setAttendanceAlreadyTaken] = useState<boolean>(false); // New state to track if attendance is already taken
+    const [volunteerName, setVolunteerName] = useState<string>();
+    const [dateTime, setDateTime] = useState<string>();
     const roles = (window as any).roles;
+
+    const decrypt = async (encrypted: string) => {
+        const response = await axios.post(`${config.domain}/portal/api/decode.php`, { data: encrypted });
+        return response.data as string;
+    };
 
     useEffect(() => {
         if (roles.includes('administrator')) {
-            
+            (async () => {
+                const decryptedString = await decrypt(encryptedString!);
+                const splitString = decryptedString.split('/');
+                const contactId = splitString[0];
+                const registrationId = splitString[1];
+
+                const registration = await EventRegistrationManager.fetchById(registrationId);
+
+                if (registration?.["contact.id"].toString() === contactId) {
+                    const eventRoleId = registration.eventRole.id;
+                    const duration = registration.eventRole.duration;
+
+                    const checkAttendance = await EventRegistrationManager.checkAttendance(parseInt(contactId), eventRoleId!).catch(() => null);
+                    if (!checkAttendance) {
+                        const takeAttendance = await EventRegistrationManager.createAttendance(parseInt(contactId), eventRoleId!, duration!).catch(() => null);
+                        if (takeAttendance) {
+                            setAttendanceTaken(true);
+                            setVolunteerName(registration["contact.first_name"] + " " + registration["contact.last_name"]);
+                            const formattedAttendanceDate = moment(takeAttendance, "YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
+                            setDateTime(formattedAttendanceDate);
+                        } else {
+                            Swal.fire({ icon: "error", title: "An error has occurred", text: "Please try again at a later time" });
+                        }
+                    } else {
+                        setAttendanceAlreadyTaken(true); // Update state if attendance was already taken
+                    }
+                }
+            })();
         } else {
             Swal.fire({
                 icon: "error",
                 title: "Access Denied",
                 text: "You are not allowed to access this page.",
-            })
+            });
             navigate("/");
         }
+    }, [encryptedString]);
 
-        (async () => {
-            const system = await SystemHandler.fetch()!;
-            if (!system?.data.civi?.components.includes("CiviContribute")) navigate("/");
-
-            const donations = await ContributionHandler.fetch(email, [["financial_type_id:label", "NOT IN", ["Campaign Contribtuion", "Event Fee", "Member Dues"]], ["contribution_status_id:name", "=", "Completed"]]);
-            setDonations(donations);
-        })();
-    }, []);
-
-    return <Wrapper>
-        {!donations ? <Loading className="h-screen items-center" /> : <div className="p-4 mb-12">
-            <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
-                <h1 className="text-lg font-semibold">My Donations</h1>
-                <div className="mt-4 bg-white rounded-md p-4 shadow-md">
-                    <div className="mb-4">
-                        <h2 className="text-2xl font-semibold mb-1">Total Contributions</h2>
-                        <p className="text-2xl text-secondary">S$ {numeral(donations.reduce((a, b) => a + b.data.total_amount!, 0)).format('0,0.00')}</p>
+    return (
+        <Wrapper>
+            {!attendanceTaken && !attendanceAlreadyTaken ? (
+                <Loading className="h-screen flex items-center justify-center" />
+            ) : attendanceAlreadyTaken ? ( // Handle case where attendance is already taken
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="bg-white shadow-lg rounded-lg p-8 max-w-sm text-center">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-4">Attendance Already Taken</h1>
+                        <p className="text-lg text-gray-600">Attendance has already been recorded for this volunteer.</p>
+                        <p className="text-sm text-gray-500 mt-2">Please use another check-in QR code.</p>
                     </div>
                 </div>
-            </div>
-        </div>}
-    </Wrapper>
+            ) : (
+                <div className="min-h-screen flex items-center justify-center">
+                    <div className="bg-white shadow-lg rounded-lg p-8 max-w-sm text-center">
+                        <h1 className="text-2xl font-bold text-gray-800 mb-4">Attendance Taken</h1>
+                        <p className="text-lg text-gray-600">for {volunteerName}</p>
+                        <p className="text-sm text-gray-500 mt-2">at {dateTime}</p>
+                    </div>
+                </div>
+            )}
+        </Wrapper>
+    );
 }

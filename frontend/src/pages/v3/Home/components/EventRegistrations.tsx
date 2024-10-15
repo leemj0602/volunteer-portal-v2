@@ -15,6 +15,8 @@ import { Contact } from "../../../../../utils/classes/Contact";
 import { inflect } from "inflection";
 import PageNavigation from "../../../../components/PageNavigation";
 import QRCode from 'qrcode';
+import axios from "axios";
+import config from "../../../../../../config.json";
 
 /**
  * THINGS TO CONSIDER
@@ -193,7 +195,6 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
 
         if (result.isConfirmed) {
             const attendance = await EventRegistrationManager.createAttendance(props.contact.id!, registration.eventRole.id!, registration.eventRole.event.duration!).catch(() => null);
-            ``
             if (attendance) {
                 props.setRegistrations(await props.contact.fetchEventRegistrations());
 
@@ -208,14 +209,22 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         }
     }
 
+    const encrypt = async (value: string) => {
+        const response = await axios.post(`${config.domain}/portal/api/encode.php`, { data: value });
+        return response.data as string;
+    }
+
     // Now using QR code to check in
     const generateCheckInQR = async (registration: EventRegistration) => {
         const contactId = props.contact.id!;
-        const eventRoleId = registration.eventRole.id!;
-        const duration = registration.eventRole.duration!;
+        const registrationId = registration.id!;
 
-        // Generate the URL for the QR code
-        const checkInUrl = window.location.href + `checkin/${contactId}/${eventRoleId}/${duration}`;
+        const string = `${contactId}/${registrationId}`;
+
+        const encryptedString = await encrypt(string);
+
+        // Generate the URL for the QR code with encrypted values
+        const checkInUrl = window.location.href + `checkin/${encryptedString}`;
 
         // Generate QR code
         const qrCodeDataUrl = await QRCode.toDataURL(checkInUrl);
