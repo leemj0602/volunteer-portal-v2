@@ -76,9 +76,9 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
             // If the event hasn't started yet
             else if (now < start) {
                 // If the user hasn't been approved yet
-                if (registration["status_id:name"] == "Approval Required") registration.status == "Pending";
+                if (registration["status_id:name"] == "Approval Required") registration.status = "Pending";
                 // or the user has been unapproved
-                else if (registration["status_id:name"] == "Not Approved") registration.status == "Unapproved";
+                else if (registration["status_id:name"] == "Not Approved") registration.status = "Unapproved";
                 else registration.status = "Upcoming";
             }
             // IF the event has started
@@ -94,7 +94,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                     console.log("hasn't ended");
                     if (!registration.attendance) {
                         // If the user hasn't been approved yet, they can't check in
-                        if (["Approval Required", "Not Approved"].includes(registration["status_id:name"])) registration.status == "Unapproved";
+                        if (["Approval Required", "Not Approved"].includes(registration["status_id:name"])) registration.status = "Unapproved";
                         // otherwise, allow them to
                         else registration.status = "Check In";
                     }
