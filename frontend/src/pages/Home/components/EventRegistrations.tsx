@@ -66,7 +66,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         const currRegistrations = props.registrations.map(registration => {
             registration.status = "Logic Incorrect";
             const start = new Date(registration.eventRole.activity_date_time!);
-            const end = new Date(start.getTime() + registration.eventRole.duration!);
+            const end = new Date(start.getTime() + (registration.eventRole.duration! * 60_000));
             const now = new Date();
 
             // If the reigstration is cancelled
@@ -81,21 +81,25 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                 else if (registration["status_id:name"] == "Not Approved") registration.status == "Unapproved";
                 else registration.status = "Upcoming";
             }
-            // IF the event has started and it's currently ongoing
-            else if (now >= start && now <= end) {
-                if (!registration.attendance) {
-                    // If the user hasn't been approved yet, they can't check in
-                    if (["Approval Required", "Not Approved"].includes(registration["status_id:name"])) registration.status == "Unapproved";
-                    // otherwise, allow them to
-                    else registration.status = "Check In";
+            // IF the event has started
+            else if (now >= start) {
+                console.log(`Now: ${now}`);
+                console.log(`End: ${end}`);
+                if (now > end) {
+                    console.log("long ended");
+                    if (!registration.attendance) registration.status = "No Show";
+                    else registration.status = "Completed";
                 }
-                else registration.status = "Checked In";
-            }
-            // If the event is over
-            else if (now > end) {
-                // and they haven't showed up
-                if (!registration.attendance) registration.status = "No Show";
-                else registration.status = "Completed";
+                else {
+                    console.log("hasn't ended");
+                    if (!registration.attendance) {
+                        // If the user hasn't been approved yet, they can't check in
+                        if (["Approval Required", "Not Approved"].includes(registration["status_id:name"])) registration.status == "Unapproved";
+                        // otherwise, allow them to
+                        else registration.status = "Check In";
+                    }
+                    else registration.status = "Checked In";
+                }
             }
 
             return registration;
