@@ -1,20 +1,20 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Contact } from "../../../../../utils/classes/Contact";
-import { TrainingRegistration } from "../../../../../utils/classes/TrainingRegistration";
-import Table from "../../../../components/Table";
-import Body from "../../../../components/Table/Body";
-import Cell from "../../../../components/Table/Cell";
-import Header from "../../../../components/Table/Header";
+import { Contact } from "../../../../utils/classes/Contact";
+import { TrainingRegistration } from "../../../../utils/classes/TrainingRegistration";
+import Table from "../../../components/Table";
+import Body from "../../../components/Table/Body";
+import Cell from "../../../components/Table/Cell";
+import Header from "../../../components/Table/Header";
 import { useNavigate } from "react-router-dom";
-import { TrainingStatus } from "../../../../../utils/classes/Training";
+import { TrainingStatus } from "../../../../utils/classes/Training";
 import moment from "moment";
 import { AiOutlineStop } from "react-icons/ai";
-import Status from "../../../../components/Table/Status";
+import Status from "../../../components/Table/Status";
 import Swal from "sweetalert2";
-import CancelEvent from "../../../../../assets/undraw_cancel_re_pkdm.svg";
-import TrainingRegistrationManager from "../../../../../utils/managers/TrainingRegistrationManager";
+import CancelEvent from "../../../../assets/undraw_cancel_re_pkdm.svg";
+import TrainingRegistrationManager from "../../../../utils/managers/TrainingRegistrationManager";
 import { inflect } from "inflection";
-import PageNavigation from "../../../../components/PageNavigation";
+import PageNavigation from "../../../components/PageNavigation";
 
 interface TrainingRegistrationsProps {
     contact: Contact;

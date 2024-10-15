@@ -1,4 +1,4 @@
-import { EventRegistration } from "../../../../../utils/classes/EventRegistration"
+import { EventRegistration } from "../../../../utils/classes/EventRegistration"
 
 /**
  * THINGS TO CONSIDER

@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import Wrapper from "../../../components/Wrapper";
-import { Contact } from "../../../../utils/classes/Contact";
-import ContactManager from "../../../../utils/managers/ContactManager";
-import Loading from "../../../components/Loading";
+import Wrapper from "../../components/Wrapper";
+import { Contact } from "../../../utils/classes/Contact";
+import ContactManager from "../../../utils/managers/ContactManager";
+import Loading from "../../components/Loading";
 import Header from "./components/Header";
 import Statistics from "./components/Statistics";
-import { EventRegistration } from "../../../../utils/classes/EventRegistration";
+import { EventRegistration } from "../../../utils/classes/EventRegistration";
 import EventRegistrations from "./components/EventRegistrations";
 import TrainingRegistrations from "./components/TrainingRegistrations";
 import UpcomingEvents from "./components/UpcomingEvents";
-import { TrainingRegistration } from "../../../../utils/classes/TrainingRegistration";
+import { TrainingRegistration } from "../../../utils/classes/TrainingRegistration";
 
 export default function Home3() {
     const email = (window as any).email;

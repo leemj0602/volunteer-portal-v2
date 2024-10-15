@@ -3,7 +3,7 @@ import ReactDOM from "react-dom/client";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import "./main.css";
 
-import Home3 from "./pages/v3/Home";
+import Home3 from "./pages/Home";
 
 import Profile from "./pages/Profile";
 import Trainings from "./pages/Trainings";
