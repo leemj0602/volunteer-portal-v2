@@ -12,6 +12,7 @@ import Events from "./pages/Events";
 import EventV3 from "./pages/v3/Event";
 import Donations from "./pages/Donations";
 import QRCheckIn from "./pages/QRCheckIn";
+import { SystemProvider } from "./contexts/System";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>

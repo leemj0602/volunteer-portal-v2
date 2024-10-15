@@ -5,28 +5,21 @@ import O8Logo from "../../../assets/O8Logo.png";
 import { PiSignOutBold } from "react-icons/pi";
 import { LuCalendarRange } from "react-icons/lu";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SignOut from "../../../assets/SignOut.png";
 import config from "../../../../config.json";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaChalkboardTeacher } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { BiDonateHeart } from "react-icons/bi";
-import { System } from "../../../utils/v2/entities/System";
-import SystemHandler from "../../../utils/v2/handlers/SystemHandler";
+import { useSystemContext } from "../../contexts/System";
 
 interface NavbarProps {
     className: string;
 }
 
 export default function Navbar(props: NavbarProps) {
-    const [system, setSystem] = useState<System>();
-    useEffect(() => {
-        (async () => {
-            const system = await SystemHandler.fetch();
-            setSystem(system!);
-        })();
-    }, []);
+    const { system } = useSystemContext()!;
 
     const openModal = async () => {
         const result = await Swal.fire({
