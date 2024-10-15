@@ -43,7 +43,7 @@ export default function QRCheckIn() {
                         if (takeAttendance) {
                             setAttendanceTaken(true);
                             setVolunteerName(registration["contact.first_name"] + " " + registration["contact.last_name"]);
-                            const formattedAttendanceDate = moment(takeAttendance, "YYYYMMDDHHmmss").format("YYYY-MM-DD HH:mm:ss");
+                            const formattedAttendanceDate = moment(takeAttendance, "YYYYMMDDHHmmss").format("DD/MM/YYYY HH:mm:ss");
                             setDateTime(formattedAttendanceDate);
                         } else {
                             Swal.fire({ icon: "error", title: "An error has occurred", text: "Please try again at a later time" });
