@@ -25,6 +25,9 @@ export interface EventRegistrationProps {
     id: number;
     "status_id:name": RegistrationStatus;
     "contact.email_primary.email": string;
+    "contact.id": string;
+    "contact.first_name": string;
+    "contact.last_name": string;
     [key: string]: any;
 }
 
@@ -34,13 +37,18 @@ export class EventRegistration implements EventRegistrationProps {
     public eventRole: EventRole;
     public "status_id:name": RegistrationStatus;
     public "contact.email_primary.email": string;
-
+    public "contact.id": string;
+    public "contact.first_name": string;
+    public "contact.last_name": string;
     [key: string]: any;
-    
+
     constructor(props: EventRegistrationProps) {
         this.id = props.id;
         this["status_id:name"] = props["status_id:name"];
         this["contact.email_primary.email"] = props["contact.email_primary.email"];
+        this["contact.id"] = props["contact.id"];
+        this["contact.first_name"] = props["contact.first_name"];
+        this["contact.last_name"] = props["contact.last_name"];
 
         const eventAttendanceDetails: Partial<EventAttendanceProps> = {};
         const eventRoleDetails: Partial<EventRoleProps> = {};

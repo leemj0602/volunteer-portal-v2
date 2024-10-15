@@ -14,6 +14,9 @@ import EventRegistrationManager from "../../../../../utils/managers/EventRegistr
 import { Contact } from "../../../../../utils/classes/Contact";
 import { inflect } from "inflection";
 import PageNavigation from "../../../../components/PageNavigation";
+import QRCode from 'qrcode';
+import axios from "axios";
+import config from "../../../../../../config.json";
 
 /**
  * THINGS TO CONSIDER
@@ -147,8 +150,8 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
 
                 return;
             }
-        }   
-        
+        }
+
         const result = await Swal.fire({
             imageUrl: CancelEvent,
             imageHeight: 200,
@@ -192,13 +195,12 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
 
         if (result.isConfirmed) {
             const attendance = await EventRegistrationManager.createAttendance(props.contact.id!, registration.eventRole.id!, registration.eventRole.event.duration!).catch(() => null);
-        ``
             if (attendance) {
                 props.setRegistrations(await props.contact.fetchEventRegistrations());
 
-                Swal.fire({ 
-                    icon: "success", 
-                    title: "Attendance successfully taken", 
+                Swal.fire({
+                    icon: "success",
+                    title: "Attendance successfully taken",
                     timer: 3000,
                     timerProgressBar: true
                 });
@@ -206,6 +208,42 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
             else Swal.fire({ icon: "error", title: "An error has occurred", text: "Please try again at a later time" });
         }
     }
+
+    const encrypt = async (value: string) => {
+        const response = await axios.post(`${config.domain}/portal/api/encode.php`, { data: value });
+        return response.data as string;
+    }
+
+    // Now using QR code to check in
+    const generateCheckInQR = async (registration: EventRegistration) => {
+        const contactId = props.contact.id!;
+        const registrationId = registration.id!;
+
+        const string = `${contactId}/${registrationId}`;
+
+        const encryptedString = await encrypt(string);
+
+        // Generate the URL for the QR code with encrypted values
+        const checkInUrl = window.location.href + `checkin/${encryptedString}`;
+
+        // Generate QR code
+        const qrCodeDataUrl = await QRCode.toDataURL(checkInUrl);
+
+        // Display the QR code in a SweetAlert2 box
+        Swal.fire({
+            title: 'Check-In',
+            html: `
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <p>Show this QR code to a staff:</p>
+                <img src="${qrCodeDataUrl}" alt="QR Code" style="width: 250px; height: 250px;" />
+            </div>
+            `,
+            width: 350,
+            padding: '1em',
+            confirmButtonText: 'Close',
+        });
+    }
+
     // #endregion
 
     return <div>
@@ -223,14 +261,14 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                     {/* Slices and shows only 5 entities per page */}
                 </tr> : currRegistrations.slice(page * limit, page + ((page + 1) * limit)).map((registration, index) => {
                     const { eventRole } = registration;
-                    
+
                     // Setting the subject
                     let subject = `${eventRole["Volunteer_Event_Role_Details.Role:label"] ? `${eventRole["Volunteer_Event_Role_Details.Role:label"]} - ` : ""}${eventRole.event.subject}`;
                     if (subject.length > 37) subject = `${subject.slice(0, 37)}...`;
-                    
+
                     // Checks whether the organisation has cancelled the event role or the event itself
                     const cancelledByOrganisation = [eventRole.event["status_id:name"], eventRole["status_id:name"]].some(e => e == "Cancelled");
-                   
+
                     // Checks whether the registration can be cancelled
                     const cancellable = ["Upcoming", "Pending"].includes(registration.status);
 
@@ -247,7 +285,8 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                         </Cell>
                         {/* Status */}
                         <Cell>
-                            <Status className={statusColor[registration.status]} onClick={registration.status != "Check In" ? () => promptCheckInModal(registration) : undefined}>
+                            {/* <Status className={statusColor[registration.status]} onClick={registration.status != "Check In" ? () => promptCheckInModal(registration) : undefined}> */}
+                            <Status className={statusColor[registration.status]} onClick={registration.status != "Check In" ? () => generateCheckInQR(registration) : undefined}>
                                 {registration.status}
                             </Status>
                         </Cell>

@@ -13,6 +13,7 @@ if (is_user_logged_in()) {
   $user = wp_get_current_user();
   $id = $user -> ID;
   $email = $user -> user_email;
+  $roles = $user -> roles;
 }
 else {
   echo '<script type="text/javascript">
@@ -26,8 +27,9 @@ else {
 
 // JavaScript code to append
 const jsCode = `<script>
-  var id = "<?php echo esc_js($id) ?>";
+  // var id = "<?php echo esc_js($id) ?>";
   var email = "<?php echo esc_js($email) ?>";
+  var roles = <?php echo json_encode($roles); ?>;
 </script>`;
 
 // Rename index.html to index.php
