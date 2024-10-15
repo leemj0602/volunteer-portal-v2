@@ -179,34 +179,35 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
     // #endregion
 
     // #region Responsible for taking their attendance
-    const promptCheckInModal = async (registration: EventRegistration) => {
-        const result = await Swal.fire({
-            icon: "question",
-            input: "text",
-            title: "Enter the Attendance Code",
-            confirmButtonColor: "#5a71b4",
-            confirmButtonText: "Verify",
-            showCloseButton: true,
-            inputValidator: (value) => {
-                if (value != registration.eventRole.event["Volunteer_Event_Details.Attendance_Code"]) return "Invalid code. Please try again.";
-            }
-        });
+    // const promptCheckInModal = async (registration: EventRegistration) => {
+    //     const result = await Swal.fire({
+    //         icon: "question",
+    //         input: "text",
+    //         title: "Enter the Attendance Code",
+    //         confirmButtonColor: "#5a71b4",
+    //         confirmButtonText: "Verify",
+    //         showCloseButton: true,
+    //         inputValidator: (value) => {
+    //             if (value != registration.eventRole.event["Volunteer_Event_Details.Attendance_Code"]) return "Invalid code. Please try again.";
+    //         }
+    //     });
 
-        if (result.isConfirmed) {
-            const attendance = await EventRegistrationManager.createAttendance(props.contact.id!, registration.eventRole.id!, registration.eventRole.event.duration!).catch(() => null);
-            if (attendance) {
-                props.setRegistrations(await props.contact.fetchEventRegistrations());
+    //     if (result.isConfirmed) {
+    //         const attendance = await EventRegistrationManager.createAttendance(props.contact.id!, registration.eventRole.id!, registration.eventRole.event.duration!).catch(() => null);
+    //         if (attendance) {
+    //             props.setRegistrations(await props.contact.fetchEventRegistrations());
 
-                Swal.fire({
-                    icon: "success",
-                    title: "Attendance successfully taken",
-                    timer: 3000,
-                    timerProgressBar: true
-                });
-            }
-            else Swal.fire({ icon: "error", title: "An error has occurred", text: "Please try again at a later time" });
-        }
-    }
+    //             Swal.fire({
+    //                 icon: "success",
+    //                 title: "Attendance successfully taken",
+    //                 timer: 3000,
+    //                 timerProgressBar: true
+    //             });
+    //         }
+    //         else Swal.fire({ icon: "error", title: "An error has occurred", text: "Please try again at a later time" });
+    //     }
+    // }
+    // #endregion
 
     const encrypt = async (value: string) => {
         const response = await axios.post(`${config.domain}/portal/api/encode.php`, { data: value });
@@ -284,8 +285,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                         </Cell>
                         {/* Status */}
                         <Cell>
-                            {/* <Status className={statusColor[registration.status]} onClick={registration.status != "Check In" ? () => promptCheckInModal(registration) : undefined}> */}
-                            <Status className={statusColor[registration.status]} onClick={registration.status != "Check In" ? () => generateCheckInQR(registration) : undefined}>
+                            <Status className={statusColor[registration.status]} onClick={registration.status == "Check In" ? () => generateCheckInQR(registration) : undefined}>
                                 {registration.status}
                             </Status>
                         </Cell>
