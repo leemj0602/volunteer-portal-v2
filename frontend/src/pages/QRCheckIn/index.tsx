@@ -17,7 +17,8 @@ export default function QRCheckIn() {
     const [volunteerName, setVolunteerName] = useState<string>();
     const [dateTime, setDateTime] = useState<string>();
     const roles = (window as any).roles;
-console.log(roles);
+    
+    console.log(roles);
     const decrypt = async (encrypted: string) => {
         const response = await axios.post(`${config.domain}/portal/api/decode.php`, { data: encrypted });
         return response.data as string;
@@ -25,9 +26,10 @@ console.log(roles);
 
     useEffect(() => {
         const roleValues = Object.values(roles);
-        if (roleValues.includes('volunteer_portal_admin')) {
+        if (['administrator', 'volunteer_portal_admin'].some(v => roleValues.includes(v))) {
             (async () => {
                 const decryptedString = await decrypt(encryptedString!);
+                console.log(decryptedString);
                 const splitString = decryptedString.split('/');
                 const contactId = splitString[0];
                 const registrationId = splitString[1];
@@ -53,6 +55,7 @@ console.log(roles);
                         setAttendanceAlreadyTaken(true); // Update state if attendance was already taken
                     }
                 }
+                else Swal.fire({ icon: "error", title: "An error has occured", text: "Please try again at a later time" });
             })();
         } else {
             Swal.fire({

@@ -8,6 +8,7 @@ if (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
 
 $key = "N6mPgeHcFfXzvlrVIeSY7Z56f9B4a7NFE32FejfmmKw=";
 $data = $query['data'];
+$data = str_replace(['-', '_'], ['+', '/'], $data);
 
 list($iv, $encrypted) = explode('::', base64_decode($data), 2);
 

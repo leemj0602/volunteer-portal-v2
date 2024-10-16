@@ -11,5 +11,7 @@ $data = $query['data'];
 
 $iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length('aes-256-cbc'));
 $encrypted = openssl_encrypt($data, 'aes-256-cbc', $key, 0, $iv);
+$encoded = base64_encode($iv . '::' . $encrypted);
 
-echo base64_encode($iv . '::' . $encrypted);
+$urlSafeEncoded = str_replace(['+', '/'], ['-', '_'], $encoded);
+echo $urlSafeEncoded;
