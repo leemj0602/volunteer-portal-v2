@@ -45,7 +45,7 @@ export default function Navbar(props: NavbarProps) {
     const [menuOpen, setMenuOpen] = useState(false);
 
     return <>
-        <nav className={`h-full fixed bg-white flex-col hidden md:flex z-[11] overflow-y-auto ${props.className}`}>
+        <nav className={`h-full fixed bg-white flex-col hidden z-[11] overflow-y-auto ${props.className} ${system ? "md:flex" : "hidden"}`}>
             {/* Responsible for the image */}
             <div className="p-4 flex items-center">
                 <img src={O8Logo} />
