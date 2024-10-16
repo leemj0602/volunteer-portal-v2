@@ -17,14 +17,15 @@ export default function QRCheckIn() {
     const [volunteerName, setVolunteerName] = useState<string>();
     const [dateTime, setDateTime] = useState<string>();
     const roles = (window as any).roles;
-
+console.log(roles);
     const decrypt = async (encrypted: string) => {
         const response = await axios.post(`${config.domain}/portal/api/decode.php`, { data: encrypted });
         return response.data as string;
     };
 
     useEffect(() => {
-        if (roles.includes('administrator')) {
+        const roleValues = Object.values(roles);
+        if (roleValues.includes('volunteer_portal_admin')) {
             (async () => {
                 const decryptedString = await decrypt(encryptedString!);
                 const splitString = decryptedString.split('/');
