@@ -108,7 +108,7 @@ const EventRegistrationManager = new class EventRegistrationManager {
     }
 
     async checkAttendance(contactId: number, eventRoleId: number) {
-        const response = await CRM("Activity", "get", {
+        const response = await CRM('Activity', 'get', {
             'where': [
                 ['activity_type_id:name', '=', "Volunteer Event Attendance"],
                 ['Volunteer_Event_Attendance_Details.Event_Role', '=', eventRoleId],
@@ -116,7 +116,7 @@ const EventRegistrationManager = new class EventRegistrationManager {
             ]
         });
 
-        if (response?.data.length > 0) return true;
+        return (response?.data.length > 0);
     }
 
     async createAttendance(contactId: number, eventRoleId: number, duration: number) {
