@@ -17,7 +17,7 @@ export default function QRCheckIn() {
     const [volunteerName, setVolunteerName] = useState<string>();
     const [dateTime, setDateTime] = useState<string>();
     const roles = (window as any).roles;
-    
+
     console.log(roles);
     const decrypt = async (encrypted: string) => {
         const response = await axios.post(`${config.domain}/portal/api/decode.php`, { data: encrypted });
@@ -50,12 +50,16 @@ export default function QRCheckIn() {
                             setDateTime(formattedAttendanceDate);
                         } else {
                             Swal.fire({ icon: "error", title: "An error has occurred", text: "Please try again at a later time" });
+                            navigate("/");
                         }
                     } else {
                         setAttendanceAlreadyTaken(true); // Update state if attendance was already taken
                     }
                 }
-                else Swal.fire({ icon: "error", title: "An error has occured", text: "Please try again at a later time" });
+                else {
+                    Swal.fire({ icon: "error", title: "An error has occured", text: "Please try again at a later time" });
+                    navigate("/");
+                }
             })();
         } else {
             Swal.fire({

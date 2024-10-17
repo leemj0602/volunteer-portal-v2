@@ -218,6 +218,35 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         return response.data as string;
     }
 
+    // Define source at the component level
+    let source: EventSource | null = null;
+
+    const initiateSSE = (contactId: number, eventRoleId: number) => {
+        const sseUrl = `${config.domain}/portal/api/sse.php?contactId=${contactId}&eventRoleId=${eventRoleId}`;
+
+        source = new EventSource(sseUrl);
+
+        source.addEventListener('attendanceRecorded', async (event) => {
+            const data = JSON.parse(event.data);
+            // Display notification
+            await Swal.fire({
+                icon: 'success',
+                title: 'Attendance Recorded',
+                text: data.message,
+                confirmButtonColor: '#5a71b4',
+            });
+            // Refresh registrations
+            props.setRegistrations(await props.contact.fetchEventRegistrations());
+            // Close SSE
+            source?.close();
+        });
+
+        source.onerror = (error) => {
+            console.error('SSE error:', error);
+            source?.close();
+        };
+    };
+
     // Now using QR code to check in
     const generateCheckInQR = async (registration: EventRegistration) => {
         const contactId = props.contact.id!;
@@ -233,20 +262,102 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         // Generate QR code
         const qrCodeDataUrl = await QRCode.toDataURL(checkInUrl);
 
-        // Display the QR code in a SweetAlert2 box
-        Swal.fire({
+        let pollingInterval: NodeJS.Timeout;
+        let timerInterval: NodeJS.Timeout;
+        let attendanceRecorded = false; // Track if attendance was recorded
+
+        // Function to handle attendance checking and response
+        const handleAttendanceCheck = async () => {
+            attendanceRecorded = await EventRegistrationManager.checkAttendance(contactId, registration.eventRole.id!);
+            console.log("Attendance check:", attendanceRecorded);
+
+            if (attendanceRecorded) {
+                // Attendance recorded, stop timers and show success
+                clearInterval(timerInterval);
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                }
+                Swal.close();
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Attendance Recorded',
+                    text: 'Your attendance has been recorded.',
+                    confirmButtonColor: '#5a71b4',
+                });
+                // Refresh registrations
+                props.setRegistrations(await props.contact.fetchEventRegistrations());
+            }
+        };
+
+        const swalResult = await Swal.fire({
             title: 'Check-In',
             html: `
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <p>Show this QR code to a staff:</p>
-                <img src="${qrCodeDataUrl}" alt="QR Code" style="width: 250px; height: 250px;" />
-            </div>
-            `,
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                    <p>Show this QR code to a staff member:</p>
+                    <img src="${qrCodeDataUrl}" alt="QR Code" style="width: 250px; height: 250px;" />
+                    <p id="countdown">Expires in: <b>1:00</b></p>
+                </div>
+                `,
             width: 350,
             padding: '1em',
             confirmButtonText: 'Close',
+            showCancelButton: false,
+            allowOutsideClick: false,
+            timer: 60000, // 1 minute
+            timerProgressBar: true,
+            didOpen: () => {
+                const content = Swal.getHtmlContainer();
+                const $ = content!.querySelector.bind(content);
+                const countdownEl = $('#countdown') as HTMLElement;
+                let timeLeft = 60; // in seconds
+
+                // Update the countdown every second
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    const minutes = Math.floor(timeLeft / 60);
+                    const seconds = timeLeft % 60;
+                    countdownEl.innerHTML = `Time remaining: <b>${minutes}:${seconds < 10 ? '0' : ''}${seconds}</b>`;
+                }, 1000);
+
+                // Start polling after 5 seconds
+                setTimeout(async () => {
+                    // First check immediately after the delay (at 5 seconds)
+                    await handleAttendanceCheck();
+
+                    if (!attendanceRecorded) {
+                        // Start polling every 5 seconds thereafter
+                        pollingInterval = setInterval(async () => {
+                            await handleAttendanceCheck();
+                        }, 5000); // Every 5 seconds
+                    }
+                }, 5000); // Initial delay of 5 seconds before first check
+            },
+            willClose: () => {
+                // Stop intervals when the modal closes
+                clearInterval(timerInterval);
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                }
+            }
         });
-    }
+
+        if (swalResult.dismiss === Swal.DismissReason.timer) {
+            // Timer expired, perform one final check
+            if (!attendanceRecorded) {
+                await handleAttendanceCheck();
+            }
+
+            if (!attendanceRecorded) {
+                // Attendance was not recorded, inform the user
+                await Swal.fire({
+                    icon: 'info',
+                    title: 'Check-In Expired',
+                    text: 'Your check-in has expired, please click "Check In" to generate a new QR code.',
+                    confirmButtonColor: '#5a71b4',
+                });
+            }
+        }
+    };
 
     // #endregion
 
