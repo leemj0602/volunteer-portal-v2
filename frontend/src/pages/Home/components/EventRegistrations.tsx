@@ -287,7 +287,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                     timeLeft--;
                     const minutes = Math.floor(timeLeft / 60);
                     const seconds = timeLeft % 60;
-                    countdownEl.innerHTML = `Time remaining: <b>${minutes}:${seconds < 10 ? '0' : ''}${seconds}</b>`;
+                    countdownEl.innerHTML = `Expires in: <b>${minutes}:${seconds < 10 ? '0' : ''}${seconds}</b>`;
                 }, 1000);
 
                 // Start polling after 5 seconds
