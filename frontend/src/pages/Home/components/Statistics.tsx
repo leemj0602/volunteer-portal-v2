@@ -16,7 +16,8 @@ export default function Statistics(props: StatsProps) {
     props.registrations.forEach(registration => {
         const { eventRole, attendance } = registration;
         const start = new Date(eventRole.activity_date_time!);
-        const end = new Date(start.getTime() + eventRole.duration!);
+        const duration = eventRole.duration! * 60 * 1000; // Convert to milliseconds because getTime() returns time in milliseconds
+        const end = new Date(start.getTime() + duration);
         const now = new Date();
 
         if (now > end && attendance) {

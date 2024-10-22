@@ -218,35 +218,6 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
         return response.data as string;
     }
 
-    // Define source at the component level
-    let source: EventSource | null = null;
-
-    const initiateSSE = (contactId: number, eventRoleId: number) => {
-        const sseUrl = `${config.domain}/portal/api/sse.php?contactId=${contactId}&eventRoleId=${eventRoleId}`;
-
-        source = new EventSource(sseUrl);
-
-        source.addEventListener('attendanceRecorded', async (event) => {
-            const data = JSON.parse(event.data);
-            // Display notification
-            await Swal.fire({
-                icon: 'success',
-                title: 'Attendance Recorded',
-                text: data.message,
-                confirmButtonColor: '#5a71b4',
-            });
-            // Refresh registrations
-            props.setRegistrations(await props.contact.fetchEventRegistrations());
-            // Close SSE
-            source?.close();
-        });
-
-        source.onerror = (error) => {
-            console.error('SSE error:', error);
-            source?.close();
-        };
-    };
-
     // Now using QR code to check in
     const generateCheckInQR = async (registration: EventRegistration) => {
         const contactId = props.contact.id!;
