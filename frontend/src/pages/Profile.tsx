@@ -82,7 +82,7 @@ export default function Profile() {
             text: "Are you sure you want to reset your password? You will be redirected to another page.",
             confirmButtonText: "Redirect",
             confirmButtonColor: "#5a71b4",
-            cancelButtonText: "Nevermind",
+            cancelButtonText: "No",
             showCloseButton: true,
             showCancelButton: true
         })
