@@ -68,7 +68,7 @@ export class EventDetails implements EventDetailProps {
         return await EventRoleManager.fetch({
             where: [
                 ["status_id:name", "!=", "Cancelled"],
-                ["activity_date_time", ">=", moment(new Date()).format("YYYY-MM-DD hh:mm:ss")],
+                ["activity_date_time", ">=", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")],
                 ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD")],
                 ["Volunteer_Event_Role_Details.Event", "=", this.id],
                 ["Volunteer_Event_Role_Details.Role", "=", roleId]

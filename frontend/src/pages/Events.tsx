@@ -89,8 +89,8 @@ export default function Events() {
 
         const where: [string, ComparisonOperator, any][] = [
             // Show all registrations that is still within the registration end date
-            ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD")],
-            ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD")]
+            ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")],
+            ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")]
         ];
         // Getting any events where the subject includes the search query
         if (searchQuery) where.push(["event.subject", "CONTAINS", searchQuery]);
