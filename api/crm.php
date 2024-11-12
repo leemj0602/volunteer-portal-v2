@@ -9,6 +9,11 @@ if (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
     $query = $_POST;
 }
 
+// $key = "iloveo8";
+// $iv = "8f3f2f0355c37b7d1dd81965dbd0516f";
+// $encryption = $query=['encryption'];
+// $decryptedString = openssl_decrypt(base64_decode($encryption), "AES-256-CBC", $key, 0, hex2bin($iv));
+
 // Specific params variables
 $entity = $query['entity'];
 $action = $query['action'];
@@ -32,7 +37,7 @@ if (is_array($select) && !empty($select))
     $params['select'] = $select;
 if (is_array($join) && !empty($join))
     $params['join'] = $join;
-if (is_array($where) && !empty($where)) 
+if (is_array($where) && !empty($where))
     $params['where'] = $where;
 if (is_array($order) && !empty($order)) {
     $orderBy = array();
@@ -46,6 +51,10 @@ if (is_array($values) && !empty($values)) {
     $valuesArray = array();
     foreach ($values as $v) {
         $valuesArray[$v[0]] = $v[1];
+    }
+    // Automatically populates activity_date_time with current Singapore time
+    if (!array_key_exists('activity_date_time', $valuesArray)) {
+        $valuesArray['activity_date_time'] = (new DateTime('now', new DateTimeZone('Asia/Singapore')))->format('Y-m-d H:i:s');
     }
     $params['values'] = $valuesArray;
 }

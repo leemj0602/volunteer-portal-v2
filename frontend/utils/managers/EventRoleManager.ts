@@ -66,8 +66,8 @@ const EventRoleManager = new class EventRoleManager {
         return await this.fetch({
             limit,
             where: [
-                ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD")],
-                ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD")],
+                ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")],
+                ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")],
                 ["activity_date_time", ">", moment(new Date()).format("YYYY-MM-DD hh:mm:ss")],
                 ["id", "NOT IN", eventRegistrationIds],
             ],

@@ -11,7 +11,10 @@ const TrainingManager = new class TrainingManager {
     private entity = "Activity";
 
     async fetch(options?: FetchOptions): Promise<Training | Training[]> {
-        const where: [string, ComparisonOperator, string][] = [["activity_type_id:name", "=", "Volunteer Training Details"]];
+        const where: [string, ComparisonOperator, string][] = [
+            ["activity_type_id:name", "=", "Volunteer Training Details"],
+            ["status_id:name", "=", "Available"],
+        ];
         if (options?.id) where.push(["id", "=", options.id]);
 
         const response = await CRM(this.entity, "get", {
