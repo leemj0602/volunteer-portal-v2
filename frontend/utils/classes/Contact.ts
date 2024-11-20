@@ -15,6 +15,7 @@ export interface ContactProps extends MandatoryContactDetailProps {
     gender_id: number | null;
     first_name: string | null;
     last_name: string | null;
+    contact_sub_type: string[] | null;
 }
 
 export class Contact implements ContactProps {
@@ -26,6 +27,7 @@ export class Contact implements ContactProps {
     public "gender_id": number | null = null;
     public "first_name": string | null = null;
     public "last_name": string | null = null;
+    public "contact_sub_type": string[] | null = null;
 
     public "Volunteer_Contact_Details.Skills_Interests": string[];
     [key: string]: any;
