@@ -21,8 +21,8 @@ export default function Category(props: CategoryProps) {
     </div>
       {location.pathname.startsWith(props.to) ? <FaChevronDown /> : <FaChevronLeft />}
     </Link>
-    {location.pathname.startsWith(props.to) && <div className="bg-secondary/10">
-      <Item to={props.to} icon={RxDashboard} name="Dashboard" />
+    {location.pathname.startsWith(props.to) && <div>
+      <Item to={props.to} name="Dashboard" />
       {props.children}
     </div>}
   </div>

@@ -58,8 +58,8 @@ export default function Navbar(props: NavbarProps) {
             <div className="mt-6 flex flex-col justify-between h-full">
                 <div className="mb-2">
                     {subtypes.includes('Volunteer') && <Category to="/volunteer" icon={FaBriefcaseMedical} name="Volunteer">
-                        <Item to="/volunteer/events" icon={LuCalendarRange} name="Events" />
-                        <Item to="/volunteer/trainings" icon={FaChalkboardTeacher} name="Trainings" />
+                        <Item to="/volunteer/events" name="Events" />
+                        <Item to="/volunteer/trainings" name="Trainings" />
                     </Category>}
                     {subtypes.includes('Donator') && <Category to="/donations" icon={FaDonate} name="Donator">
                     </Category>}
