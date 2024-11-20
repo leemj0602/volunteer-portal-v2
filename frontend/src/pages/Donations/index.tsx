@@ -6,23 +6,23 @@ import Loading from "../../components/Loading";
 import Summarisation from "./componenets/Summarisation";
 import History from "./componenets/History";
 import numeral from "numeral";
-import SystemHandler from "../../../utils/v2/handlers/SystemHandler";
 import { useNavigate } from "react-router-dom";
 import RecurringDonations from "./componenets/RecurringDonations";
-import { useSystemContext } from "../../contexts/System";
+import ContactManager from "../../../utils/managers/ContactManager";
+import { useSubtypesContext } from "../../contexts/Subtypes";
 
 export default function Donations() {
     const email = (window as any).email;
     const [donations, setDonations] = useState<Contribution[]>();
-    const { setSystem } = useSystemContext()!;
-
+    const { setSubTypes } = useSubtypesContext()!;
     const navigate = useNavigate();
 
     useEffect(() => {
         (async () => {
-            const system = await SystemHandler.fetch()!;
-            if (!system?.data.civi?.components.includes("CiviContribute")) {
-                setSystem(system);
+            const email = (window as any).email;
+            const contact = await ContactManager.fetch(email);
+            if (!contact.contact_sub_type?.includes('Donator')) {
+                setSubTypes(contact.contact_sub_type);
                 return navigate("/");
             }
 

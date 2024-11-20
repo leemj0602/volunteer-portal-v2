@@ -5,21 +5,25 @@ import O8Logo from "../../../assets/O8Logo.png";
 import { PiSignOutBold } from "react-icons/pi";
 import { LuCalendarRange } from "react-icons/lu";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SignOut from "../../../assets/SignOut.png";
 import config from "../../../../config.json";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { FaChalkboardTeacher } from "react-icons/fa";
+import { FaBriefcaseMedical, FaChalkboardTeacher, FaClinicMedical, FaDonate, FaHeartbeat, FaInfoCircle } from "react-icons/fa";
 import Swal from "sweetalert2";
 import { BiDonateHeart } from "react-icons/bi";
-import { useSystemContext } from "../../contexts/System";
+import Category from "./Category";
+import Item from "./Item";
+import { RiMailSendFill } from "react-icons/ri";
+import { useSubtypesContext } from "../../contexts/Subtypes";
+import ContactManager from "../../../utils/managers/ContactManager";
 
 interface NavbarProps {
     className: string;
 }
 
 export default function Navbar(props: NavbarProps) {
-    const { system } = useSystemContext()!;
+    const { subtypes } = useSubtypesContext()!;
 
     const openModal = async () => {
         const result = await Swal.fire({
@@ -44,50 +48,38 @@ export default function Navbar(props: NavbarProps) {
 
     const [menuOpen, setMenuOpen] = useState(false);
 
-    return <>
-        <nav className={`h-full fixed bg-white flex-col hidden z-[11] overflow-y-auto ${props.className} ${system ? "md:flex" : "hidden"}`}>
+    return subtypes && <>
+        <nav className={`h-full fixed bg-white flex-col hidden z-[11] overflow-y-auto ${props.className} md:flex`}>
             {/* Responsible for the image */}
-            <div className="p-4 flex items-center">
+            <Link to="/" className="p-4 flex items-center">
                 <img src={O8Logo} />
-            </div>
+            </Link>
             {/* Navigation */}
             <div className="mt-6 flex flex-col justify-between h-full">
-                <div>
-                    <Link to="/">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                            <RxDashboard />
-                            <span>Dashboard</span>
-                        </div>
-                    </Link>
-                    <Link to="/events">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                            <LuCalendarRange />
-                            <span>All Events</span>
-                        </div>
-                    </Link>
-                    <Link to="/trainings">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                            <FaChalkboardTeacher />
-                            <span>Trainings</span>
-                        </div>
-                    </Link>
-                    <Link to="/profile">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                            <CgProfile />
-                            <span>Profile</span>
-                        </div>
-                    </Link>
-                    {system?.data.civi?.components.includes("CiviContribute") && <Link to="/donations">
-                        <div className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-1-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                            <BiDonateHeart />
-                            <span>Donations</span>
-                        </div>
-                    </Link>}
+                <div className="mb-2">
+                    {subtypes.includes('Volunteer') && <Category to="/volunteer" icon={FaBriefcaseMedical} name="Volunteer">
+                        <Item to="/volunteer/events" icon={LuCalendarRange} name="Events" />
+                        <Item to="/volunteer/trainings" icon={FaChalkboardTeacher} name="Trainings" />
+                    </Category>}
+                    {subtypes.includes('Donator') && <Category to="/donations" icon={FaDonate} name="Donator">
+                    </Category>}
+                    {subtypes.includes('Caregiver') && <Category to="/caregiver" icon={FaHeartbeat} name="Caregiver">
+                        <Item to="/caregiver/service-info-pack" icon={FaInfoCircle} name="Service Info Pack" />
+                        <Item to="/caregiver/requests" icon={RiMailSendFill} name="Request for Volunteer" />
+                        <Item to="/caregiver/trainings" icon={FaChalkboardTeacher} name="Trainings" />
+                    </Category>}
+                    {subtypes.includes('Patient') && <Category to="/patient" icon={FaClinicMedical} name="Patient">
+                        <Item to="/patient/service-info-pack" icon={FaInfoCircle} name="Service Info Pack" />
+                        <Item to="/patient/requests" icon={RiMailSendFill} name="Request for Volunteer" />
+                    </Category>}
                 </div>
-                <button onClick={openModal} className="hover:bg-primary/30 text-secondary hover:text-secondary/90 border-l-[5px] border-l-transparent hover:border-l-secondary/70 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
-                    <PiSignOutBold />
-                    <span>Sign Out</span>
-                </button>
+                <div className="w-full">
+                    <Item to="/profile" icon={CgProfile} name="Profile" />
+                    <button onClick={openModal} className="flex pl-9 py-2 items-center gap-x-4 text-secondary border-l-4 font-semibold hover:bg-primary/10 hover:text-secondary/90 border-l-transparent hover:border-l-secondary/70 w-full">
+                        <PiSignOutBold />
+                        <span>Sign Out</span>
+                    </button>
+                </div>
             </div>
         </nav>
         {menuOpen && <div className="h-full w-screen bg-black opacity-30 z-[11] fixed md:hidden" onClick={() => setMenuOpen(false)} />}
@@ -129,12 +121,12 @@ export default function Navbar(props: NavbarProps) {
                             Profile
                         </div>
                     </Link>
-                    {system?.data.civi?.components.includes("CiviContribute") && <Link to="/donations">
+                    {/* {system?.data.civi?.components.includes("CiviContribute") && <Link to="/donations">
                         <div className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                             <BiDonateHeart />
                             Donations
                         </div>
-                    </Link>}
+                    </Link>} */}
                     <button onClick={openModal} className="text-center hover:bg-primary/30 text-secondary hover:text-secondary/90 font-semibold flex pl-12 py-2 mb-2 items-center gap-x-4">
                         <PiSignOutBold />
                         <span>Sign Out</span>
