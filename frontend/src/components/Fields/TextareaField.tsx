@@ -1,27 +1,22 @@
 import { ChangeEvent, useState } from "react";
 import { MdInfoOutline } from "react-icons/md";
 
-interface TextFieldProps {
+interface TextareaFieldProps {
     id: string;
     label: string;
-    /** The info message if there's any */
     info?: string;
-    /** If this is not provided, it will automatically used fieldsObj[id] */
     value?: string;
-    /** The fields object to use provided there's also an id, otherwise, use value parameter */
     fields?: any;
-    /** The actual code to update a specific field by its id */
     handleFields?: (id: string, value: any) => void;
-    /** If there is no handleFields parameter, use handleChange to handle when onChange event is listened */
-    handleChange?: (e: ChangeEvent<HTMLInputElement>) => void;
+    handleChange?: (e: ChangeEvent<HTMLTextAreaElement>) => void;
     disabled?: boolean;
     showInfo?: boolean;
     className?: string;
-    /** The maximum number of words allowed */
-    wordLimit?: number;
+    rows?: number;
+    wordLimit?: number; // Add word limit prop
 }
 
-export default function TextField(props: TextFieldProps) {
+export default function TextareaField(props: TextareaFieldProps) {
     const [isHovering, setIsHovering] = useState(false);
     const [currentValue, setCurrentValue] = useState(props.value || "");
     const [wordCount, setWordCount] = useState(0);
@@ -30,7 +25,7 @@ export default function TextField(props: TextFieldProps) {
 
     const countWords = (text: string) => text.trim().split(/\s+/).length;
 
-    const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
         const inputText = e.target.value;
         const words = countWords(inputText);
 
@@ -59,7 +54,6 @@ export default function TextField(props: TextFieldProps) {
                     >
                         {props.label}
                     </label>
-                    {/* If it's currently editable, and there is more information to display */}
                     {props.showInfo && props.info?.length !== 0 && (
                         <div
                             className="relative"
@@ -67,7 +61,6 @@ export default function TextField(props: TextFieldProps) {
                             onMouseLeave={handleHovering}
                         >
                             <MdInfoOutline className="text-secondary cursor-pointer" />
-                            {/* Information block */}
                             {isHovering && (
                                 <div className="absolute w-[240px] top-5 right-0 bg-white p-1 rounded-lg shadow-md text-center text-[12px] z-[1]">
                                     <p className="text-secondary font-semibold text-[12px]">
@@ -78,20 +71,18 @@ export default function TextField(props: TextFieldProps) {
                         </div>
                     )}
                 </div>
-                {/* Text Input */}
+                {/* Textarea */}
                 <div className="relative">
-                    <input
-                        type="text"
+                    <textarea
                         id={props.id}
-                        className="w-full py-2 px-4 rounded-[5px] disabled:bg-white disabled:cursor-not-allowed outline-none"
+                        className="w-full py-2 px-4 rounded-[5px] disabled:bg-white disabled:cursor-not-allowed outline-none border-none"
                         value={currentValue}
                         placeholder={
-                            props.value !== undefined
-                                ? props.value
-                                : props.fields?.[props.id]
+                            props.value !== undefined ? props.value : props.fields?.[props.id]
                         }
                         disabled={props.disabled}
                         onChange={onChange}
+                        rows={props.rows || 4}
                     />
                     {/* Word Limit Display */}
                     {props.wordLimit && (
