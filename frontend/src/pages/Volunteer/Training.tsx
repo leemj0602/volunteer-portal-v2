@@ -1,18 +1,18 @@
 import { useParams } from "react-router-dom";
-import Wrapper from "../components/Wrapper";
+import Wrapper from "../../components/Wrapper";
 import { useEffect, useState } from "react";
-import { Training } from "../../utils/classes/Training";
-import { TrainingSchedule } from "../../utils/classes/TrainingSchedule";
-import TrainingManager from "../../utils/managers/TrainingManager";
-import Loading from "../components/Loading";
-import config from "../../../config.json";
+import { Training } from "../../../utils/classes/Training";
+import { TrainingSchedule } from "../../../utils/classes/TrainingSchedule";
+import TrainingManager from "../../../utils/managers/TrainingManager";
+import Loading from "../../components/Loading";
+import config from "../../../../config.json";
 import { CiFileOff } from "react-icons/ci";
 import moment from "moment";
 import Swal from "sweetalert2";
 import { UserIcon, PhoneIcon, EnvelopeOpenIcon } from '@heroicons/react/24/solid';
-import ScheduleTable from "../components/ScheduleTable";
+import ScheduleTable from "../../components/ScheduleTable";
 
-export default function TrainingPage() {
+export default function VolunteerTrainingPage() {
     const { id } = useParams();
     const [training, setTraining] = useState<Training>();
     const [schedules, setSchedules] = useState<any[]>([]);

@@ -1,6 +1,6 @@
 import { FiEdit } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { Contact } from "../../../../utils/classes/Contact";
+import { Contact } from "../../../../../utils/classes/Contact";
 
 interface HeaderProps {
     contact: Contact;

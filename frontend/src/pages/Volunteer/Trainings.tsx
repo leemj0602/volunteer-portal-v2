@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Wrapper from "../components/Wrapper";
-import { Training } from "../../utils/classes/Training";
-import TrainingManager from "../../utils/managers/TrainingManager";
-import Loading from "../components/Loading";
-import TrainingCard from "../components/Card/TrainingCard";
+import Wrapper from "../../components/Wrapper";
+import { Training } from "../../../utils/classes/Training";
+import TrainingManager from "../../../utils/managers/TrainingManager";
+import Loading from "../../components/Loading";
+import TrainingCard from "../../components/Card/TrainingCard";
 
-export default function Trainings() {
+export default function VolunteerTrainings() {
     const [trainings, setTrainings] = useState<Training[]>();
     useEffect(() => {
         (async () => {

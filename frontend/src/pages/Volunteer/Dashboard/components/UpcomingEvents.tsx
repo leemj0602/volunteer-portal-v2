@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { EventRole } from "../../../../utils/classes/EventRole"
-import Loading from "../../../components/Loading";
-import EventRoleCard from "../../../components/Card/EventRoleCard";
+import { EventRole } from "../../../../../utils/classes/EventRole"
+import Loading from "../../../../components/Loading";
+import EventRoleCard from "../../../../components/Card/EventRoleCard";
 import { useEffect, useState } from "react";
-import EventRoleManager from "../../../../utils/managers/EventRoleManager";
-import { EventRegistration } from "../../../../utils/classes/EventRegistration";
+import EventRoleManager from "../../../../../utils/managers/EventRoleManager";
+import { EventRegistration } from "../../../../../utils/classes/EventRegistration";
 
 interface UpcomingEventsProps {
     registrations: EventRegistration[];

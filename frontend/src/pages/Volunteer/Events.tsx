@@ -1,17 +1,17 @@
 import { KeyboardEvent, useEffect, useState } from "react";
-import Loading from "../components/Loading";
-import Wrapper from "../components/Wrapper";
+import Loading from "../../components/Loading";
+import Wrapper from "../../components/Wrapper";
 import { createSearchParams, useSearchParams } from "react-router-dom";
-import { EventRole } from "../../utils/classes/EventRole";
-import CustomFieldSetManager, { CustomField, CustomFieldOptions } from "../../utils/managers/CustomFieldSetManager";
-import ContactManager from "../../utils/managers/ContactManager";
-import DropdownButton from "../components/DropdownButton";
+import { EventRole } from "../../../utils/classes/EventRole";
+import CustomFieldSetManager, { CustomField, CustomFieldOptions } from "../../../utils/managers/CustomFieldSetManager";
+import ContactManager from "../../../utils/managers/ContactManager";
+import DropdownButton from "../../components/DropdownButton";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { ComparisonOperator } from "../../utils/crm";
+import { ComparisonOperator } from "../../../utils/crm";
 import moment from "moment";
-import EventRoleManager from "../../utils/managers/EventRoleManager";
-import EventCard from "../components/Card/EventCard";
+import EventRoleManager from "../../../utils/managers/EventRoleManager";
+import EventCard from "../../components/Card/EventCard";
 
 const limit = 9;
 export default function Events() {
