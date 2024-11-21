@@ -1,19 +1,19 @@
 import { useNavigate, useParams } from "react-router-dom";
-import Wrapper from "../../components/Wrapper";
+import Wrapper from "../components/Wrapper";
 import { useEffect, useState } from "react";
-import { EventDetails } from "../../../utils/classes/EventDetails";
-import { EventRole } from "../../../utils/classes/EventRole";
-import EventDetailManager from "../../../utils/managers/EventDetailManager";
-import Loading from "../../components/Loading";
-import config from "../../../../config.json";
+import { EventDetails } from "../../utils/classes/EventDetails";
+import { EventRole } from "../../utils/classes/EventRole";
+import EventDetailManager from "../../utils/managers/EventDetailManager";
+import Loading from "../components/Loading";
+import config from "../../../config.json";
 import { CiFileOff } from "react-icons/ci";
 import { GrLocation } from "react-icons/gr";
 import { FiCalendar } from "react-icons/fi";
 import moment from "moment";
 import { IoMdBriefcase } from "react-icons/io";
-import EventRoleManager from "../../../utils/managers/EventRoleManager";
-import { EventRegistration, RegistrationStatus } from "../../../utils/classes/EventRegistration";
-import ScheduleTable from "../../components/ScheduleTable";
+import EventRoleManager from "../../utils/managers/EventRoleManager";
+import { EventRegistration, RegistrationStatus } from "../../utils/classes/EventRegistration";
+import ScheduleTable from "../components/ScheduleTable";
 import Swal from "sweetalert2";
 
 export default function Event() {

@@ -33,7 +33,6 @@ export default function RecurringDonations(props: RecurringDonationsProps) {
     const fetchSubscriptions = async (contact: Contact) => {
         const recurringDonations = await RecurringDonationHandler.fetch(contact.id!);
         const subscriptions = await Promise.all(recurringDonations.map(r => r.fetchStripe()));
-        console.log(recurringDonations, subscriptions);
         setSubscriptions(subscriptions.filter(s => !s?.canceled_at));
     }
 

@@ -9,9 +9,9 @@ import Profile from "./pages/Profile";
 import VolunteerTrainings from "./pages/Volunteer/Trainings";
 import VolunteerTrainingPage from "./pages/Volunteer/Training";
 import Events from "./pages/Volunteer/Events";
-import EventV3 from "./pages/v3/Event";
+import Event from "./pages/Event";
 import Donations from "./pages/Donations";
-import QRCheckIn from "./pages/QRCheckIn";
+import CheckIn from "./pages/CheckIn";
 import { SubtypesProvider } from "./contexts/Subtypes";
 import Caregiver from "./pages/Caregiver/Dashboard";
 import CaregiverServiceInfoPacks from "./pages/Caregiver/ServiceInfoPacks";
@@ -30,19 +30,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route index path="/" element={<Home3 />} />
 					<Route path="/volunteer" element={<Home3 />} />
 					<Route path="/volunteer/events" element={<Events />} />
-					<Route path="/volunteer/events/:eventId/:roleId" element={<EventV3 />} />
+					<Route path="/volunteer/events/:eventId/:roleId" element={<Event />} />
 					<Route path="/volunteer/trainings" element={<VolunteerTrainings />} />
 					<Route path="/volunteer/trainings/:id" element={<VolunteerTrainingPage />} />
 
 					<Route path="/donations" element={<Donations />} />
 
 					<Route path="/profile" element={<Profile />} />
-					<Route path="/events" element={<Events />} />
-					<Route path="/events/:eventId/:roleId" element={<EventV3 />} />
-					<Route path="/trainings" element={<VolunteerTrainings />} />
-					<Route path="/trainings/:id" element={<VolunteerTrainingPage />} />
-					<Route path="/donations" element={<Donations />} />
-					<Route path="/checkin/:encryptedString" element={<QRCheckIn />} />
+					<Route path="/checkin/:encrypted" element={<CheckIn />} />
 
 					<Route path="/caregiver" element={<Caregiver />} />
 					<Route path="/caregiver/service-info-packs" element={<CaregiverServiceInfoPacks />} />

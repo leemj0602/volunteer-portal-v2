@@ -28,7 +28,7 @@ export default function TrainingCard(props: TrainingCardProps) {
 
     return <Card
         className={props.className}
-        url={`/trainings/${props.training.id}`}
+        url={`/volunteer/trainings/${props.training.id}`}
         thumbnail={props.training.thumbnail}
         cancelled={props.training["status_id:name"] == TrainingStatus.Cancelled}
     >

@@ -1,4 +1,4 @@
-import EventRoleCard from "./Card/EventRoleCard";
+import EventScheduleCard from "./Card/EventScheduleCard";
 import { EventRole, EventRoleProps } from "../../utils/classes/EventRole";
 import { useNavigate } from "react-router-dom";
 
@@ -25,7 +25,7 @@ export default function UpcomingEvents({ eventRoles }: UpcomingEventsProps) {
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
         {eventRoles && eventRoles.length > 0 ? (
-          eventRoles.map((event: any) => <EventRoleCard className="flex justify-center" eventRole={event} />)
+          eventRoles.map((event: any) => <EventScheduleCard className="flex justify-center" eventRole={event} />)
         ) : (
           <p className="text-lg text-gray-500">Looks like there aren't any upcoming events</p>
         )}
