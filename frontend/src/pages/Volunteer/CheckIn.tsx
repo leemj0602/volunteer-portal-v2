@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import Wrapper from "../components/Wrapper";
-import Loading from "../components/Loading";
+import Wrapper from "../../components/Wrapper";
+import Loading from "../../components/Loading";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import config from "../../../config.json";
-import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
+import config from "../../../../config.json";
+import EventRegistrationManager from "../../../utils/managers/EventRegistrationManager";
 import moment from "moment";
 
 export default function CheckIn() {

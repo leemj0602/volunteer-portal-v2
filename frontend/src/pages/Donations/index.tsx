@@ -3,11 +3,11 @@ import Wrapper from "../../components/Wrapper";
 import ContributionHandler from "../../../utils/v2/handlers/ContributionHandler";
 import { Contribution } from "../../../utils/v2/entities/Contribution";
 import Loading from "../../components/Loading";
-import Summarisation from "./componenets/Summarisation";
-import History from "./componenets/History";
+import Summarisation from "./components/Summarisation";
+import History from "./components/History";
 import numeral from "numeral";
 import { useNavigate } from "react-router-dom";
-import RecurringDonations from "./componenets/RecurringDonations";
+import RecurringDonations from "./components/RecurringDonations";
 import ContactManager from "../../../utils/managers/ContactManager";
 import { useSubtypesContext } from "../../contexts/Subtypes";
 

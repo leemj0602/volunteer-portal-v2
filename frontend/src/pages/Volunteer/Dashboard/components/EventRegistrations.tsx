@@ -1,21 +1,21 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { EventRegistration } from "../../../../utils/classes/EventRegistration";
-import Table from "../../../components/Table";
-import Body from "../../../components/Table/Body";
-import Cell from "../../../components/Table/Cell";
-import Header from "../../../components/Table/Header";
+import { EventRegistration } from "../../../../../utils/classes/EventRegistration";
+import Table from "../../../../components/Table";
+import Body from "../../../../components/Table/Body";
+import Cell from "../../../../components/Table/Cell";
+import Header from "../../../../components/Table/Header";
 import moment from "moment";
-import Status from "../../../components/Table/Status";
+import Status from "../../../../components/Table/Status";
 import { useNavigate } from "react-router-dom";
 import { AiOutlineStop } from "react-icons/ai";
-import CancelEvent from "../../../../assets/undraw_cancel_re_pkdm.svg";
+import CancelEvent from "../../../../../assets/undraw_cancel_re_pkdm.svg";
 import Swal from "sweetalert2";
-import EventRegistrationManager from "../../../../utils/managers/EventRegistrationManager";
-import { Contact } from "../../../../utils/classes/Contact";
-import PageNavigation from "../../../components/PageNavigation";
+import EventRegistrationManager from "../../../../../utils/managers/EventRegistrationManager";
+import { Contact } from "../../../../../utils/classes/Contact";
+import PageNavigation from "../../../../components/PageNavigation";
 import QRCode from 'qrcode';
 import axios from "axios";
-import config from "../../../../../config.json";
+import config from "../../../../../../config.json";
 
 /**
  * THINGS TO CONSIDER
