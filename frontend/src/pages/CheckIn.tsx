@@ -1,24 +1,23 @@
 import { useEffect, useState } from "react";
-import Wrapper from "../../components/Wrapper";
-import Loading from "../../components/Loading";
+import Wrapper from "../components/Wrapper";
+import Loading from "../components/Loading";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
-import config from "../../../../config.json";
-import EventRegistrationManager from "../../../utils/managers/EventRegistrationManager";
+import config from "../../../config.json";
+import EventRegistrationManager from "../../utils/managers/EventRegistrationManager";
 import moment from "moment";
 
-export default function QRCheckIn() {
+export default function CheckIn() {
     const navigate = useNavigate();
 
-    const { encryptedString } = useParams();
+    const { encrypted } = useParams();
     const [attendanceTaken, setAttendanceTaken] = useState<boolean>(false);
     const [attendanceAlreadyTaken, setAttendanceAlreadyTaken] = useState<boolean>(false); // New state to track if attendance is already taken
     const [volunteerName, setVolunteerName] = useState<string>();
     const [dateTime, setDateTime] = useState<string>();
     const roles = (window as any).roles;
 
-    console.log(roles);
     const decrypt = async (encrypted: string) => {
         const response = await axios.post(`${config.domain}/portal/api/decode.php`, { data: encrypted });
         return response.data as string;
@@ -28,7 +27,7 @@ export default function QRCheckIn() {
         const roleValues = Object.values(roles);
         if (['administrator', 'volunteer_portal_admin'].some(v => roleValues.includes(v))) {
             (async () => {
-                const decryptedString = await decrypt(encryptedString!);
+                const decryptedString = await decrypt(encrypted!);
                 console.log(decryptedString);
                 const splitString = decryptedString.split('/');
                 const contactId = splitString[0];
@@ -69,7 +68,7 @@ export default function QRCheckIn() {
             });
             navigate("/");
         }
-    }, [encryptedString]);
+    }, [encrypted]);
 
     return (
         <Wrapper>
