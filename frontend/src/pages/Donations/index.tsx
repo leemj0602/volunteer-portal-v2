@@ -12,7 +12,6 @@ import ContactManager from "../../../utils/managers/ContactManager";
 import { useSubtypesContext } from "../../contexts/Subtypes";
 
 export default function Donations() {
-    const email = (window as any).email;
     const [donations, setDonations] = useState<Contribution[]>();
     const { setSubTypes } = useSubtypesContext()!;
     const navigate = useNavigate();
