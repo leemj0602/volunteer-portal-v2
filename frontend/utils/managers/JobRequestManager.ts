@@ -19,9 +19,10 @@ const JobRequestManager = new class JobRequestManager {
 
         const combinedValues = [...baseValues, ...propsValues];
 
-        await CRM("Activity", "create", {
+        const result = await CRM("Activity", "create", {
             values: combinedValues,
-        })
+        }).catch(() => null);
+        return result != null;
     }
 
 }

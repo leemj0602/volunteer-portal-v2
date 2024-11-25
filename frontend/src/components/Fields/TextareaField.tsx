@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { MdInfoOutline } from "react-icons/md";
 
 interface TextareaFieldProps {
@@ -13,13 +13,19 @@ interface TextareaFieldProps {
     showInfo?: boolean;
     className?: string;
     rows?: number;
-    wordLimit?: number; // Add word limit prop
+    wordLimit?: number;
+    required?: boolean;
 }
 
 export default function TextareaField(props: TextareaFieldProps) {
     const [isHovering, setIsHovering] = useState(false);
     const [currentValue, setCurrentValue] = useState(props.value || "");
     const [wordCount, setWordCount] = useState(0);
+
+    useEffect(() => {
+        setCurrentValue(props.value || "");
+        setWordCount(props.value ? countWords(props.value) : 0);
+    }, [props.value]);
 
     const handleHovering = () => setIsHovering(!isHovering);
 
@@ -53,6 +59,7 @@ export default function TextareaField(props: TextareaFieldProps) {
                         className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}
                     >
                         {props.label}
+                        {props.required && <span className="text-red-500 ml-1">*</span>}
                     </label>
                     {props.showInfo && props.info?.length !== 0 && (
                         <div
@@ -83,6 +90,7 @@ export default function TextareaField(props: TextareaFieldProps) {
                         disabled={props.disabled}
                         onChange={onChange}
                         rows={props.rows || 4}
+                        required={props.required}
                     />
                     {/* Word Limit Display */}
                     {props.wordLimit && (

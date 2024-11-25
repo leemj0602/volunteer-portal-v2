@@ -12,20 +12,29 @@ interface DropdownFieldProps {
     placeholder?: string;
     options: CustomFieldOptions[];
     label: string;
+    required?: boolean;
 }
 
 export default function DropdownField(props: DropdownFieldProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [selectedOption, setSelectedOption] = useState<CustomFieldOptions | null>(null);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
 
     const toggleDropdown = () => setIsMenuOpen(!isMenuOpen);
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const selected = props.options.find((opt) => opt.value === e.target.value) || null;
+        setSelectedOption(selected);
         if (props.handleFields) {
             toggleDropdown();
             props.handleFields(props.id, e.target.value);
         }
-
+        setIsMenuOpen(false);
     }
+
+    useEffect(() => {
+        const selected = props.options.find((opt) => opt.value === props.fields[props.id]) || null;
+        setSelectedOption(selected);
+    }, [props.fields, props.id, props.options]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -39,11 +48,14 @@ export default function DropdownField(props: DropdownFieldProps) {
     return <div className={props.className}>
         <div className="w-full md:w-[300px]">
             {/* Label */}
-            <label htmlFor={props.id} className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}>{props.label}</label>
+            <label htmlFor={props.id} className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}>
+                {props.label}
+                {props.required && <span className="text-red-500 ml-1">*</span>}
+            </label>
             <div className="relative mt-1" ref={dropdownRef}>
                 {/* Input */}
                 <div className="relative flex items-center">
-                    <input type="text" id={props.id} placeholder={props.disabled ? props.options.find(o => o.value == props.fields[props.id])?.label ?? "None provided" : props.placeholder ?? "Please select an option"} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:cursor-not-allowed`} onClick={toggleDropdown} value={props.disabled ? "" : props.options.find(o => o.value == props.fields[props.id])?.label} disabled={props.disabled} />
+                    <input type="text" id={props.id} placeholder={props.disabled ? props.options.find(o => o.value == props.fields[props.id])?.label ?? "None provided" : props.placeholder ?? "Please select an option"} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:cursor-not-allowed`} onClick={toggleDropdown} value={selectedOption?.label || ""} disabled={props.disabled} required={props.required} />
                     {!props.disabled && <IoIosArrowDown className="text-secondary absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />}
                 </div>
                 {/* Dropdown menu */}

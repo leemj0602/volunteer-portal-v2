@@ -7,6 +7,8 @@ import DropdownField from "../../components/Fields/DropdownField";
 import CheckboxField from "../../components/Fields/CheckboxField";
 import Loading from "../../components/Loading";
 import { MdCreate } from "react-icons/md";
+import JobRequestManager from "../../../utils/managers/JobRequestManager";
+import Swal from "sweetalert2";
 
 export default function PatientRequests() {
     const email = (window as any).email;
@@ -41,6 +43,31 @@ export default function PatientRequests() {
         e.preventDefault();
         setIsCreating(true);
         console.log(formValues);
+        const result = await JobRequestManager.create(email, email, formValues);
+
+        if (result) {
+            Swal.fire({
+                title: "Request submitted",
+                icon: "success"
+            })
+
+            // Reset form values after successful submission
+            const resetValues: { [key: string]: any } = {
+                subject: "",
+                details: "",
+            };
+            customFieldData?.forEach((_, id) => {
+                resetValues[id] = ""; // Reset dynamic fields to empty
+            });
+            setFormValues(resetValues);
+        } else {
+            Swal.fire({
+                title: "An error occurred",
+                text: "Please try again at a later time.",
+                icon: "error"
+            });
+        }
+        setIsCreating(false);
     }
 
     return (
@@ -50,7 +77,6 @@ export default function PatientRequests() {
             ) : (
                 <>
                     <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
-                        <h1>New Request</h1>
                         <div className="p-4">
                             <form onSubmit={createRequest} className="max-w-[1000px]">
                                 {/* Subject */}
@@ -63,6 +89,7 @@ export default function PatientRequests() {
                                     value={formValues.subject}
                                     handleChange={(e) => handleFieldChange("subject", e.target.value)}
                                     wordLimit={10}
+                                    required={true}
                                 />
                                 {/* Details */}
                                 <TextareaField
@@ -74,6 +101,7 @@ export default function PatientRequests() {
                                     value={formValues.details}
                                     handleChange={(e) => handleFieldChange("details", e.target.value)}
                                     wordLimit={100}
+                                    required={true}
                                 />
                                 {/* Custom Fields */}
                                 {customFieldData &&
@@ -90,6 +118,7 @@ export default function PatientRequests() {
                                                         handleChange={(e) =>
                                                             handleFieldChange(id, e.target.value)
                                                         }
+                                                        required={true}
                                                     />
                                                 );
                                             case "Radio":
@@ -105,6 +134,7 @@ export default function PatientRequests() {
                                                             handleFieldChange(id, value)
                                                         }
                                                         options={field.options!}
+                                                        required={true}
                                                     />
                                                 );
                                             case "CheckBox":

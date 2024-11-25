@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { MdInfoOutline } from "react-icons/md";
 
 interface TextFieldProps {
@@ -19,12 +19,19 @@ interface TextFieldProps {
     className?: string;
     /** The maximum number of words allowed */
     wordLimit?: number;
+    required?: boolean;
 }
 
 export default function TextField(props: TextFieldProps) {
     const [isHovering, setIsHovering] = useState(false);
     const [currentValue, setCurrentValue] = useState(props.value || "");
     const [wordCount, setWordCount] = useState(0);
+
+    useEffect(() => {
+        setCurrentValue(props.value || "");
+        setWordCount(props.value ? countWords(props.value) : 0);
+    }, [props.value]);
+
 
     const handleHovering = () => setIsHovering(!isHovering);
 
@@ -58,6 +65,7 @@ export default function TextField(props: TextFieldProps) {
                         className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}
                     >
                         {props.label}
+                        {props.required && <span className="text-red-500 ml-1">*</span>}
                     </label>
                     {/* If it's currently editable, and there is more information to display */}
                     {props.showInfo && props.info?.length !== 0 && (
@@ -92,6 +100,7 @@ export default function TextField(props: TextFieldProps) {
                         }
                         disabled={props.disabled}
                         onChange={onChange}
+                        required={props.required}
                     />
                     {/* Word Limit Display */}
                     {props.wordLimit && (
