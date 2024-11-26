@@ -5,21 +5,19 @@ import O8Logo from "../../../assets/O8Logo.png";
 import { PiSignOutBold } from "react-icons/pi";
 import { LuCalendarRange } from "react-icons/lu";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SignOut from "../../../assets/SignOut.png";
 import config from "../../../../config.json";
 import { GiHamburgerMenu } from "react-icons/gi";
-import { FaBriefcaseMedical, FaChalkboardTeacher, FaClinicMedical, FaDonate, FaHeartbeat, FaInfoCircle } from "react-icons/fa";
+import { FaBriefcaseMedical, FaChalkboardTeacher, FaClinicMedical, FaDonate, FaHeartbeat } from "react-icons/fa";
 import Swal from "sweetalert2";
-import { BiDonateHeart } from "react-icons/bi";
 import Category from "./Category";
 import Item from "./Item";
-import { RiMailSendFill } from "react-icons/ri";
 import { useSubtypesContext } from "../../contexts/Subtypes";
-import ContactManager from "../../../utils/managers/ContactManager";
 
 interface NavbarProps {
     className: string;
+    location?: string;
 }
 
 export default function Navbar(props: NavbarProps) {
@@ -58,27 +56,30 @@ export default function Navbar(props: NavbarProps) {
             <div className="mt-6 flex flex-col justify-between h-full">
                 <div className="mb-2">
                     {subtypes.includes('Volunteer') && <Category to="/volunteer" icon={FaBriefcaseMedical} name="Volunteer">
-                        <Item to="/volunteer/events" name="Events" />
-                        <Item to="/volunteer/trainings" name="Trainings" />
+                        <Item location={props.location} to="/volunteer/events" name="Events" />
+                        <Item location={props.location} to="/volunteer/trainings" name="Trainings" />
                     </Category>}
-                    {subtypes.includes('Donator') && <Category to="/donations" icon={FaDonate} name="Donator">
+                    {subtypes.includes('Donator') && <Category to="/donations" icon={FaDonate} name="Donations">
                     </Category>}
                     {subtypes.includes('Caregiver') && <Category to="/caregiver" icon={FaHeartbeat} name="Caregiver">
-                        <Item to="/caregiver/service-info-packs" name="Service Info Packs" />
-                        <Item to="/caregiver/requests" name="Request for Volunteer" />
-                        <Item to="/caregiver/trainings" name="Trainings" />
+                        <Item location={props.location} to="/caregiver/service-info-packs" name="Service Info Packs" />
+                        <Item location={props.location} to="/caregiver/requests" name="Request for Volunteer" />
+                        <Item location={props.location} to="/caregiver/trainings" name="Trainings" />
                     </Category>}
                     {subtypes.includes('Patient') && <Category to="/patient" icon={FaClinicMedical} name="Patient">
-                        <Item to="/patient/service-info-packs" name="Service Info Pack" />
-                        <Item to="/patient/requests" name="Request for Volunteer" />
+                        <Item location={props.location} to="/patient/service-info-packs" name="Service Info Pack" />
+                        <Item location={props.location} to="/patient/requests" name="Request for Volunteer" />
                     </Category>}
                 </div>
-                <div className="w-full">
-                    <Item to="/profile" icon={CgProfile} name="Profile" />
+                <div>
+                    <Link to="/profile" className="flex pl-9 py-2 items-center gap-x-4 text-secondary border-l-4 font-semibold hover:bg-primary/10 hover:text-secondary/90 border-l-transparent hover:border-l-secondary/70 w-full">
+                        <CgProfile />
+                        <span>Profile</span>
+                    </Link>
                     <button onClick={openModal} className="flex pl-9 py-2 items-center gap-x-4 text-secondary border-l-4 font-semibold hover:bg-primary/10 hover:text-secondary/90 border-l-transparent hover:border-l-secondary/70 w-full">
                         <PiSignOutBold />
                         <span>Sign Out</span>
-                    </button>
+                    </button>                    
                 </div>
             </div>
         </nav>
