@@ -85,7 +85,9 @@ export default function TextareaField(props: TextareaFieldProps) {
                         className="w-full py-2 px-4 rounded-[5px] disabled:bg-white disabled:cursor-not-allowed outline-none border-none"
                         value={currentValue}
                         placeholder={
-                            props.value !== undefined ? props.value : props.fields?.[props.id]
+                            props.value !== undefined
+                                ? props.value
+                                : props.fields?.[props.id]
                         }
                         disabled={props.disabled}
                         onChange={onChange}

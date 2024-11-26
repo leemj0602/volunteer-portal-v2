@@ -35,7 +35,6 @@ const JobRequestManager = new class JobRequestManager {
         if (result) return status
         else return null;
     }
-
 }
 
 export default JobRequestManager;

@@ -10,6 +10,7 @@ import { MdCreate } from "react-icons/md";
 import JobRequestManager from "../../../utils/managers/JobRequestManager";
 import Swal from "sweetalert2";
 import { JobRequestStatus } from "../../../utils/classes/JobRequest";
+import DateTimePickerField from "../../components/Fields/DateTimePickerField";
 
 export default function PatientRequests() {
     const email = (window as any).email;
@@ -17,8 +18,10 @@ export default function PatientRequests() {
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({
         subject: "",
         details: "",
+        activity_date_time: null,
     });
     const [isCreating, setIsCreating] = useState(false);
+    const currentDate = new Date();
 
     useEffect(() => {
         (async function () {
@@ -40,9 +43,62 @@ export default function PatientRequests() {
         }));
     };
 
+    // Filter function for weekdays
+    const filterWeekdays = (date: Date) => {
+        const day = date.getDay();
+        // Allow only weekdays (Monday - Friday)
+        return day !== 0 && day !== 6;
+    };
+
+    // Filter function for time between 9 AM and 5 PM and at least 1 hour ahead
+    const filterTimeRange = (time: Date) => {
+        const hour = time.getHours();
+        const minute = time.getMinutes();
+
+        // Time should be between 9:00 AM and 5:00 PM
+        const isWithinWorkingHours = (hour > 9 && hour < 21) || (hour === 9 && minute >= 0) || (hour === 21 && minute === 0);
+
+        if (isWithinWorkingHours) {
+            const now = new Date();
+            const selectedDay = formValues.activity_date_time
+                ? new Date(formValues.activity_date_time).toDateString()
+                : "";
+
+            const currentHour = now.getHours();
+            const currentMinute = now.getMinutes();
+            const isToday = selectedDay === now.toDateString();
+
+            // Ensure at least 1 hour ahead for today
+            if (isToday) {
+                if (hour > currentHour + 1) return true;
+                if (hour === currentHour + 1 && minute >= currentMinute) return true;
+                return false;
+            }
+
+            return true;
+        }
+
+        return false;
+    };
+
     const createRequest = async function (e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
+
+        // Check if `activity_date_time` is valid
+        const selectedDate = formValues.activity_date_time;
+        const now = new Date();
+
+        if (!selectedDate || new Date(selectedDate) <= now || !filterWeekdays(new Date(selectedDate))) {
+            Swal.fire({
+                title: "Invalid Date and Time",
+                text: "Please select a valid weekday and time within working hours (9:00 AM - 9:00 PM) and at least 1 hour ahead.",
+                icon: "error"
+            });
+            return; // Prevent form submission
+        }
+
         setIsCreating(true);
+
         const resultStatus = await JobRequestManager.create(email, email, formValues);
 
         if (resultStatus === JobRequestStatus.Approved) {
@@ -55,6 +111,7 @@ export default function PatientRequests() {
             const resetValues: { [key: string]: any } = {
                 subject: "",
                 details: "",
+                activity_date_time: null,
             };
             customFieldData?.forEach((_, id) => {
                 resetValues[id] = ""; // Reset dynamic fields to empty
@@ -73,6 +130,7 @@ export default function PatientRequests() {
             const resetValues: { [key: string]: any } = {
                 subject: "",
                 details: "",
+                activity_date_time: null,
             };
             customFieldData?.forEach((_, id) => {
                 resetValues[id] = ""; // Reset dynamic fields to empty
@@ -103,7 +161,7 @@ export default function PatientRequests() {
                                     label="Subject"
                                     id="subject"
                                     showInfo={true}
-                                    info="Short title summary of your request (Max. 10 words)"
+                                    info="Short title summary of your request (Max. 10 words)."
                                     value={formValues.subject}
                                     handleChange={(e) => handleFieldChange("subject", e.target.value)}
                                     wordLimit={10}
@@ -111,15 +169,30 @@ export default function PatientRequests() {
                                 />
                                 {/* Details */}
                                 <TextareaField
-                                    className="flex justify-center"
+                                    className="flex justify-center mt-4"
                                     label="Description"
                                     id="details"
                                     showInfo={true}
-                                    info="Description of your request (Max. 100 words)"
+                                    info="Description of your request (Max. 100 words)."
                                     value={formValues.details}
                                     handleChange={(e) => handleFieldChange("details", e.target.value)}
                                     wordLimit={100}
                                     required={true}
+                                />
+                                {/* Date Time */}
+                                <DateTimePickerField
+                                    className="flex justify-center mt-4"
+                                    label="Request Date & Time"
+                                    id="activity_date_time"
+                                    showInfo={true}
+                                    info="Please select a valid weekday and time within working hours (9:00 AM - 9:00 PM) and at least 1 hour ahead."
+                                    value={formValues.activity_date_time ? new Date(formValues.activity_date_time) : null}
+                                    handleChange={(date) => handleFieldChange("activity_date_time", date)}
+                                    required={true}
+                                    showTimeSelect={true}
+                                    minDate={currentDate}
+                                    filterDate={filterWeekdays}
+                                    filterTime={filterTimeRange}
                                 />
                                 {/* Custom Fields */}
                                 {customFieldData &&
@@ -129,7 +202,7 @@ export default function PatientRequests() {
                                                 return (
                                                     <TextField
                                                         key={id}
-                                                        className="flex justify-center"
+                                                        className="flex justify-center mt-4"
                                                         label={field.label}
                                                         id={id}
                                                         value={formValues[id]}
@@ -144,7 +217,7 @@ export default function PatientRequests() {
                                                 return (
                                                     <DropdownField
                                                         key={id}
-                                                        className="flex justify-center"
+                                                        className="flex justify-center mt-4"
                                                         label={field.label}
                                                         id={id}
                                                         fields={formValues}
@@ -159,7 +232,7 @@ export default function PatientRequests() {
                                                 return (
                                                     <CheckboxField
                                                         key={id}
-                                                        className="flex justify-center"
+                                                        className="flex justify-center mt-4"
                                                         label={field.label}
                                                         id={id}
                                                         fields={formValues}
@@ -172,7 +245,8 @@ export default function PatientRequests() {
                                             default:
                                                 return null;
                                         }
-                                    })}
+                                    })
+                                }
                                 <div className="mt-4 flex justify-center">
                                     <button
                                         type="submit"

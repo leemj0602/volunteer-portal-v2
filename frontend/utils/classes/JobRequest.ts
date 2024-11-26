@@ -11,6 +11,7 @@ export interface JobRequestProps {
     subject: string | null;
     details: string | null;
     "status_id:name": JobRequestStatus | null;
+    activity_date_time: string | null;
 }
 
 export class JobRequest implements JobRequestProps {
@@ -20,6 +21,7 @@ export class JobRequest implements JobRequestProps {
     public subject: string | null;
     public details: string | null;
     public "status_id:name": JobRequestStatus | null;
+    public activity_date_time: string | null;
     [key: string]: any;
 
     constructor(props: JobRequestProps) {
@@ -28,6 +30,7 @@ export class JobRequest implements JobRequestProps {
         this["Job_Request_Details.Category:label"] = props["Job_Request_Details.Category:label"];
         this.subject = props.subject;
         this.details = props.details;
-        this["status_id:name"] = props["status_id:name"]
+        this["status_id:name"] = props["status_id:name"];
+        this.activity_date_time = props.activity_date_time;
     }
 }
