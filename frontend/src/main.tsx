@@ -14,12 +14,12 @@ import Donations from "./pages/Donations";
 import CheckIn from "./pages/Volunteer/CheckIn";
 import { SubtypesProvider } from "./contexts/Subtypes";
 import Caregiver from "./pages/Caregiver/Dashboard";
-import CaregiverServiceInfoPacks from "./pages/Caregiver/ServiceInfoPacks";
 import CaregiverRequests from "./pages/Caregiver/Requests";
 import CaregiverTrainings from "./pages/Caregiver/Trainings";
 import Patient from "./pages/Patient/Dashboard";
-import PatientServiceInfoPacks from "./pages/Patient/ServiceInfoPacks";
 import PatientRequests from "./pages/Patient/Requests";
+import ServiceInfoPacks from "./pages/ServiceInfoPacks";
+import SIP from "./pages/SearchInfoPack";
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -40,12 +40,14 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/checkin/:encrypted" element={<CheckIn />} />
 
 					<Route path="/caregiver" element={<Caregiver />} />
-					<Route path="/caregiver/service-info-packs" element={<CaregiverServiceInfoPacks />} />
+					<Route path="/caregiver/service-info-packs" element={<ServiceInfoPacks />} />
+					<Route path="/caregiver/service-info-packs/:id" element={<SIP />} />
 					<Route path="/caregiver/requests" element={<CaregiverRequests />} />
 					<Route path="/caregiver/trainings" element={<CaregiverTrainings />} />
 
 					<Route path="/patient" element={<Patient />} />
-					<Route path="/patient/service-info-packs" element={<PatientServiceInfoPacks />} />
+					<Route path="/patient/service-info-packs" element={<ServiceInfoPacks />} />
+					<Route path="/patient/service-info-packs/:id" element={<SIP />} />
 					<Route path="/patient/requests" element={<PatientRequests />} />
 
 				</Routes>
