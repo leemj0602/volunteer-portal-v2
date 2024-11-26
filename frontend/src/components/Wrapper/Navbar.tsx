@@ -60,6 +60,7 @@ export default function Navbar(props: NavbarProps) {
                         <Item location={props.location} to="/volunteer/trainings" name="Trainings" />
                     </Category>}
                     {subtypes.includes('Donator') && <Category to="/donations" icon={FaDonate} name="Donations">
+                        <Item to="/donations/service-info-pack" name="Service Info Pack" />
                     </Category>}
                     {subtypes.includes('Caregiver') && <Category to="/caregiver" icon={FaHeartbeat} name="Caregiver">
                         <Item location={props.location} to="/caregiver/service-info-packs" name="Service Info Packs" />
