@@ -3,7 +3,7 @@ import Wrapper from "../../components/Wrapper";
 import { useEffect, useState } from "react";
 import ServiceInfoPackManager, { ServiceInfoPack } from "../../../utils/managers/ServiceInfoPackManager";
 import Loading from "../../components/Loading";
-import "./default.css";
+import styles from "./sip.module.css";
 
 export default function SIP() {
   const { id } = useParams();
@@ -20,7 +20,7 @@ export default function SIP() {
       <div className="py-4">
         <div className="p-8 bg-white rounded-md">
           <h1 className="text-2xl mb-4 font-semibold text-secondary">{sip.subject}</h1>
-          <div dangerouslySetInnerHTML={{ __html: sip.details }} />
+          <div className={styles.container} dangerouslySetInnerHTML={{ __html: sip.details }} />
         </div>
       </div>
     </div>}
