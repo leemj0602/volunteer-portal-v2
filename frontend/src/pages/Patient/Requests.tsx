@@ -9,6 +9,7 @@ import Loading from "../../components/Loading";
 import { MdCreate } from "react-icons/md";
 import JobRequestManager from "../../../utils/managers/JobRequestManager";
 import Swal from "sweetalert2";
+import { JobRequestStatus } from "../../../utils/classes/JobRequest";
 
 export default function PatientRequests() {
     const email = (window as any).email;
@@ -42,13 +43,30 @@ export default function PatientRequests() {
     const createRequest = async function (e: FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setIsCreating(true);
-        console.log(formValues);
-        const result = await JobRequestManager.create(email, email, formValues);
+        const resultStatus = await JobRequestManager.create(email, email, formValues);
 
-        if (result) {
+        if (resultStatus === JobRequestStatus.Approved) {
             Swal.fire({
-                title: "Request submitted",
+                title: "Your request has submitted",
                 icon: "success"
+            })
+
+            // Reset form values after successful submission
+            const resetValues: { [key: string]: any } = {
+                subject: "",
+                details: "",
+            };
+            customFieldData?.forEach((_, id) => {
+                resetValues[id] = ""; // Reset dynamic fields to empty
+            });
+            setFormValues(resetValues);
+        }
+        else if (resultStatus === JobRequestStatus.ApprovalRequired) {
+            Swal.fire({
+                title: "Your request has been submitted",
+                text: 'Since you have selected "Others" category, please wait for an Administrator to approve your request.',
+                icon: "success",
+                iconColor: "#f8bb86",
             })
 
             // Reset form values after successful submission
