@@ -1,4 +1,5 @@
 import EventRegistrationManager from "../managers/EventRegistrationManager";
+import JobRequestManager from "../managers/JobRequestManager";
 import TrainingRegistrationManager from "../managers/TrainingRegistrationManager";
 
 interface MandatoryContactDetailProps {
@@ -70,5 +71,9 @@ export class Contact implements ContactProps {
 
     async fetchTrainingRegistrations() {
         return TrainingRegistrationManager.fetch({ contactId: this.id! });
+    }
+
+    async fetchJobRequests() {
+        return JobRequestManager.fetch({ contactId: this.id! });
     }
 }
