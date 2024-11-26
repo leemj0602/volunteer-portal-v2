@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
-import Wrapper from "../../components/Wrapper";
-import ContributionHandler from "../../../utils/v2/handlers/ContributionHandler";
-import { Contribution } from "../../../utils/v2/entities/Contribution";
-import Loading from "../../components/Loading";
+import Wrapper from "../../../components/Wrapper";
+import ContributionHandler from "../../../../utils/v2/handlers/ContributionHandler";
+import { Contribution } from "../../../../utils/v2/entities/Contribution";
+import Loading from "../../../components/Loading";
 import Summarisation from "./components/Summarisation";
 import History from "./components/History";
 import numeral from "numeral";
 import { useNavigate } from "react-router-dom";
 import RecurringDonations from "./components/RecurringDonations";
-import ContactManager from "../../../utils/managers/ContactManager";
-import { useSubtypesContext } from "../../contexts/Subtypes";
+import ContactManager from "../../../../utils/managers/ContactManager";
+import { useSubtypesContext } from "../../../contexts/Subtypes";
 
 export default function Donations() {
     const [donations, setDonations] = useState<Contribution[]>();

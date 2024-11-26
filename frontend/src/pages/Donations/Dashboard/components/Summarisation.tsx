@@ -1,5 +1,5 @@
 import numeral from "numeral";
-import { Contribution } from "../../../../utils/v2/entities/Contribution";
+import { Contribution } from "../../../../../utils/v2/entities/Contribution";
 import { FaArrowUp, FaArrowDown } from "react-icons/fa6";
 
 interface SummarisationProps {

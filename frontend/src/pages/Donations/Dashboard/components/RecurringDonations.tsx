@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import Table from "../../../components/Table";
-import ContactManager from "../../../../utils/managers/ContactManager";
-import RecurringDonationHandler from "../../../../utils/v2/handlers/RecurringDonationHandler";
-import Header from "../../../components/Table/Header";
-import Body from "../../../components/Table/Body";
-import Cell from "../../../components/Table/Cell";
-import config from "../../../../../config.json";
+import Table from "../../../../components/Table";
+import ContactManager from "../../../../../utils/managers/ContactManager";
+import RecurringDonationHandler from "../../../../../utils/v2/handlers/RecurringDonationHandler";
+import Header from "../../../../components/Table/Header";
+import Body from "../../../../components/Table/Body";
+import Cell from "../../../../components/Table/Cell";
+import config from "../../../../../../config.json";
 import numeral from "numeral";
 import moment from "moment";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FcCancel } from "react-icons/fc";
-import { Contact } from "../../../../utils/classes/Contact";
+import { Contact } from "../../../../../utils/classes/Contact";
 
 interface RecurringDonationsProps {
     className?: string;
