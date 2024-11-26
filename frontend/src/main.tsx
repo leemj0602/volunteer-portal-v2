@@ -43,9 +43,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/checkin/:encrypted" element={<CheckIn />} />
 
 					<Route path="/caregiver" element={<Caregiver />} />
-					<Route path="/caregiver" element={<CaregiverInfoPack />} />
 					<Route path="/caregiver/requests" element={<CaregiverRequests />} />
 					<Route path="/caregiver/trainings" element={<CaregiverTrainings />} />
+					<Route path="/caregiver/service-info-pack" element={<CaregiverInfoPack />} />
 
 					<Route path="/patient" element={<Patient />} />
 					<Route path="/patient/service-info-packs" element={<ServiceInfoPacks />} />
