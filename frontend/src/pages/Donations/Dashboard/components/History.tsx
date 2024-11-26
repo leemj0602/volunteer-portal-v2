@@ -1,16 +1,16 @@
 import { useState } from "react";
-import { Contribution } from "../../../../utils/v2/entities/Contribution"
-import Table from "../../../components/Table";
-import Body from "../../../components/Table/Body";
-import Cell from "../../../components/Table/Cell";
-import Header from "../../../components/Table/Header";
+import { Contribution } from "../../../../../utils/v2/entities/Contribution"
+import Table from "../../../../components/Table";
+import Body from "../../../../components/Table/Body";
+import Cell from "../../../../components/Table/Cell";
+import Header from "../../../../components/Table/Header";
 import numeral from "numeral";
 import moment from "moment";
-import PageNavigation from "../../../components/PageNavigation";
-import CRM from "../../../../utils/crm";
+import PageNavigation from "../../../../components/PageNavigation";
+import CRM from "../../../../../utils/crm";
 import Swal from "sweetalert2";
-import ContactManager from "../../../../utils/managers/ContactManager";
-import config from "../../../../../config.json";
+import ContactManager from "../../../../../utils/managers/ContactManager";
+import config from "../../../../../../config.json";
 import axios from "axios";
 import { MdOutlineMail } from "react-icons/md";
 

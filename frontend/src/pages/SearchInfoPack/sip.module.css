@@ -1,0 +1,61 @@
+.default ol, .default ul {
+  list-style-position: inside;
+}
+
+.default ol {
+  list-style-type: decimal;
+}
+
+.default ol ol {
+  list-style-type: decimal;
+  padding-left: 20px;
+}
+
+.default ul {
+  list-style-type: disc;
+}
+
+.default li ul {
+  list-style-type: circle;
+  padding-left: 20px;
+}
+
+.default blockquote {
+  margin: 1em 20px;
+  padding: 0 1em;
+  border-left: 4px solid #ccc;
+  font-style: italic;
+}
+
+.default th, td {
+  padding: 2px;
+  border: 1px solid #ccc;
+}
+
+.default .marker {
+  background-color: yellow;
+}
+
+.default h1 {
+  font-size: 2rem;
+}
+
+.default h2 {
+  font-size: 1.5rem;
+}
+
+.default h3 {
+  font-size: 1.25em;
+}
+
+.default h4 {
+  font-size: 1rem;
+}
+
+.default h5 {
+  font-size: 0.8em;
+}
+
+.default h6 {
+  font-size: 0.6rem;
+}
