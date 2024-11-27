@@ -1,4 +1,4 @@
-import { JobRequest, JobRequestStatus } from "../classes/JobRequest";
+import { JobRequest, JobRequestProps, JobRequestStatus } from "../classes/JobRequest";
 import CRM from "../crm";
 import ContactManager from "./ContactManager";
 import OptionValueManager from "./OptionValueManager";
@@ -28,12 +28,35 @@ const JobRequestManager = new class JobRequestManager {
 
         const combinedValues = [...baseValues, ...propsValues];
 
-        const result = await CRM("Activity", "create", {
+        const response = await CRM("Activity", "create", {
             values: combinedValues,
         }).catch(() => null);
 
-        if (result) return status
+        if (response) return status
         else return null;
+    }
+
+    async fetch(props: { contactId: number }) {
+        const response = await CRM("Activity", "get", {
+            select: [
+                'subject',
+                'details',
+                'Job_Request_Details.Category:label',
+                'status_id:name',
+                'activity_date_time',
+                
+                "contact.email_primary.email",
+            ],
+            join: [
+                ['Contact AS contact', 'LEFT', ['target_contact_id', '=', 'contact.id']],
+            ],
+            where: [
+                ['activity_type_id:name', '=', 'Job Request'],
+                ['contact.id', '=', props.contactId],
+            ],
+        }).catch(() => null);
+
+        return ((response?.data ?? []) as JobRequestProps[]).map(j => new JobRequest(j));
     }
 }
 
