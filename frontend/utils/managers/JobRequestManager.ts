@@ -10,7 +10,8 @@ const JobRequestManager = new class JobRequestManager {
 
         let status = JobRequestStatus.Approved;
 
-        const optionValue = await OptionValueManager.get("Job_Request_Details_Category", Number(props["Job_Request_Details.Category"]!));
+        const optionValue = await OptionValueManager.get("Job_Request_Details_Request_Type", Number(props["Job_Request_Details.Request_Type"]!));
+        let subject = optionValue.name;
         if (optionValue.name === "Others") {
             status = JobRequestStatus.ApprovalRequired;
         }
@@ -20,6 +21,7 @@ const JobRequestManager = new class JobRequestManager {
             ["target_contact_id", [patient.id]],
             ["source_contact_id", creator.id],
             ["status_id:name", status],
+            ["subject", subject],
         ];
 
         const propsValues: [string, any][] = Object.entries(props).map(
@@ -41,10 +43,10 @@ const JobRequestManager = new class JobRequestManager {
             select: [
                 'subject',
                 'details',
-                'Job_Request_Details.Category:label',
+                'Job_Request_Details.Request_Type:label',
                 'status_id:name',
                 'activity_date_time',
-                
+
                 "contact.email_primary.email",
             ],
             join: [

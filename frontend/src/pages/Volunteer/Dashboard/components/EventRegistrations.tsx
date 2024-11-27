@@ -376,7 +376,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                             </Status>
                         </Cell>
                         {/* Location */}
-                        <Cell className={cancelledByOrganisation ? "text-gray-400" : ""}>
+                        <Cell className={`whitespace-nowrap hidden lg:table-cell ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
                             {eventRole.event.location}
                         </Cell>
                         {/* Action */}

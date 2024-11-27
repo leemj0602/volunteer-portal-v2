@@ -9,7 +9,7 @@ import PageNavigation from "../../../../components/PageNavigation";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import Status from "../../../../components/Table/Status";
-import { AiOutlineStop } from "react-icons/ai";
+import { AiOutlineEdit, AiOutlineStop } from "react-icons/ai";
 
 interface JobRequestsProps {
     contact: Contact;
@@ -84,14 +84,11 @@ export default function JobRequests(props: JobRequestsProps) {
                     <Cell colSpan={5} className="text-center text-lg text-gray-500">No job request history available</Cell>
                     {/* Slices and shows only 5 entities per page */}
                 </tr> : currRequests.slice(page * limit, page + ((page + 1) * limit)).map((request, index) => {
-                    let subject = `${request["Job_Request_Details.Category:label"] ? `${request["Job_Request_Details.Category:label"]} - ` : ""} ${request.subject}`;
-                    if (subject.length > 37) subject = `${subject.slice(0, 37)}...`;
-
                     return <tr key={index}>
                         {/* Subject */}
                         <Cell>
-                            <button onClick={() => navigate("requests")}>
-                                {subject}
+                            <button className="text-secondary hover:text-primary cursor-pointer" onClick={() => navigate("requests")}>
+                                {request.subject?.slice(0, 37)}{request.subject?.length ?? 0 > 37 ? "..." : ""}
                             </button>
                         </Cell>
                         {/* Date & Time */}
@@ -106,9 +103,14 @@ export default function JobRequests(props: JobRequestsProps) {
                         </Cell>
                         {/* Action */}
                         <Cell>
-                            <button className="flex items-center" onClick={() => navigate("requests")}>
-                                <AiOutlineStop className="mr-2" /> Cancel
-                            </button>
+                            <div className="flex flex-row space-x-3">
+                                <button className="flex items-center" onClick={() => navigate("requests")}>
+                                    <AiOutlineEdit className="mr-2" /> Edit
+                                </button>
+                                <button className="flex items-center" onClick={() => navigate("requests")}>
+                                    <AiOutlineStop className="mr-2" /> Cancel
+                                </button>
+                            </div>
                         </Cell>
                     </tr>
                 })}

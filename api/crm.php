@@ -2,6 +2,8 @@
 require_once '../../wp-content/plugins/civicrm/civicrm/civicrm.config.php';
 require_once '../../wp-content/plugins/civicrm/civicrm/CRM/Core/Config.php';
 
+date_default_timezone_set('Asia/Singapore');
+
 $query = array();
 if (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
     $query = json_decode(file_get_contents("php://input"), true);

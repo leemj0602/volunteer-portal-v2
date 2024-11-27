@@ -16,9 +16,9 @@ export default function PatientRequests() {
     const email = (window as any).email;
     const [customFieldData, setCustomFieldData] = useState<Map<string, CustomField>>();
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({
-        subject: "",
         details: "",
         activity_date_time: null,
+        location: "",
     });
     const [isCreating, setIsCreating] = useState(false);
     const currentDate = new Date();
@@ -55,7 +55,7 @@ export default function PatientRequests() {
         const hour = time.getHours();
         const minute = time.getMinutes();
 
-        // Time should be between 9:00 AM and 5:00 PM
+        // Time should be between 9:00 AM and 9:00 PM
         const isWithinWorkingHours = (hour > 9 && hour < 21) || (hour === 9 && minute >= 0) || (hour === 21 && minute === 0);
 
         if (isWithinWorkingHours) {
@@ -109,7 +109,6 @@ export default function PatientRequests() {
 
             // Reset form values after successful submission
             const resetValues: { [key: string]: any } = {
-                subject: "",
                 details: "",
                 activity_date_time: null,
             };
@@ -128,7 +127,6 @@ export default function PatientRequests() {
 
             // Reset form values after successful submission
             const resetValues: { [key: string]: any } = {
-                subject: "",
                 details: "",
                 activity_date_time: null,
             };
@@ -155,30 +153,58 @@ export default function PatientRequests() {
                     <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
                         <div className="p-4">
                             <form onSubmit={createRequest} className="max-w-[1000px]">
-                                {/* Subject */}
-                                <TextField
-                                    className="flex justify-center"
-                                    label="Subject"
-                                    id="subject"
-                                    showInfo={true}
-                                    info="Short title summary of your request (Max. 10 words)."
-                                    value={formValues.subject}
-                                    handleChange={(e) => handleFieldChange("subject", e.target.value)}
-                                    wordLimit={10}
-                                    required={true}
-                                />
-                                {/* Details */}
-                                <TextareaField
-                                    className="flex justify-center mt-4"
-                                    label="Description"
-                                    id="details"
-                                    showInfo={true}
-                                    info="Description of your request (Max. 100 words)."
-                                    value={formValues.details}
-                                    handleChange={(e) => handleFieldChange("details", e.target.value)}
-                                    wordLimit={100}
-                                    required={true}
-                                />
+                                {/* Request Type */}
+                                {customFieldData.has("Job_Request_Details.Request_Type") && (() => {
+                                    const requestTypeField = customFieldData.get("Job_Request_Details.Request_Type");
+                                    switch (requestTypeField?.html_type) {
+                                        case "Text":
+                                            return (
+                                                <TextField
+                                                    key="Job_Request_Details.Request_Type"
+                                                    className="flex justify-center mt-4"
+                                                    label={requestTypeField?.label || "Request Type"}
+                                                    id="Job_Request_Details.Request_Type"
+                                                    value={formValues["Job_Request_Details.Request_Type"]}
+                                                    handleChange={(e) =>
+                                                        handleFieldChange("Job_Request_Details.Request_Type", e.target.value)
+                                                    }
+                                                    required={true}
+                                                />
+                                            );
+                                        case "Radio":
+                                        case "Select":
+                                            return (
+                                                <DropdownField
+                                                    key="Job_Request_Details.Request_Type"
+                                                    className="flex justify-center mt-4"
+                                                    label={requestTypeField?.label || "Request Type"}
+                                                    id="Job_Request_Details.Request_Type"
+                                                    fields={formValues}
+                                                    handleFields={(id, value) =>
+                                                        handleFieldChange(id, value)
+                                                    }
+                                                    options={requestTypeField?.options || []}
+                                                    required={true}
+                                                />
+                                            );
+                                        case "CheckBox":
+                                            return (
+                                                <CheckboxField
+                                                    key="Job_Request_Details.Request_Type"
+                                                    className="flex justify-center mt-4"
+                                                    label={requestTypeField?.label || "Request Type"}
+                                                    id="Job_Request_Details.Request_Type"
+                                                    fields={formValues}
+                                                    handleFields={(id, value) =>
+                                                        handleFieldChange(id, value)
+                                                    }
+                                                    options={requestTypeField?.options || []}
+                                                />
+                                            );
+                                        default:
+                                            return null;
+                                    }
+                                })()}
                                 {/* Date Time */}
                                 <DateTimePickerField
                                     className="flex justify-center mt-4"
@@ -194,9 +220,33 @@ export default function PatientRequests() {
                                     filterDate={filterWeekdays}
                                     filterTime={filterTimeRange}
                                 />
+                                {/* Location */}
+                                <TextField
+                                    className="flex justify-center mt-4"
+                                    label="Location"
+                                    id="location"
+                                    showInfo={true}
+                                    info="Location of your request."
+                                    value={formValues.location}
+                                    handleChange={(e) => handleFieldChange("location", e.target.value)}
+                                    required={true}
+                                />
+                                {/* Details */}
+                                <TextareaField
+                                    className="flex justify-center mt-4"
+                                    label="Description"
+                                    id="details"
+                                    showInfo={true}
+                                    info="Description of your request (Max. 100 words)."
+                                    value={formValues.details}
+                                    handleChange={(e) => handleFieldChange("details", e.target.value)}
+                                    wordLimit={100}
+                                    required={true}
+                                />
                                 {/* Custom Fields */}
                                 {customFieldData &&
                                     Array.from(customFieldData).map(([id, field]) => {
+                                        if (id === "Job_Request_Details.Request_Type") return null;
                                         switch (field.html_type) {
                                             case "Text":
                                                 return (
