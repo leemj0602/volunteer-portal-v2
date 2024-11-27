@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 import { JobRequestStatus } from "../../../utils/classes/JobRequest";
 import DateTimePickerField from "../../components/Fields/DateTimePickerField";
 
-export default function PatientRequests() {
+export default function PatientRequest() {
     const email = (window as any).email;
     const [customFieldData, setCustomFieldData] = useState<Map<string, CustomField>>();
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({

@@ -64,12 +64,12 @@ export default function Navbar(props: NavbarProps) {
                         <Item to="/donations/service-info-pack" name="Service Info Pack" />
                     </Category>}
                     {subtypes.includes('Caregiver') && <Category to="/caregiver" icon={FaHeartbeat} name="Caregiver">
-                        <Item location={props.location} to="/caregiver/requests" name="Request for Volunteer" />
+                        <Item location={props.location} to="/caregiver/request" name="Request for Volunteer" />
                         <Item location={props.location} to="/caregiver/trainings" name="Trainings" />
                         <Item location={props.location} to="/caregiver/service-info-pack" name="Service Info Packs" />
                     </Category>}
                     {subtypes.includes('Patient') && <Category to="/patient" icon={FaClinicMedical} name="Patient">
-                        <Item location={props.location} to="/patient/requests" name="Request for Volunteer" />
+                        <Item location={props.location} to="/patient/request" name="Request for Volunteer" />
                     </Category>}
                 </div>
                 <div>

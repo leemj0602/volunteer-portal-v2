@@ -14,10 +14,10 @@ import Donations from "./pages/Donations/Dashboard";
 import CheckIn from "./pages/Volunteer/CheckIn";
 import { SubtypesProvider } from "./contexts/Subtypes";
 import Caregiver from "./pages/Caregiver/Dashboard";
-import CaregiverRequests from "./pages/Caregiver/Requests";
+import CaregiverRequest from "./pages/Caregiver/Request";
 import CaregiverTrainings from "./pages/Caregiver/Trainings";
 import Patient from "./pages/Patient/Dashboard";
-import PatientRequests from "./pages/Patient/Requests";
+import PatientRequest from "./pages/Patient/Request";
 import DonationInfoPack from "./pages/Donations/ServiceInfoPack";
 import CaregiverInfoPack from "./pages/Caregiver/ServiceInfoPack";
 import VolunteerInfoPack from "./pages/Volunteer/ServiceInfoPack";
@@ -43,12 +43,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/checkin/:encrypted" element={<CheckIn />} />
 
 					<Route path="/caregiver" element={<Caregiver />} />
-					<Route path="/caregiver/requests" element={<CaregiverRequests />} />
+					<Route path="/caregiver/request" element={<CaregiverRequest />} />
 					<Route path="/caregiver/trainings" element={<CaregiverTrainings />} />
 					<Route path="/caregiver/service-info-pack" element={<CaregiverInfoPack />} />
 
 					<Route path="/patient" element={<Patient />} />
-					<Route path="/patient/requests" element={<PatientRequests />} />
+					<Route path="/patient/request" element={<PatientRequest />} />
 
 				</Routes>
 			</HashRouter>

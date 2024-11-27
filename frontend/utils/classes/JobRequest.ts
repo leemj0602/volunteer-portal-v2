@@ -1,7 +1,8 @@
 export enum JobRequestStatus {
-    Approved = "Completed",
+    Approved = "Approved",
     ApprovalRequired = "Approval Required",
-    Unapproved = "Not Approved"
+    Unapproved = "Not Approved",
+    Cancelled = "Cancelled",
 }
 
 export interface JobRequestProps {

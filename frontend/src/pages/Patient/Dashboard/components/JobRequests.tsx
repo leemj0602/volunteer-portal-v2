@@ -47,7 +47,7 @@ export default function JobRequests(props: JobRequestsProps) {
         const currRequests = props.requests.map(request => {
             request.status = "Logic Incorrect";
             switch (request["status_id:name"]) {
-                case "Completed": request.status = "Requested";
+                case "Approved": request.status = "Requested";
                     break;
                 case "Approval Required": request.status = "Pending";
                     break;
@@ -104,10 +104,10 @@ export default function JobRequests(props: JobRequestsProps) {
                         {/* Action */}
                         <Cell>
                             <div className="flex flex-row space-x-3">
-                                <button className="flex items-center" onClick={() => navigate("requests")}>
+                                <button className="flex items-center" onClick={() => navigate("request")}>
                                     <AiOutlineEdit className="mr-2" /> Edit
                                 </button>
-                                <button className="flex items-center" onClick={() => navigate("requests")}>
+                                <button className="flex items-center" onClick={() => navigate("request")}>
                                     <AiOutlineStop className="mr-2" /> Cancel
                                 </button>
                             </div>
