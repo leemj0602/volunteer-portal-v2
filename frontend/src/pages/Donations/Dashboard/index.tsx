@@ -6,10 +6,11 @@ import Loading from "../../../components/Loading";
 import Summarisation from "./components/Summarisation";
 import History from "./components/History";
 import numeral from "numeral";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import RecurringDonations from "./components/RecurringDonations";
 import ContactManager from "../../../../utils/managers/ContactManager";
 import { useSubtypesContext } from "../../../contexts/Subtypes";
+import config from "../../../../../config.json";
 
 export default function Donations() {
     const [donations, setDonations] = useState<Contribution[]>();
@@ -26,7 +27,7 @@ export default function Donations() {
             }
 
             const donations = await ContributionHandler.fetch(email, [
-                ["financial_type_id:label", "NOT IN", ["Campaign Contribution", "Event Fee", "Member Dues"]], 
+                ["financial_type_id:label", "NOT IN", ["Campaign Contribution", "Event Fee", "Member Dues"]],
                 ["contribution_status_id:name", "=", "Completed"]
             ]);
             setDonations(donations);
@@ -38,9 +39,17 @@ export default function Donations() {
             <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
                 <h1 className="text-lg font-semibold">My Donations</h1>
                 <div className="mt-4 bg-white rounded-md p-4 shadow-md">
-                    <div className="mb-4">
-                        <h2 className="text-2xl font-semibold mb-1">Total Contributions</h2>
-                        <p className="text-2xl text-secondary">S$ {numeral(donations.reduce((a, b) => a + b.data.total_amount!, 0)).format('0,0.00')}</p>
+                    <Link className="bg-secondary rounded-lg p-2 font-semibold text-white md:hidden mt-2" to={config.donate} target="_blank">
+                        Donate Now
+                    </Link>
+                    <div className="mb-4 mt-4 md:mt-0 flex justify-between items-center">
+                        <div>
+                            <h2 className="text-2xl font-semibold mb-1">Total Contributions</h2>
+                            <p className="text-2xl text-secondary">S$ {numeral(donations.reduce((a, b) => a + b.data.total_amount!, 0)).format('0,0.00')}</p>
+                        </div>
+                        <Link className="bg-secondary rounded-lg p-2 font-semibold text-white hidden md:block cursor-pointer" to={config.donate} target="_blank">
+                            Donate Now
+                        </Link>
                     </div>
                     <Summarisation donations={donations} />
                 </div>

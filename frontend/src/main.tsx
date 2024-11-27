@@ -20,6 +20,7 @@ import Patient from "./pages/Patient/Dashboard";
 import PatientRequests from "./pages/Patient/Requests";
 import DonationInfoPack from "./pages/Donations/ServiceInfoPack";
 import CaregiverInfoPack from "./pages/Caregiver/ServiceInfoPack";
+import VolunteerInfoPack from "./pages/Volunteer/ServiceInfoPack";
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -33,6 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/volunteer/events/:eventId/:roleId" element={<Event />} />
 					<Route path="/volunteer/trainings" element={<VolunteerTrainings />} />
 					<Route path="/volunteer/trainings/:id" element={<VolunteerTrainingPage />} />
+					<Route path="/volunteer/service-info-pack" element={<VolunteerInfoPack />} />
 
 					<Route path="/donations" element={<Donations />} />
 					<Route path="/donations/service-info-pack" element={<DonationInfoPack />} />
