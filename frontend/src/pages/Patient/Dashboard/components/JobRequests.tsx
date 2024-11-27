@@ -90,7 +90,7 @@ export default function JobRequests(props: JobRequestsProps) {
                     return <tr key={index}>
                         {/* Subject */}
                         <Cell>
-                            <button onClick={() => navigate("patient/requests")}>
+                            <button onClick={() => navigate("requests")}>
                                 {subject}
                             </button>
                         </Cell>
@@ -106,7 +106,7 @@ export default function JobRequests(props: JobRequestsProps) {
                         </Cell>
                         {/* Action */}
                         <Cell>
-                            <button className="flex items-center" onClick={() => navigate("patient/requests")}>
+                            <button className="flex items-center" onClick={() => navigate("requests")}>
                                 <AiOutlineStop className="mr-2" /> Cancel
                             </button>
                         </Cell>
