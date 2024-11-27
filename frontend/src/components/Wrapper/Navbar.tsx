@@ -58,17 +58,17 @@ export default function Navbar(props: NavbarProps) {
                     {subtypes.includes('Volunteer') && <Category to="/volunteer" icon={FaBriefcaseMedical} name="Volunteer">
                         <Item location={props.location} to="/volunteer/events" name="Events" />
                         <Item location={props.location} to="/volunteer/trainings" name="Trainings" />
+                        <Item to="/volunteer/service-info-pack" name="Service Info Pack" />
                     </Category>}
                     {subtypes.includes('Donator') && <Category to="/donations" icon={FaDonate} name="Donations">
                         <Item to="/donations/service-info-pack" name="Service Info Pack" />
                     </Category>}
                     {subtypes.includes('Caregiver') && <Category to="/caregiver" icon={FaHeartbeat} name="Caregiver">
-                        <Item location={props.location} to="/caregiver/service-info-pack" name="Service Info Packs" />
                         <Item location={props.location} to="/caregiver/requests" name="Request for Volunteer" />
                         <Item location={props.location} to="/caregiver/trainings" name="Trainings" />
+                        <Item location={props.location} to="/caregiver/service-info-pack" name="Service Info Packs" />
                     </Category>}
                     {subtypes.includes('Patient') && <Category to="/patient" icon={FaClinicMedical} name="Patient">
-                        <Item location={props.location} to="/patient/service-info-packs" name="Service Info Pack" />
                         <Item location={props.location} to="/patient/requests" name="Request for Volunteer" />
                     </Category>}
                 </div>
