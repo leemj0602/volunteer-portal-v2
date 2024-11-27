@@ -18,7 +18,6 @@ import CaregiverRequests from "./pages/Caregiver/Requests";
 import CaregiverTrainings from "./pages/Caregiver/Trainings";
 import Patient from "./pages/Patient/Dashboard";
 import PatientRequests from "./pages/Patient/Requests";
-import ServiceInfoPacks from "./pages/ServiceInfoPacks";
 import DonationInfoPack from "./pages/Donations/ServiceInfoPack";
 import CaregiverInfoPack from "./pages/Caregiver/ServiceInfoPack";
 
