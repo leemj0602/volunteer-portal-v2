@@ -44,41 +44,49 @@ export default function PatientRequests() {
     };
 
     // Filter function for weekdays
-    const filterWeekdays = (date: Date) => {
-        const day = date.getDay();
-        // Allow only weekdays (Monday - Friday)
-        return day !== 0 && day !== 6;
-    };
+    // const filterWeekdays = (date: Date) => {
+    //     const day = date.getDay();
+    //     // Allow only weekdays (Monday - Friday)
+    //     return day !== 0 && day !== 6;
+    // };
 
-    // Filter function for time between 9 AM and 5 PM and at least 1 hour ahead
+    // Filter function for time between 9 AM and 9 PM and at least 1 hour ahead
+    // const filterTimeRange = (time: Date) => {
+    //     const hour = time.getHours();
+    //     const minute = time.getMinutes();
+
+    //     // Time should be between 9:00 AM and 9:00 PM
+    //     const isWithinWorkingHours = (hour > 9 && hour < 21) || (hour === 9 && minute >= 0) || (hour === 21 && minute === 0);
+
+    //     if (isWithinWorkingHours) {
+    //         const now = new Date();
+    //         const selectedDay = formValues.activity_date_time
+    //             ? new Date(formValues.activity_date_time).toDateString()
+    //             : "";
+
+    //         const currentHour = now.getHours();
+    //         const currentMinute = now.getMinutes();
+    //         const isToday = selectedDay === now.toDateString();
+
+    //         // Ensure at least 1 hour ahead for today
+    //         if (isToday) {
+    //             if (hour > currentHour + 1) return true;
+    //             if (hour === currentHour + 1 && minute >= currentMinute) return true;
+    //             return false;
+    //         }
+
+    //         return true;
+    //     }
+
+    //     return false;
+    // };
+
     const filterTimeRange = (time: Date) => {
-        const hour = time.getHours();
-        const minute = time.getMinutes();
+        const now = new Date();
+        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
 
-        // Time should be between 9:00 AM and 9:00 PM
-        const isWithinWorkingHours = (hour > 9 && hour < 21) || (hour === 9 && minute >= 0) || (hour === 21 && minute === 0);
-
-        if (isWithinWorkingHours) {
-            const now = new Date();
-            const selectedDay = formValues.activity_date_time
-                ? new Date(formValues.activity_date_time).toDateString()
-                : "";
-
-            const currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            const isToday = selectedDay === now.toDateString();
-
-            // Ensure at least 1 hour ahead for today
-            if (isToday) {
-                if (hour > currentHour + 1) return true;
-                if (hour === currentHour + 1 && minute >= currentMinute) return true;
-                return false;
-            }
-
-            return true;
-        }
-
-        return false;
+        // Ensure the selected time is at least 1 hour from now
+        return time > oneHourFromNow;
     };
 
     const createRequest = async function (e: FormEvent<HTMLFormElement>) {
@@ -87,11 +95,12 @@ export default function PatientRequests() {
         // Check if `activity_date_time` is valid
         const selectedDate = formValues.activity_date_time;
         const now = new Date();
+        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
 
-        if (!selectedDate || new Date(selectedDate) <= now || !filterWeekdays(new Date(selectedDate))) {
+        if (!selectedDate || new Date(selectedDate) <= oneHourFromNow /*|| !filterWeekdays(new Date(selectedDate))*/) {
             Swal.fire({
-                title: "Invalid Date and Time",
-                text: "Please select a valid weekday and time within working hours (9:00 AM - 9:00 PM) and at least 1 hour ahead.",
+                title: "Invalid Date & Time",
+                text: "Please select a date & time that is at least 1 hour ahead.",
                 icon: "error"
             });
             return; // Prevent form submission
@@ -211,13 +220,13 @@ export default function PatientRequests() {
                                     label="Request Date & Time"
                                     id="activity_date_time"
                                     showInfo={true}
-                                    info="Please select a valid weekday and time within working hours (9:00 AM - 9:00 PM) and at least 1 hour ahead."
+                                    info="Please select a date & time that is at least 1 hour ahead."
                                     value={formValues.activity_date_time ? new Date(formValues.activity_date_time) : null}
                                     handleChange={(date) => handleFieldChange("activity_date_time", date)}
                                     required={true}
                                     showTimeSelect={true}
                                     minDate={currentDate}
-                                    filterDate={filterWeekdays}
+                                    // filterDate={filterWeekdays}
                                     filterTime={filterTimeRange}
                                 />
                                 {/* Location */}
