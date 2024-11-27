@@ -1,3 +1,4 @@
 {
-    "domain": "http://localhost/wordpress"
+    "domain": "http://localhost/wordpress",
+    "donate": "https://demo.socialservicesconnect.com/donation-page"
 }
