@@ -55,21 +55,22 @@ export default function Navbar(props: NavbarProps) {
             {/* Navigation */}
             <div className="mt-6 flex flex-col justify-between h-full">
                 <div className="mb-2">
-                    {subtypes.includes('Volunteer') && <Category to="/volunteer" icon={FaBriefcaseMedical} name="Volunteer">
+                    {subtypes.includes('Volunteer') && <Category location={props.location} to="/volunteer" icon={FaBriefcaseMedical} name="Volunteer">
                         <Item location={props.location} to="/volunteer/events" name="Events" />
                         <Item location={props.location} to="/volunteer/trainings" name="Trainings" />
-                        <Item to="/volunteer/service-info-pack" name="Service Info Pack" />
+                        <Item to="/volunteer/volunteer-info-pack" name="Volunteer Info Pack" />
                     </Category>}
-                    {subtypes.includes('Donator') && <Category to="/donations" icon={FaDonate} name="Donations">
-                        <Item to="/donations/service-info-pack" name="Service Info Pack" />
+                    {subtypes.includes('Donator') && <Category location={props.location} to="/donations" icon={FaDonate} name="Donations">
+                        <Item to="/donations/donor-info-pack" name="Donor Info Pack" />
                     </Category>}
-                    {subtypes.includes('Caregiver') && <Category to="/caregiver" icon={FaHeartbeat} name="Caregiver">
+                    {subtypes.includes('Caregiver') && <Category location={props.location} to="/caregiver" icon={FaHeartbeat} name="Caregiver">
                         <Item location={props.location} to="/caregiver/request" name="Request for Volunteer" />
                         <Item location={props.location} to="/caregiver/trainings" name="Trainings" />
-                        <Item location={props.location} to="/caregiver/service-info-pack" name="Service Info Packs" />
+                        <Item location={props.location} to="/caregiver/service-info-pack" name="Service Info Pack" />
                     </Category>}
-                    {subtypes.includes('Patient') && <Category to="/patient" icon={FaClinicMedical} name="Patient">
+                    {subtypes.includes('Patient') && <Category location={props.location} to="/patient" icon={FaClinicMedical} name="Patient">
                         <Item location={props.location} to="/patient/request" name="Request for Volunteer" />
+                        <Item location={props.location} to="/patient/service-info-pack" name="Service Info Pack" />
                     </Category>}
                 </div>
                 <div>
@@ -95,7 +96,7 @@ export default function Navbar(props: NavbarProps) {
                 <button className={`text ${menuOpen ? "text-secondary" : "text-primary"} hover:text-secondary`} onClick={() => setMenuOpen(!menuOpen)}>
                     <GiHamburgerMenu size={24} />
                 </button>
-            </div>
+            </div>      
             {menuOpen && <>
                 <hr />
                 <div className="flex flex-col pt-2 max-h-[200px] overflow-y-scroll">

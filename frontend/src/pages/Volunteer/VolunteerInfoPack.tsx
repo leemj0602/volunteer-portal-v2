@@ -3,7 +3,7 @@ import config from "../../../../config.json";
 import { useState } from "react";
 import Loading from "../../components/Loading";
 
-export default function DonationInfoPack() {
+export default function VolunteerInfoPack() {
   const [loading, setLoading] = useState(true);
   const handleFrameLoad = () => {
     setLoading(false);
@@ -11,6 +11,6 @@ export default function DonationInfoPack() {
   
   return <Wrapper>
     {loading && <Loading className="h-screen items-center" />}
-    <iframe onLoad={handleFrameLoad} className="h-screen w-full" src={`${config.domain}/index.php/donation-service-info-pack/`} />
+    <iframe onLoad={handleFrameLoad} className="h-screen w-full" src={`${config.domain}/index.php/volunteer-info-pack/`} />
   </Wrapper>
 }
