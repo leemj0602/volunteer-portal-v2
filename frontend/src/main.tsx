@@ -18,9 +18,9 @@ import CaregiverRequests from "./pages/Caregiver/Requests";
 import CaregiverTrainings from "./pages/Caregiver/Trainings";
 import Patient from "./pages/Patient/Dashboard";
 import PatientRequests from "./pages/Patient/Requests";
-import DonationInfoPack from "./pages/Donations/ServiceInfoPack";
-import CaregiverInfoPack from "./pages/Caregiver/ServiceInfoPack";
-import VolunteerInfoPack from "./pages/Volunteer/ServiceInfoPack";
+import DonorInfoPack from "./pages/Donations/DonorInfoPack";
+import ServiceInfoPack from "./pages/ServiceInfoPack";
+import VolunteerInfoPack from "./pages/Volunteer/VolunteerInfoPack";
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -34,10 +34,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/volunteer/events/:eventId/:roleId" element={<Event />} />
 					<Route path="/volunteer/trainings" element={<VolunteerTrainings />} />
 					<Route path="/volunteer/trainings/:id" element={<VolunteerTrainingPage />} />
-					<Route path="/volunteer/service-info-pack" element={<VolunteerInfoPack />} />
+					<Route path="/volunteer/volunteer-info-pack" element={<VolunteerInfoPack />} />
 
 					<Route path="/donations" element={<Donations />} />
-					<Route path="/donations/service-info-pack" element={<DonationInfoPack />} />
+					<Route path="/donations/donor-info-pack" element={<DonorInfoPack />} />
 
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/checkin/:encrypted" element={<CheckIn />} />
@@ -45,11 +45,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/caregiver" element={<Caregiver />} />
 					<Route path="/caregiver/requests" element={<CaregiverRequests />} />
 					<Route path="/caregiver/trainings" element={<CaregiverTrainings />} />
-					<Route path="/caregiver/service-info-pack" element={<CaregiverInfoPack />} />
+					<Route path="/caregiver/service-info-pack" element={<ServiceInfoPack />} />
+
 
 					<Route path="/patient" element={<Patient />} />
 					<Route path="/patient/requests" element={<PatientRequests />} />
-
+					<Route path="/patient/service-info-pack" element={<ServiceInfoPack />} />
 				</Routes>
 			</HashRouter>
 		</SubtypesProvider>
