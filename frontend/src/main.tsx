@@ -20,7 +20,7 @@ import Patient from "./pages/Patient/Dashboard";
 import PatientRequests from "./pages/Patient/Requests";
 import ServiceInfoPacks from "./pages/ServiceInfoPacks";
 import SIP from "./pages/SearchInfoPack";
-import DonationInfoPack from "./pages/Caregiver/ServiceInfoPack";
+import DonationInfoPack from "./pages/Donations/ServiceInfoPack";
 import CaregiverInfoPack from "./pages/Caregiver/ServiceInfoPack";
 
 
