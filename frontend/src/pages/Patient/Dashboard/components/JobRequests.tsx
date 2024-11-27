@@ -74,9 +74,10 @@ export default function JobRequests(props: JobRequestsProps) {
     return <div>
         <Table header="Job Requests">
             <Header>
-                <Cell className="text-lg font-semibold w-1/4">Subject</Cell>
+                <Cell className="text-lg font-semibold w-1/4">Request Type</Cell>
                 <Cell className="text-lg font-semibold w-1/4">Date & Time</Cell>
                 <Cell className="text-lg font-semibold w-1/6">Status</Cell>
+                <Cell className="text-lg font-semibold w-1/4  hidden lg:table-cell">Location</Cell>
                 <Cell className="text-lg font-semibold w-1/6">Action</Cell>
             </Header>
             <Body>
@@ -87,8 +88,8 @@ export default function JobRequests(props: JobRequestsProps) {
                     return <tr key={index}>
                         {/* Subject */}
                         <Cell>
-                            <button className="text-secondary hover:text-primary cursor-pointer" onClick={() => navigate("requests")}>
-                                {request.subject?.slice(0, 37)}{request.subject?.length ?? 0 > 37 ? "..." : ""}
+                            <button className="text-secondary hover:text-primary cursor-pointer" onClick={() => navigate("request")}>
+                                {request["Job_Request_Details.Request_Type:label"]}{request["Job_Request_Details.Request_Type:label"]!.length > 37 ? "..." : ""}
                             </button>
                         </Cell>
                         {/* Date & Time */}
@@ -100,6 +101,10 @@ export default function JobRequests(props: JobRequestsProps) {
                             <Status className={statusColor[request.status]}>
                                 {request.status}
                             </Status>
+                        </Cell>
+                        {/* Location */}
+                        <Cell className="whitespace-nowrap hidden lg:table-cell">
+                            {request.location?.slice(0, 37)}{request.location?.length ?? 0 > 37 ? "..." : ""}
                         </Cell>
                         {/* Action */}
                         <Cell>

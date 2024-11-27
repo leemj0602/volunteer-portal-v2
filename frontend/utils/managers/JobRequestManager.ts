@@ -46,6 +46,7 @@ const JobRequestManager = new class JobRequestManager {
                 'Job_Request_Details.Request_Type:label',
                 'status_id:name',
                 'activity_date_time',
+                'location',
 
                 "contact.email_primary.email",
             ],
