@@ -19,7 +19,6 @@ import CaregiverTrainings from "./pages/Caregiver/Trainings";
 import Patient from "./pages/Patient/Dashboard";
 import PatientRequests from "./pages/Patient/Requests";
 import ServiceInfoPacks from "./pages/ServiceInfoPacks";
-import SIP from "./pages/SearchInfoPack";
 import DonationInfoPack from "./pages/Donations/ServiceInfoPack";
 import CaregiverInfoPack from "./pages/Caregiver/ServiceInfoPack";
 
@@ -48,8 +47,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/caregiver/service-info-pack" element={<CaregiverInfoPack />} />
 
 					<Route path="/patient" element={<Patient />} />
-					<Route path="/patient/service-info-packs" element={<ServiceInfoPacks />} />
-					<Route path="/patient/service-info-packs/:id" element={<SIP />} />
 					<Route path="/patient/requests" element={<PatientRequests />} />
 
 				</Routes>
