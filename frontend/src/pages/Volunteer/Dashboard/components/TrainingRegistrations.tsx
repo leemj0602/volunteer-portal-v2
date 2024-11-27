@@ -134,7 +134,7 @@ export default function TrainingRegistrations(props: TrainingRegistrationsProps)
                         {/* Subject */}
                         <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
                             <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/trainings/${trainingSchedule.training.id}`)}>
-                                {trainingSchedule.training.subject?.slice(0, 37)}{trainingSchedule.training.subject?.length ?? 0 > 37 ? "..." : ""}
+                                {trainingSchedule.training.subject}{trainingSchedule.training.subject!.length > 37 ? "..." : ""}
                             </button>
                         </Cell>
                         {/* Date and Time */}

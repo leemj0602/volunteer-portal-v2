@@ -9,7 +9,7 @@ import PageNavigation from "../../../../components/PageNavigation";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import Status from "../../../../components/Table/Status";
-import { AiOutlineStop } from "react-icons/ai";
+import { AiOutlineEdit, AiOutlineStop } from "react-icons/ai";
 
 interface JobRequestsProps {
     contact: Contact;
@@ -47,7 +47,7 @@ export default function JobRequests(props: JobRequestsProps) {
         const currRequests = props.requests.map(request => {
             request.status = "Logic Incorrect";
             switch (request["status_id:name"]) {
-                case "Completed": request.status = "Requested";
+                case "Approved": request.status = "Requested";
                     break;
                 case "Approval Required": request.status = "Pending";
                     break;
@@ -74,9 +74,10 @@ export default function JobRequests(props: JobRequestsProps) {
     return <div>
         <Table header="Job Requests">
             <Header>
-                <Cell className="text-lg font-semibold w-1/4">Subject</Cell>
+                <Cell className="text-lg font-semibold w-1/4">Request Type</Cell>
                 <Cell className="text-lg font-semibold w-1/4">Date & Time</Cell>
                 <Cell className="text-lg font-semibold w-1/6">Status</Cell>
+                <Cell className="text-lg font-semibold w-1/4  hidden lg:table-cell">Location</Cell>
                 <Cell className="text-lg font-semibold w-1/6">Action</Cell>
             </Header>
             <Body>
@@ -84,14 +85,11 @@ export default function JobRequests(props: JobRequestsProps) {
                     <Cell colSpan={5} className="text-center text-lg text-gray-500">No job request history available</Cell>
                     {/* Slices and shows only 5 entities per page */}
                 </tr> : currRequests.slice(page * limit, page + ((page + 1) * limit)).map((request, index) => {
-                    let subject = `${request["Job_Request_Details.Category:label"] ? `${request["Job_Request_Details.Category:label"]} - ` : ""} ${request.subject}`;
-                    if (subject.length > 37) subject = `${subject.slice(0, 37)}...`;
-
                     return <tr key={index}>
                         {/* Subject */}
                         <Cell>
-                            <button onClick={() => navigate("requests")}>
-                                {subject}
+                            <button className="text-secondary hover:text-primary cursor-pointer" onClick={() => navigate("request")}>
+                                {request["Job_Request_Details.Request_Type:label"]}{request["Job_Request_Details.Request_Type:label"]!.length > 37 ? "..." : ""}
                             </button>
                         </Cell>
                         {/* Date & Time */}
@@ -104,11 +102,20 @@ export default function JobRequests(props: JobRequestsProps) {
                                 {request.status}
                             </Status>
                         </Cell>
+                        {/* Location */}
+                        <Cell className="whitespace-nowrap hidden lg:table-cell">
+                            {request.location?.slice(0, 37)}{request.location?.length ?? 0 > 37 ? "..." : ""}
+                        </Cell>
                         {/* Action */}
                         <Cell>
-                            <button className="flex items-center" onClick={() => navigate("requests")}>
-                                <AiOutlineStop className="mr-2" /> Cancel
-                            </button>
+                            <div className="flex flex-row space-x-3">
+                                <button className="flex items-center" onClick={() => navigate("request")}>
+                                    <AiOutlineEdit className="mr-2" /> Edit
+                                </button>
+                                <button className="flex items-center" onClick={() => navigate("request")}>
+                                    <AiOutlineStop className="mr-2" /> Cancel
+                                </button>
+                            </div>
                         </Cell>
                     </tr>
                 })}

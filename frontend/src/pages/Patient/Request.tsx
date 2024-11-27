@@ -12,13 +12,13 @@ import Swal from "sweetalert2";
 import { JobRequestStatus } from "../../../utils/classes/JobRequest";
 import DateTimePickerField from "../../components/Fields/DateTimePickerField";
 
-export default function PatientRequests() {
+export default function PatientRequest() {
     const email = (window as any).email;
     const [customFieldData, setCustomFieldData] = useState<Map<string, CustomField>>();
     const [formValues, setFormValues] = useState<{ [key: string]: any }>({
-        subject: "",
         details: "",
         activity_date_time: null,
+        location: "",
     });
     const [isCreating, setIsCreating] = useState(false);
     const currentDate = new Date();
@@ -44,41 +44,49 @@ export default function PatientRequests() {
     };
 
     // Filter function for weekdays
-    const filterWeekdays = (date: Date) => {
-        const day = date.getDay();
-        // Allow only weekdays (Monday - Friday)
-        return day !== 0 && day !== 6;
-    };
+    // const filterWeekdays = (date: Date) => {
+    //     const day = date.getDay();
+    //     // Allow only weekdays (Monday - Friday)
+    //     return day !== 0 && day !== 6;
+    // };
 
-    // Filter function for time between 9 AM and 5 PM and at least 1 hour ahead
+    // Filter function for time between 9 AM and 9 PM and at least 1 hour ahead
+    // const filterTimeRange = (time: Date) => {
+    //     const hour = time.getHours();
+    //     const minute = time.getMinutes();
+
+    //     // Time should be between 9:00 AM and 9:00 PM
+    //     const isWithinWorkingHours = (hour > 9 && hour < 21) || (hour === 9 && minute >= 0) || (hour === 21 && minute === 0);
+
+    //     if (isWithinWorkingHours) {
+    //         const now = new Date();
+    //         const selectedDay = formValues.activity_date_time
+    //             ? new Date(formValues.activity_date_time).toDateString()
+    //             : "";
+
+    //         const currentHour = now.getHours();
+    //         const currentMinute = now.getMinutes();
+    //         const isToday = selectedDay === now.toDateString();
+
+    //         // Ensure at least 1 hour ahead for today
+    //         if (isToday) {
+    //             if (hour > currentHour + 1) return true;
+    //             if (hour === currentHour + 1 && minute >= currentMinute) return true;
+    //             return false;
+    //         }
+
+    //         return true;
+    //     }
+
+    //     return false;
+    // };
+
     const filterTimeRange = (time: Date) => {
-        const hour = time.getHours();
-        const minute = time.getMinutes();
+        const now = new Date();
+        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
 
-        // Time should be between 9:00 AM and 5:00 PM
-        const isWithinWorkingHours = (hour > 9 && hour < 21) || (hour === 9 && minute >= 0) || (hour === 21 && minute === 0);
-
-        if (isWithinWorkingHours) {
-            const now = new Date();
-            const selectedDay = formValues.activity_date_time
-                ? new Date(formValues.activity_date_time).toDateString()
-                : "";
-
-            const currentHour = now.getHours();
-            const currentMinute = now.getMinutes();
-            const isToday = selectedDay === now.toDateString();
-
-            // Ensure at least 1 hour ahead for today
-            if (isToday) {
-                if (hour > currentHour + 1) return true;
-                if (hour === currentHour + 1 && minute >= currentMinute) return true;
-                return false;
-            }
-
-            return true;
-        }
-
-        return false;
+        // Ensure the selected time is at least 1 hour from now
+        return time > oneHourFromNow;
     };
 
     const createRequest = async function (e: FormEvent<HTMLFormElement>) {
@@ -87,11 +95,12 @@ export default function PatientRequests() {
         // Check if `activity_date_time` is valid
         const selectedDate = formValues.activity_date_time;
         const now = new Date();
+        const oneHourFromNow = new Date(now.getTime() + 60 * 60 * 1000);
 
-        if (!selectedDate || new Date(selectedDate) <= now || !filterWeekdays(new Date(selectedDate))) {
+        if (!selectedDate || new Date(selectedDate) <= oneHourFromNow /*|| !filterWeekdays(new Date(selectedDate))*/) {
             Swal.fire({
-                title: "Invalid Date and Time",
-                text: "Please select a valid weekday and time within working hours (9:00 AM - 9:00 PM) and at least 1 hour ahead.",
+                title: "Invalid Date & Time",
+                text: "Please select a date & time that is at least 1 hour ahead.",
                 icon: "error"
             });
             return; // Prevent form submission
@@ -109,7 +118,6 @@ export default function PatientRequests() {
 
             // Reset form values after successful submission
             const resetValues: { [key: string]: any } = {
-                subject: "",
                 details: "",
                 activity_date_time: null,
             };
@@ -128,7 +136,6 @@ export default function PatientRequests() {
 
             // Reset form values after successful submission
             const resetValues: { [key: string]: any } = {
-                subject: "",
                 details: "",
                 activity_date_time: null,
             };
@@ -155,16 +162,82 @@ export default function PatientRequests() {
                     <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
                         <div className="p-4">
                             <form onSubmit={createRequest} className="max-w-[1000px]">
-                                {/* Subject */}
-                                <TextField
-                                    className="flex justify-center"
-                                    label="Subject"
-                                    id="subject"
+                                {/* Request Type */}
+                                {customFieldData.has("Job_Request_Details.Request_Type") && (() => {
+                                    const requestTypeField = customFieldData.get("Job_Request_Details.Request_Type");
+                                    switch (requestTypeField?.html_type) {
+                                        case "Text":
+                                            return (
+                                                <TextField
+                                                    key="Job_Request_Details.Request_Type"
+                                                    className="flex justify-center mt-4"
+                                                    label={requestTypeField?.label || "Request Type"}
+                                                    id="Job_Request_Details.Request_Type"
+                                                    value={formValues["Job_Request_Details.Request_Type"]}
+                                                    handleChange={(e) =>
+                                                        handleFieldChange("Job_Request_Details.Request_Type", e.target.value)
+                                                    }
+                                                    required={true}
+                                                />
+                                            );
+                                        case "Radio":
+                                        case "Select":
+                                            return (
+                                                <DropdownField
+                                                    key="Job_Request_Details.Request_Type"
+                                                    className="flex justify-center mt-4"
+                                                    label={requestTypeField?.label || "Request Type"}
+                                                    id="Job_Request_Details.Request_Type"
+                                                    fields={formValues}
+                                                    handleFields={(id, value) =>
+                                                        handleFieldChange(id, value)
+                                                    }
+                                                    options={requestTypeField?.options || []}
+                                                    required={true}
+                                                />
+                                            );
+                                        case "CheckBox":
+                                            return (
+                                                <CheckboxField
+                                                    key="Job_Request_Details.Request_Type"
+                                                    className="flex justify-center mt-4"
+                                                    label={requestTypeField?.label || "Request Type"}
+                                                    id="Job_Request_Details.Request_Type"
+                                                    fields={formValues}
+                                                    handleFields={(id, value) =>
+                                                        handleFieldChange(id, value)
+                                                    }
+                                                    options={requestTypeField?.options || []}
+                                                />
+                                            );
+                                        default:
+                                            return null;
+                                    }
+                                })()}
+                                {/* Date Time */}
+                                <DateTimePickerField
+                                    className="flex justify-center mt-4"
+                                    label="Request Date & Time"
+                                    id="activity_date_time"
                                     showInfo={true}
-                                    info="Short title summary of your request (Max. 10 words)."
-                                    value={formValues.subject}
-                                    handleChange={(e) => handleFieldChange("subject", e.target.value)}
-                                    wordLimit={10}
+                                    info="Please select a date & time that is at least 1 hour ahead."
+                                    value={formValues.activity_date_time ? new Date(formValues.activity_date_time) : null}
+                                    handleChange={(date) => handleFieldChange("activity_date_time", date)}
+                                    required={true}
+                                    showTimeSelect={true}
+                                    minDate={currentDate}
+                                    // filterDate={filterWeekdays}
+                                    filterTime={filterTimeRange}
+                                />
+                                {/* Location */}
+                                <TextField
+                                    className="flex justify-center mt-4"
+                                    label="Location"
+                                    id="location"
+                                    showInfo={true}
+                                    info="Location of your request."
+                                    value={formValues.location}
+                                    handleChange={(e) => handleFieldChange("location", e.target.value)}
                                     required={true}
                                 />
                                 {/* Details */}
@@ -179,24 +252,10 @@ export default function PatientRequests() {
                                     wordLimit={100}
                                     required={true}
                                 />
-                                {/* Date Time */}
-                                <DateTimePickerField
-                                    className="flex justify-center mt-4"
-                                    label="Request Date & Time"
-                                    id="activity_date_time"
-                                    showInfo={true}
-                                    info="Please select a valid weekday and time within working hours (9:00 AM - 9:00 PM) and at least 1 hour ahead."
-                                    value={formValues.activity_date_time ? new Date(formValues.activity_date_time) : null}
-                                    handleChange={(date) => handleFieldChange("activity_date_time", date)}
-                                    required={true}
-                                    showTimeSelect={true}
-                                    minDate={currentDate}
-                                    filterDate={filterWeekdays}
-                                    filterTime={filterTimeRange}
-                                />
                                 {/* Custom Fields */}
                                 {customFieldData &&
                                     Array.from(customFieldData).map(([id, field]) => {
+                                        if (id === "Job_Request_Details.Request_Type") return null;
                                         switch (field.html_type) {
                                             case "Text":
                                                 return (
