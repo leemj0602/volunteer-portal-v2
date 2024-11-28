@@ -1,6 +1,7 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { CustomFieldOptions } from "../../../utils/managers/CustomFieldSetManager";
+import { MdInfoOutline } from "react-icons/md";
 
 interface DropdownFieldProps {
     id: string;
@@ -13,11 +14,14 @@ interface DropdownFieldProps {
     options: CustomFieldOptions[];
     label: string;
     required?: boolean;
+    info?: string;
+    showInfo?: boolean;
 }
 
 export default function DropdownField(props: DropdownFieldProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [selectedOption, setSelectedOption] = useState<CustomFieldOptions | null>(null);
+    const [isHovering, setIsHovering] = useState(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
 
     const toggleDropdown = () => setIsMenuOpen(!isMenuOpen);
@@ -44,15 +48,35 @@ export default function DropdownField(props: DropdownFieldProps) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, [dropdownRef]);
 
+    const handleHovering = () => setIsHovering(!isHovering);
 
     return <div className={props.className}>
         <div className="w-full md:w-[300px]">
             {/* Label */}
-            <label htmlFor={props.id} className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}>
-                {props.label}
-                {props.required && <span className="text-red-500 ml-1">*</span>}
-            </label>
-            <div className="relative mt-1" ref={dropdownRef}>
+            <div className="flex flex-row justify-between items-center mb-1">
+                <label htmlFor={props.id} className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}>
+                    {props.label}
+                    {props.required && <span className="text-red-500 ml-1">*</span>}
+                </label>
+                {props.showInfo && props.info?.length !== 0 && (
+                    <div
+                        className="relative"
+                        onMouseEnter={handleHovering}
+                        onMouseLeave={handleHovering}
+                    >
+                        <MdInfoOutline className="text-secondary cursor-pointer" />
+                        {/* Information block */}
+                        {isHovering && (
+                            <div className="absolute w-[240px] top-5 right-0 bg-white p-1 rounded-lg shadow-md text-center text-[12px] z-[1]">
+                                <p className="text-secondary font-semibold text-[12px]">
+                                    {props.info}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+            <div className="relative" ref={dropdownRef}>
                 {/* Input */}
                 <div className="relative flex items-center">
                     <input type="text" id={props.id} placeholder={props.disabled ? props.options.find(o => o.value == props.fields[props.id])?.label ?? "None provided" : props.placeholder ?? "Please select an option"} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:cursor-not-allowed`} onClick={toggleDropdown} value={selectedOption?.label || ""} disabled={props.disabled} required={props.required} />

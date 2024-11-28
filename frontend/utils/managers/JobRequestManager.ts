@@ -43,6 +43,7 @@ const JobRequestManager = new class JobRequestManager {
             select: [
                 'subject',
                 'details',
+                'Job_Request_Details.Request_Type',
                 'Job_Request_Details.Request_Type:label',
                 'status_id:name',
                 'activity_date_time',
@@ -60,6 +61,37 @@ const JobRequestManager = new class JobRequestManager {
         }).catch(() => null);
 
         return ((response?.data ?? []) as JobRequestProps[]).map(j => new JobRequest(j));
+    }
+
+    async update(jobRequestId: number, props: Partial<JobRequest>) {
+        console.log(props);
+        let status = JobRequestStatus.Approved;
+
+        const optionValue = await OptionValueManager.get("Job_Request_Details_Request_Type", Number(props["Job_Request_Details.Request_Type"]!));
+        let subject = optionValue.name;
+        if (optionValue.name === "Others") {
+            status = JobRequestStatus.ApprovalRequired;
+        }
+
+        const baseValues: [string, any][] = [
+            ["status_id:name", status],
+            ["subject", subject],
+        ];
+
+        const propsValues: [string, any][] = Object.entries(props)
+            .map(([key, value]) => [key, value] as [string, any]);
+
+        const combinedValues = [...baseValues, ...propsValues];
+
+        const response = await CRM("Activity", "update", {
+            values: combinedValues,
+            where: [
+                ["id", "=", jobRequestId],
+            ]
+        }).catch(() => null);
+
+        if (response) return status
+        else return null;
     }
 }
 

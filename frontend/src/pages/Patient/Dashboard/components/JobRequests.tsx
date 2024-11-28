@@ -1,6 +1,6 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react";
 import { Contact } from "../../../../../utils/classes/Contact";
-import { JobRequest } from "../../../../../utils/classes/JobRequest";
+import { JobRequest, JobRequestStatus } from "../../../../../utils/classes/JobRequest";
 import Table from "../../../../components/Table";
 import Body from "../../../../components/Table/Body";
 import Cell from "../../../../components/Table/Cell";
@@ -10,6 +10,19 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import Status from "../../../../components/Table/Status";
 import { AiOutlineEdit, AiOutlineStop } from "react-icons/ai";
+import CustomFieldSetManager, { CustomField } from "../../../../../utils/managers/CustomFieldSetManager";
+import Modal from "../../../../components/Modal";
+import TextField from "../../../../components/Fields/TextField";
+import TextareaField from "../../../../components/Fields/TextareaField";
+import DropdownField from "../../../../components/Fields/DropdownField";
+import CheckboxField from "../../../../components/Fields/CheckboxField";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
+import { MdCreate } from "react-icons/md";
+import JobRequestManager from "../../../../../utils/managers/JobRequestManager";
+import React from "react";
+
+const MySwal = withReactContent(Swal);
 
 interface JobRequestsProps {
     contact: Contact;
@@ -19,16 +32,24 @@ interface JobRequestsProps {
 
 const limit = 5;
 
-const order = ["Requested", "Pending", "Unapproved"];
+const order = ["Accepted", "Requested", "Pending", "Unapproved", "Cancelled", "Completed"];
 
 const statusColor: { [key: string]: string } = {
+    "Volunteer Accepted": "bg-[#57D5FF]",
     "Requested": "bg-[#FFB656]",
     "Pending": "bg-[#F0D202]",
     "Unapproved": "bg-[#efb7c0]",
+    "Cancelled": "bg-[#f26a6a]",
+    "Completed": "bg-[#7bcf72]"
 }
 
 export default function JobRequests(props: JobRequestsProps) {
     const [currRequests, setCurrRequests] = useState<JobRequest[]>();
+    const [formValues, setFormValues] = useState<{ [key: string]: any }>({});
+    const [customFieldData, setCustomFieldData] = useState<Map<string, CustomField>>();
+    const [isModalOpen, setModalOpen] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [currentRequest, setCurrentRequest] = useState<JobRequest | null>(null);
 
     const navigate = useNavigate();
     const [page, setPage] = useState(0);
@@ -71,6 +92,220 @@ export default function JobRequests(props: JobRequestsProps) {
         setCurrRequests(currRequests);
     }, [props.requests]);
 
+    const openEditModal = async (request: JobRequest) => {
+        const data = await CustomFieldSetManager.get("Job_Request_Details");
+
+        const initialValues: { [key: string]: any } = {
+            details: request.details || "",
+            location: request.location || "",
+        };
+
+        if (data) {
+            data.forEach((field, id) => {
+                initialValues[id] = request[id] || "";
+            });
+        }
+
+        setCustomFieldData(data);
+        setFormValues(initialValues);
+        setCurrentRequest(request);
+        setModalOpen(true);
+    };
+
+    const FormComponent = React.memo(
+        ({
+            formValues,
+            data,
+            handleFieldChange,
+            handleSave,
+            isEditing,
+        }: {
+            formValues: { [key: string]: any };
+            data: Map<string, CustomField>;
+            handleFieldChange: (id: string, value: any) => void;
+            handleSave: (e: React.FormEvent<HTMLFormElement>) => void;
+            isEditing: boolean;
+        }) => {
+            return (
+                <form onSubmit={handleSave} id="editForm" className="max-w-[1000px] mx-auto">
+                    {/* Request Type */}
+                    {data?.has("Job_Request_Details.Request_Type") && (() => {
+                        const requestTypeField = data.get("Job_Request_Details.Request_Type");
+                        switch (requestTypeField?.html_type) {
+                            case "Text":
+                                return (
+                                    <TextField
+                                        key="Job_Request_Details.Request_Type"
+                                        className="flex justify-center mt-4"
+                                        label={requestTypeField?.label || "Request Type"}
+                                        id="Job_Request_Details.Request_Type"
+                                        value={formValues["Job_Request_Details.Request_Type"] || ""}
+                                        handleChange={(e) =>
+                                            handleFieldChange("Job_Request_Details.Request_Type", e.target.value)
+                                        }
+                                        required={true}
+                                    />
+                                );
+                            case "Radio":
+                            case "Select":
+                                return (
+                                    <DropdownField
+                                        key="Job_Request_Details.Request_Type"
+                                        className="flex justify-center mt-4"
+                                        label={requestTypeField?.label || "Request Type"}
+                                        id="Job_Request_Details.Request_Type"
+                                        fields={formValues}
+                                        handleFields={(id, value) =>
+                                            handleFieldChange(id, value)
+                                        }
+                                        options={requestTypeField?.options || []}
+                                        required={true}
+                                    />
+                                );
+                            case "CheckBox":
+                                return (
+                                    <CheckboxField
+                                        key="Job_Request_Details.Request_Type"
+                                        className="flex justify-center mt-4"
+                                        label={requestTypeField?.label || "Request Type"}
+                                        id="Job_Request_Details.Request_Type"
+                                        fields={formValues}
+                                        handleFields={(id, value) =>
+                                            handleFieldChange(id, value)
+                                        }
+                                        options={requestTypeField?.options || []}
+                                    />
+                                );
+                            default:
+                                return null;
+                        }
+                    })()}
+                    {/* Location */}
+                    <TextField
+                        className="flex justify-center mt-4"
+                        label="Location"
+                        id="location"
+                        showInfo={true}
+                        info="Location of your request."
+                        value={formValues.location || ""}
+                        handleChange={(e) => handleFieldChange("location", e.target.value)}
+                        required={true}
+                    />
+                    {/* Details */}
+                    <TextareaField
+                        className="flex justify-center mt-4"
+                        label="Description"
+                        id="details"
+                        value={formValues.details || ""}
+                        handleChange={(e) => handleFieldChange("details", e.target.value)}
+                        wordLimit={100}
+                        required={true}
+                    />
+                    {/* Custom Fields */}
+                    {data &&
+                        Array.from(data).map(([id, field]) => {
+                            if (id === "Job_Request_Details.Request_Type") return null;
+                            switch (field.html_type) {
+                                case "Text":
+                                    return (
+                                        <TextField
+                                            key={id}
+                                            className="flex justify-center mt-4"
+                                            label={field.label}
+                                            id={id}
+                                            value={formValues[id] || ""}
+                                            handleChange={(e) => handleFieldChange(id, e.target.value)}
+                                            required={true}
+                                        />
+                                    );
+                                case "Radio":
+                                case "Select":
+                                    return (
+                                        <DropdownField
+                                            key={id}
+                                            className="flex justify-center mt-4"
+                                            label={field.label}
+                                            id={id}
+                                            fields={formValues}
+                                            handleFields={(id, value) =>
+                                                handleFieldChange(id, value)
+                                            }
+                                            options={field.options!}
+                                            required={true}
+                                        />
+                                    );
+                                case "CheckBox":
+                                    return (
+                                        <CheckboxField
+                                            key={id}
+                                            className="flex justify-center mt-4"
+                                            label={field.label}
+                                            id={id}
+                                            fields={formValues}
+                                            handleFields={(id, value) =>
+                                                handleFieldChange(id, value)
+                                            }
+                                            options={field.options!}
+                                        />
+                                    );
+                                default:
+                                    return null;
+                            }
+                        })
+                    }
+                    <div className="flex justify-center mt-4">
+                        <button
+                            type="submit"
+                            className={`text-white font-semibold text-sm rounded-md py-[6px] px-4 flex justify-center sm:justify-between items-center gap-x-3 ${isEditing ? "bg-primary" : "bg-secondary"}`}
+                            disabled={isEditing}
+                        >
+                            <MdCreate />
+                            <span>{isEditing ? "Saving..." : "Save Request"}</span>
+                        </button>
+                    </div>
+                </form>
+            );
+        }
+    );
+
+    const handleFieldChange = useCallback((id: string, value: any) => {
+        setFormValues((prev) => ({ ...prev, [id]: value }));
+    }, []);
+
+    const handleSave = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        console.log(formValues);
+        if (!currentRequest) return;
+        setIsEditing(true);
+
+        const resultStatus = await JobRequestManager.update(currentRequest.id!, formValues);
+        MySwal.close();
+
+        if (resultStatus === JobRequestStatus.Approved) {
+            Swal.fire({
+                title: "Your request has been saved",
+                icon: "success"
+            })
+        } else if (resultStatus === JobRequestStatus.ApprovalRequired) {
+            Swal.fire({
+                title: "Your request has been saved",
+                text: 'Since you have selected "Others" category, please wait for an Administrator to approve your request.',
+                icon: "success",
+                iconColor: "#f8bb86",
+            })
+        } else {
+            Swal.fire({
+                title: "An error occurred",
+                text: "Please try again at a later time.",
+                icon: "error"
+            });
+        }
+        setIsEditing(false);
+        setModalOpen(false);
+
+        props.setRequests(await props.contact.fetchJobRequests());
+    };
+
     return <div>
         <Table header="Job Requests">
             <Header>
@@ -85,6 +320,8 @@ export default function JobRequests(props: JobRequestsProps) {
                     <Cell colSpan={5} className="text-center text-lg text-gray-500">No job request history available</Cell>
                     {/* Slices and shows only 5 entities per page */}
                 </tr> : currRequests.slice(page * limit, page + ((page + 1) * limit)).map((request, index) => {
+                    const editable = ["Pending"].includes(request.status);
+                    const cancellable = ["Pending", "Requested"].includes(request.status);
                     return <tr key={index}>
                         {/* Subject */}
                         <Cell>
@@ -104,15 +341,15 @@ export default function JobRequests(props: JobRequestsProps) {
                         </Cell>
                         {/* Location */}
                         <Cell className="whitespace-nowrap hidden lg:table-cell">
-                            {request.location?.slice(0, 37)}{request.location?.length ?? 0 > 37 ? "..." : ""}
+                            {request.location}{request.location!.length > 37 ? "..." : ""}
                         </Cell>
                         {/* Action */}
                         <Cell>
                             <div className="flex flex-row space-x-3">
-                                <button className="flex items-center" onClick={() => navigate("request")}>
+                                <button className={`flex ${editable ? "text-blue-700" : "text-gray-500"} items-center`} disabled={!editable} onClick={() => openEditModal(request)}>
                                     <AiOutlineEdit className="mr-2" /> Edit
                                 </button>
-                                <button className="flex items-center" onClick={() => navigate("request")}>
+                                <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} onClick={() => navigate("request")}>
                                     <AiOutlineStop className="mr-2" /> Cancel
                                 </button>
                             </div>
@@ -122,5 +359,158 @@ export default function JobRequests(props: JobRequestsProps) {
             </Body>
         </Table>
         <PageNavigation page={page} pages={pages} limit={limit} array={props.requests} previousPage={previousPage} nextPage={nextPage} />
+
+        {isModalOpen && (
+            <Modal
+                isOpen={isModalOpen}
+                onRequestClose={() => setModalOpen(false)}
+                title="Edit Job Request"
+            >
+                {/* <FormComponent
+                    formValues={formValues}
+                    data={customFieldData!}
+                    handleFieldChange={handleFieldChange}
+                    handleSave={handleSave}
+                    isEditing={isEditing}
+                /> */}
+                <form onSubmit={handleSave} id="editForm" className="max-w-[1000px] mx-auto">
+                    {/* Request Type */}
+                    {customFieldData?.has("Job_Request_Details.Request_Type") && (() => {
+                        const requestTypeField = customFieldData.get("Job_Request_Details.Request_Type");
+                        switch (requestTypeField?.html_type) {
+                            case "Text":
+                                return (
+                                    <TextField
+                                        key="Job_Request_Details.Request_Type"
+                                        className="flex justify-center mt-4"
+                                        label={requestTypeField?.label || "Request Type"}
+                                        id="Job_Request_Details.Request_Type"
+                                        value={formValues["Job_Request_Details.Request_Type"] || ""}
+                                        handleChange={(e) =>
+                                            handleFieldChange("Job_Request_Details.Request_Type", e.target.value)
+                                        }
+                                        required={true}
+                                    />
+                                );
+                            case "Radio":
+                            case "Select":
+                                return (
+                                    <DropdownField
+                                        key="Job_Request_Details.Request_Type"
+                                        className="flex justify-center mt-4"
+                                        label={requestTypeField?.label || "Request Type"}
+                                        id="Job_Request_Details.Request_Type"
+                                        fields={formValues}
+                                        handleFields={(id, value) =>
+                                            handleFieldChange(id, value)
+                                        }
+                                        options={requestTypeField?.options || []}
+                                        required={true}
+                                    />
+                                );
+                            case "CheckBox":
+                                return (
+                                    <CheckboxField
+                                        key="Job_Request_Details.Request_Type"
+                                        className="flex justify-center mt-4"
+                                        label={requestTypeField?.label || "Request Type"}
+                                        id="Job_Request_Details.Request_Type"
+                                        fields={formValues}
+                                        handleFields={(id, value) =>
+                                            handleFieldChange(id, value)
+                                        }
+                                        options={requestTypeField?.options || []}
+                                    />
+                                );
+                            default:
+                                return null;
+                        }
+                    })()}
+                    {/* Location */}
+                    <TextField
+                        className="flex justify-center mt-4"
+                        label="Location"
+                        id="location"
+                        showInfo={true}
+                        info="Location of your request."
+                        value={formValues.location || ""}
+                        handleChange={(e) => handleFieldChange("location", e.target.value)}
+                        required={true}
+                    />
+                    {/* Details */}
+                    <TextareaField
+                        className="flex justify-center mt-4"
+                        label="Description"
+                        id="details"
+                        value={formValues.details || ""}
+                        handleChange={(e) => handleFieldChange("details", e.target.value)}
+                        wordLimit={100}
+                        required={true}
+                    />
+                    {/* Custom Fields */}
+                    {customFieldData &&
+                        Array.from(customFieldData).map(([id, field]) => {
+                            if (id === "Job_Request_Details.Request_Type") return null;
+                            switch (field.html_type) {
+                                case "Text":
+                                    return (
+                                        <TextField
+                                            key={id}
+                                            className="flex justify-center mt-4"
+                                            label={field.label}
+                                            id={id}
+                                            value={formValues[id] || ""}
+                                            handleChange={(e) => handleFieldChange(id, e.target.value)}
+                                            required={true}
+                                        />
+                                    );
+                                case "Radio":
+                                case "Select":
+                                    return (
+                                        <DropdownField
+                                            key={id}
+                                            className="flex justify-center mt-4"
+                                            label={field.label}
+                                            id={id}
+                                            fields={formValues}
+                                            handleFields={(id, value) =>
+                                                handleFieldChange(id, value)
+                                            }
+                                            options={field.options!}
+                                            required={true}
+                                        />
+                                    );
+                                case "CheckBox":
+                                    return (
+                                        <CheckboxField
+                                            key={id}
+                                            className="flex justify-center mt-4"
+                                            label={field.label}
+                                            id={id}
+                                            fields={formValues}
+                                            handleFields={(id, value) =>
+                                                handleFieldChange(id, value)
+                                            }
+                                            options={field.options!}
+                                        />
+                                    );
+                                default:
+                                    return null;
+                            }
+                        })
+                    }
+                    <div className="flex justify-center mt-4">
+                        <button
+                            type="submit"
+                            className={`text-white font-semibold text-sm rounded-md py-[6px] px-4 flex justify-center sm:justify-between items-center gap-x-3 ${isEditing ? "bg-primary" : "bg-secondary"}`}
+                            disabled={isEditing}
+                        >
+                            <MdCreate />
+                            <span>{isEditing ? "Saving..." : "Save Request"}</span>
+                        </button>
+                    </div>
+                </form>
+            </Modal>
+        )}
     </div>
 }
