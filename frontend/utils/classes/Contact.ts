@@ -90,6 +90,7 @@ export class Contact implements ContactProps {
                 'contact_id_a.address_primary.street_address',
                 'contact_id_a.address_primary.postal_code',
                 'contact_id_a.gender_id:label',
+                'contact_id_a.email_primary.email'
             ],
             where: [
                 ["relationship_type_id:name", "=", "Supervised by"],

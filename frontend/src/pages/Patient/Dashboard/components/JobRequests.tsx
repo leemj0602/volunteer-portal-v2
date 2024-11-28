@@ -32,14 +32,14 @@ const limit = 5;
 const order = ["Accepted", "Requested", "Pending", "Unapproved", "Cancelled", "Completed"];
 
 const statusColor: { [key: string]: string } = {
-    "Accepted": "bg-[#57D5FF]",
-    "Requested": "bg-[#FFB656]",
-    "Pending": "bg-[#F0D202]",
-    "Unapproved": "bg-[#efb7c0]",
-    "Cancelled": "bg-[#f26a6a]",
+    "Accepted": "bg-[#57D5FF] text-white",
+    "Requested": "bg-[#FFB656] text-white",
+    "Pending": "bg-[#F0D202] text-white",
+    "Unapproved": "bg-[#efb7c0] text-white",
+    "Cancelled": "bg-[#f26a6a] text-white",
     "Volunteer Cancelled": "bg-gray-200 text-[#f26a6a] underline",
-    "Expired": "bg-gray-400",
-    "Completed": "bg-[#7bcf72]",
+    "Expired": "bg-gray-400 text-white",
+    "Completed": "bg-[#7bcf72] text-white",
 }
 
 export default function JobRequests(props: JobRequestsProps) {
@@ -86,13 +86,13 @@ export default function JobRequests(props: JobRequestsProps) {
                 if (request["accepted_job.status_id:name"] === "Completed") {
                     request.status = "Completed";
                 }
-            }
-
-            if (request["status_id:name"] === "Approved" || request["status_id:name"] === "Approval Required") {
-                const now = new Date();
-                const activity_date_time = new Date(request.activity_date_time)
-                if (now > activity_date_time) {
-                    request.status = "Expired";
+            } else {
+                if (request["status_id:name"] === "Approved" || request["status_id:name"] === "Approval Required") {
+                    const now = new Date();
+                    const activity_date_time = new Date(request.activity_date_time)
+                    if (now > activity_date_time) {
+                        request.status = "Expired";
+                    }
                 }
             }
 
@@ -197,27 +197,27 @@ export default function JobRequests(props: JobRequestsProps) {
 
                     return <tr key={index} className={volunteerCancelled ? "bg-gray-200" : ""}>
                         {/* Subject */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             <button className="text-secondary hover:text-primary cursor-pointer" onClick={() => handleView(request)}>
                                 {request["Job_Request_Details.Request_Type:label"]}{request["Job_Request_Details.Request_Type:label"]!.length > 37 ? "..." : ""}
                             </button>
                         </Cell>
                         {/* Date & Time */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             {moment(request.activity_date_time!).format("DD/MM/yyyy hh:mm A")}
                         </Cell>
                         {/* Status */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             <Status className={statusColor[request.status]}>
                                 {request.status}
                             </Status>
                         </Cell>
                         {/* Location */}
-                        <Cell className={`whitespace-nowrap hidden lg:table-cell ${volunteerCancelled ? "bg-gray-400" : ""}`}>
+                        <Cell className={`whitespace-nowrap hidden lg:table-cell ${volunteerCancelled ? "text-gray-400" : ""}`}>
                             {request.location}{request.location!.length > 37 ? "..." : ""}
                         </Cell>
                         {/* Action */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             <div className="flex flex-row space-x-3">
                                 <button className={`flex ${editable ? "text-blue-700" : "text-gray-500"} items-center`} disabled={!editable} onClick={() => openEditModal(request)}>
                                     <AiOutlineEdit className="mr-2" /> Edit

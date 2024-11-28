@@ -33,15 +33,15 @@ const limit = 5;
 const order = ["Check In", "Checked In", "Upcoming", "Pending", "Unapproved", "No Show", "Cancelled", "Cancelled By Organiser", "Completed"];
 
 const statusColor: { [key: string]: string } = {
-    "Upcoming": "bg-[#FFB656]",
-    "Pending": "bg-[#F0D202]",
-    "Check In": "bg-[#57D5FF]",
-    "No Show": "bg-gray-400",
-    "Cancelled": "bg-[#f26a6a]",
-    "Completed": "bg-[#7bcf72]",
+    "Upcoming": "bg-[#FFB656] text-white",
+    "Pending": "bg-[#F0D202] text-white",
+    "Check In": "bg-[#57D5FF] text-white",
+    "No Show": "bg-gray-400 text-white",
+    "Cancelled": "bg-[#f26a6a] text-white",
+    "Completed": "bg-[#7bcf72] text-white",
     "Cancelled By Organiser": "bg-gray-200 text-[#f26a6a]",
-    "Checked In": "bg-[#5a71b4]",
-    "Unapproved": "bg-[#efb7c0]"
+    "Checked In": "bg-[#5a71b4] text-white",
+    "Unapproved": "bg-[#efb7c0] text-white"
 };
 
 
