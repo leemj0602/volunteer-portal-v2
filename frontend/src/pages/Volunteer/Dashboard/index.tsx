@@ -10,6 +10,7 @@ import EventRegistrations from "./components/EventRegistrations";
 import TrainingRegistrations from "./components/TrainingRegistrations";
 import UpcomingEvents from "./components/UpcomingEvents";
 import { TrainingRegistration } from "../../../../utils/classes/TrainingRegistration";
+import AcceptedJobs from "./components/AcceptedJobs";
 
 export default function Home3() {
     const email = (window as any).email;
@@ -34,6 +35,8 @@ export default function Home3() {
             <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
                 {/* Displays their name and email */}
                 <Header contact={contact} />
+                {/* Accepted Jobs */}
+                <AcceptedJobs contact={contact} />
                 {/* Displays their hours and attended events */}
                 <Statistics registrations={eventRegistrations!} />
                 {/* Displays all their event registrations */}
