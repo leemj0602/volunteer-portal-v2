@@ -112,7 +112,7 @@ export default function PatientRequest() {
 
         if (resultStatus === JobRequestStatus.Approved) {
             Swal.fire({
-                title: "Your request has submitted",
+                title: "Your request has been submitted",
                 icon: "success"
             })
 
@@ -306,7 +306,7 @@ export default function PatientRequest() {
                                         }
                                     })
                                 }
-                                <div className="mt-4 flex justify-center">
+                                <div className="flex justify-center mt-4">
                                     <button
                                         type="submit"
                                         className={`text-white font-semibold text-sm rounded-md py-[6px] px-4 flex justify-center sm:justify-between items-center gap-x-3 ${isCreating ? "bg-primary" : "bg-secondary"
