@@ -61,7 +61,8 @@ const JobRequestManager = new class JobRequestManager {
                 'contact.*',
                 'contact.email_primary.*',
                 'accepted_job.id',
-                'accepted_job.source_contact_id'
+                'accepted_job.source_contact_id',
+                'accepted_job.status_id:name'
             ],
             join: [
                 ['Contact AS contact', 'LEFT', ['target_contact_id', '=', 'contact.id']],
@@ -122,7 +123,8 @@ const JobRequestManager = new class JobRequestManager {
                 'contact.*',
                 'contact.email_primary.*',
                 'accepted_job.id',
-                'accepted_job.source_contact_id'
+                'accepted_job.source_contact_id',
+                'accepted_job.status_id:name'
             ],
             join: [
                 ['Contact AS contact', 'LEFT', ['target_contact_id', '=', 'contact.id']],
