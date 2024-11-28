@@ -29,7 +29,7 @@ interface JobRequestsProps {
 
 const limit = 5;
 
-const order = ["Accepted", "Requested", "Pending", "Unapproved", "Cancelled", "Completed"];
+const order = ["Accepted", "Requested", "Pending", "Unapproved", "Cancelled", "Volunteer Cancelled", "Expired", "Completed"];
 
 const statusColor: { [key: string]: string } = {
     "Accepted": "bg-[#57D5FF] text-white",
