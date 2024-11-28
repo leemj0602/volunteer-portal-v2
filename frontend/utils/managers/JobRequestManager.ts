@@ -140,6 +140,19 @@ const JobRequestManager = new class JobRequestManager {
         return ((response?.data ?? []) as JobRequestProps[]).map(j => new JobRequest(j));
 
     }
+
+    async cancelRequest(jobRequestId: number) {
+        const cancel = await CRM("Activity", 'update', {
+            values: [
+                ['status_id:name', 'Cancelled'],
+            ],
+            where: [
+                ['id', '=', jobRequestId],
+            ]
+        });
+
+        return cancel?.data.length > 0;
+    }
 }
 
 export default JobRequestManager;
