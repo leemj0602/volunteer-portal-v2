@@ -37,7 +37,9 @@ const statusColor: { [key: string]: string } = {
     "Pending": "bg-[#F0D202]",
     "Unapproved": "bg-[#efb7c0]",
     "Cancelled": "bg-[#f26a6a]",
-    "Completed": "bg-[#7bcf72]"
+    "Volunteer Cancelled": "bg-gray-200 text-[#f26a6a] underline",
+    "Expired": "bg-gray-400",
+    "Completed": "bg-[#7bcf72]",
 }
 
 export default function JobRequests(props: JobRequestsProps) {
@@ -71,6 +73,23 @@ export default function JobRequests(props: JobRequestsProps) {
                     break;
                 case "Not Approved": request.status = "Unapproved";
                     break;
+                case "Cancelled": request.status = "Cancelled";
+                    break;
+            }
+
+            if (request["status_id:name"] === "Approved" && request["accepted_job.id"] != null) {
+                request.status = "Volunteer Accepted";
+                if (request["accepted_job.status_id:name"] === "Cancelled") {
+                    request.status = "Volunteer Cancelled";
+                }
+            }
+
+            if (request["status_id:name"] === "Approved" || request["status_id:name"] === "Approval Required") {
+                const now = new Date();
+                const activity_date_time = new Date(request.activity_date_time)
+                if (now > activity_date_time) {
+                    request.status = "Expired";
+                }
             }
 
             return request;
