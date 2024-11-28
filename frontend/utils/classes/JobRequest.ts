@@ -7,9 +7,16 @@ export enum JobRequestStatus {
     Cancelled = "Cancelled",
 }
 
+export enum AcceptedJobStatus {
+    Pending = "Pending",
+    Completed = "Completed",
+    Cancelled = "Cancelled"
+}
+
 interface AcceptedJob {
     id: number;
     "Volunteer_Accepted_Job_Details.Job_Request": number;
+    'status_id:name': AcceptedJobStatus
 }
 
 export interface JobRequestProps {
@@ -27,6 +34,7 @@ export interface JobRequestProps {
     "contact.last_name": string;
     "accepted_job.id": number | null;
     "accepted_job.source_contact_id": number | null;
+    'accepted_job.status_id:name': AcceptedJobStatus;
     created_date: string;
     [key: string]: any;
 }
@@ -47,6 +55,7 @@ export class JobRequest implements JobRequestProps {
     public "contact.last_name": string;
     public "accepted_job.id": number | null;
     public "accepted_job.source_contact_id": number | null;
+    public "accepted_job.status_id:name": AcceptedJobStatus;
     [key: string]: any;
 
     constructor(props: JobRequestProps) {
@@ -65,6 +74,7 @@ export class JobRequest implements JobRequestProps {
         this["contact.last_name"] = props["contact.last_name"];
         this["accepted_job.id"] = props["accepted_job.id"];
         this["accepted_job.source_contact_id"] = props["accepted_job.source_contact_id"];
+        this["accepted_job.status_id:name"] = props["accepted_job.status_id:name"]
     }
 
     /**
