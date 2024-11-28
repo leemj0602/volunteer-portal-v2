@@ -7,8 +7,9 @@ export interface CardProps extends PropsWithChildren {
     className?: string;
     thumbnail?: string | null;
     hideThumbnail?: boolean;
-    url: string;
+    url?: string;
     cancelled?: boolean;
+    disableHover?: boolean;
 }
 
 export default function Card(props: CardProps) {
@@ -20,11 +21,11 @@ export default function Card(props: CardProps) {
                 Cancelled
             </div>
         </div>}
-        <div className="bg-white w-full shadow-md rounded-md p-4 transition-transform duration-300 transform hover:scale-105 flex flex-col justify-between relative">
+        <div className={`bg-white w-full shadow-md rounded-md p-4 ${props.disableHover ? "" : "transform duration-300 transition-transform hover:scale-105"} flex flex-col justify-between relative`}>
             {/* Main body */}
             <div>
                 {/* Image */}
-                {!props.hideThumbnail && <div className="mb-4 h-[160px] rounded-lg relative bg-gray-200 cursor-pointer" onClick={() => navigate(props.url)}>
+                {!props.hideThumbnail && <div className={`mb-4 h-[160px] rounded-lg relative bg-gray-200 ${props.url ? "cursor-pointer" : ""}`} onClick={() => props.url ? navigate(props.url!) : null}>
                     {props.thumbnail && <img src={`${config.domain}/wp-content/uploads/civicrm/custom/${props.thumbnail}`} className="w-full h-full object-cover rounded-lg" />}
                     {!props.thumbnail && <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <CiFileOff size={64} className="text-80px text-gray-500" />
@@ -34,9 +35,9 @@ export default function Card(props: CardProps) {
                 {props.children}
             </div>
             {/* Button */}
-            <button className="text-white bg-secondary text-center w-full rounded-md text-sm mt-6 py-2" onClick={() => navigate(props.url)}>
+            {props.url?.length && <button className="text-white bg-secondary text-center w-full rounded-md text-sm mt-6 py-2" onClick={() => navigate(props.url!)}>
                 Read More
-            </button>
+            </button>}
         </div>
     </div>
 }

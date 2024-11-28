@@ -84,7 +84,7 @@ export class Contact implements ContactProps {
         const response = await CRM("Relationship", "get", {
             'select': [
                 'contact_id_a.first_name',
-                'contact_id_b.first_name',
+                'contact_id_a.last_name',
                 'contact_id_a.phone_primary.phone',
                 'created_date',
                 'contact_id_a.address_primary.street_address',
