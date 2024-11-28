@@ -8,7 +8,7 @@ export enum JobRequestStatus {
 }
 
 export enum AcceptedJobStatus {
-    Pending = "Pending",
+    Scheduled = "Scheduled",
     Completed = "Completed",
     Cancelled = "Cancelled"
 }
