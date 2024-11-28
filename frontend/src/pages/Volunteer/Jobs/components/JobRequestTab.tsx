@@ -5,6 +5,8 @@ import JobRequestManager from "../../../../../utils/managers/JobRequestManager";
 import Swal from "sweetalert2";
 import ContactManager from "../../../../../utils/managers/ContactManager";
 import { Spinner } from "flowbite-react";
+import { FaClock, FaLocationArrow } from "react-icons/fa";
+import { FaLocationPin } from "react-icons/fa6";
 
 interface JobRequestTabProps {
   job: JobRequest;
@@ -13,7 +15,8 @@ interface JobRequestTabProps {
 
 export default function JobRequestTab(props: JobRequestTabProps) {
   const email = (window as any).email;
-  const [collapsed, setCollapsed] = useState(props.job.details!.length > 300);
+  const details = props.job.details!.replace(/<\/?[^>]+(>|$)/g, '')
+  const [collapsed, setCollapsed] = useState(details.length > 300);
   const [loading, setLoading] = useState(false);
 
   const handleAccept = async () => {
@@ -52,9 +55,18 @@ export default function JobRequestTab(props: JobRequestTabProps) {
           <h2 className="font-semibold text-secondary text-xl">{props.job["Job_Request_Details.Request_Type:label"]}</h2>
           <h6 className="text-sm text-gray-600 italic">{moment(props.job.created_date).fromNow()}</h6>
         </div>
-        <p className="text-sm text-gray-700 mb-4 font-semibold">{props.job.location}</p>
-        <p>{props.job.details?.slice(0, collapsed ? 300 : props.job.details.length)}{collapsed ? '...' : ""}</p>
-        {props.job.details!.length > 300 && <button className="text-secondary text-sm font-semibold mt-4" onClick={() => setCollapsed(!collapsed)}>{collapsed ? "Read More" : "Collapse"}</button>}
+        <div className="mt-2 mb-4">
+          <div className="flex items-center text-sm text-gray-600 gap-x-2">
+            <FaLocationArrow color="#4b5563" /> 
+            <span>{props.job.location}</span>
+          </div>
+          <div className="flex items-center text-sm text-gray-600 gap-x-2">
+            <FaClock color="#4b5563" /> 
+            <span>Due {moment(props.job.activity_date_time).fromNow()}</span>
+          </div>
+        </div>
+        <p>{details.slice(0, collapsed ? 300 : details.length)}{collapsed ? '...' : ""}</p>
+        {details.length > 300 && <button className="text-secondary text-sm font-semibold mt-4" onClick={() => setCollapsed(!collapsed)}>{collapsed ? "Read More" : "Collapse"}</button>}
       </div>
       <button onClick={handleAccept} className="bg-secondary p-2 font-semibold text-white rounded-lg h-fit top-0 disabled:bg-primary" disabled={loading}>{loading ? <Spinner className="w-[25px] h-[25px] fill-secondary" /> : "Accept"}</button>
     </div>

@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import Wrapper from "../../../components/Wrapper";
 import CustomFieldSetManager, { CustomField, CustomFieldOptions } from "../../../../utils/managers/CustomFieldSetManager";
 import Loading from "../../../components/Loading";
-import { JobRequest } from "../../../../utils/classes/JobRequest";
+import { JobRequest, JobRequestStatus } from "../../../../utils/classes/JobRequest";
 import { ComparisonOperator } from "../../../../utils/crm";
 import DropdownButton from "../../../components/DropdownButton";
 import { useSearchParams } from "react-router-dom";
 import JobRequestManager from "../../../../utils/managers/JobRequestManager";
 import JobRequestTab from "./components/JobRequestTab";
+import moment from "moment";
 
 const limit = 12;
 
@@ -31,8 +32,9 @@ export default function Jobs() {
   const updateJobs = async () => {
     setJobs(undefined);
     const where: [string, ComparisonOperator, any?][] = [
-      ["status_id:name", "=", "Completed"],
-      ["accepted_job.id", "IS NULL"]
+      ["accepted_job.id", "IS NULL"],
+      ["status_id:name", "=", JobRequestStatus.Approved],
+      ["activity_date_time", ">=", moment(new Date()).format('YYYY-MM-DD hh:mm:ss')]
     ];
     searchParams.forEach((val, key) => {
       if (!key.includes("undefined") && key != "page") where.push([key, 'IN', JSON.parse(val ?? "[]")])

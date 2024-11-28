@@ -103,7 +103,7 @@ const JobRequestManager = new class JobRequestManager {
             limit: options?.limit,
             offset: options?.page && options?.limit ? (options?.page - 1) * options.limit : 0,
             order: options?.order ?? []
-        }).catch(() => null);
+        }).catch(console.log);
 
         return ((response?.data ?? []) as JobRequestProps[]).map(j => new JobRequest(j));
 
