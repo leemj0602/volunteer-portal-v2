@@ -57,6 +57,7 @@ export default function Navbar(props: NavbarProps) {
                 <div className="mb-2">
                     {subtypes.includes('Volunteer') && <Category location={props.location} to="/volunteer" icon={FaBriefcaseMedical} name="Volunteer">
                         <Item location={props.location} to="/volunteer/events" name="Events" />
+                        <Item location={props.location} to="/volunteer/jobs" name="Jobs" />
                         <Item location={props.location} to="/volunteer/trainings" name="Trainings" />
                         <Item to="/volunteer/volunteer-info-pack" name="Volunteer Info Pack" />
                     </Category>}
