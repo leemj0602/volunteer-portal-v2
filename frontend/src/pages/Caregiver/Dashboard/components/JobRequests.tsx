@@ -197,27 +197,27 @@ export default function JobRequests(props: JobRequestsProps) {
 
                     return <tr key={index} className={volunteerCancelled ? "bg-gray-200" : ""}>
                         {/* Subject */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             <button className="text-secondary hover:text-primary cursor-pointer" onClick={() => handleView(request)}>
                                 {request["Job_Request_Details.Request_Type:label"]}{request["Job_Request_Details.Request_Type:label"]!.length > 37 ? "..." : ""}
                             </button>
                         </Cell>
                         {/* Date & Time */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             {moment(request.activity_date_time!).format("DD/MM/yyyy hh:mm A")}
                         </Cell>
                         {/* Status */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             <Status className={statusColor[request.status]}>
                                 {request.status}
                             </Status>
                         </Cell>
                         {/* Location */}
-                        <Cell className={`whitespace-nowrap hidden lg:table-cell ${volunteerCancelled ? "bg-gray-400" : ""}`}>
+                        <Cell className={`whitespace-nowrap hidden lg:table-cell ${volunteerCancelled ? "text-gray-400" : ""}`}>
                             {request.location}{request.location!.length > 37 ? "..." : ""}
                         </Cell>
                         {/* Action */}
-                        <Cell className={volunteerCancelled ? "bg-gray-400" : ""}>
+                        <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             <div className="flex flex-row space-x-3">
                                 <button className={`flex ${editable ? "text-blue-700" : "text-gray-500"} items-center`} disabled={!editable} onClick={() => openEditModal(request)}>
                                     <AiOutlineEdit className="mr-2" /> Edit

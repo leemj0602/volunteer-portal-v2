@@ -1,6 +1,8 @@
+import CRM from "../crm";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
 import JobRequestManager from "../managers/JobRequestManager";
 import TrainingRegistrationManager from "../managers/TrainingRegistrationManager";
+import { Relationship, RelationshipProps } from "./Relationship";
 
 interface MandatoryContactDetailProps {
     "Volunteer_Contact_Details.Skills_Interests": string[];
@@ -75,5 +77,26 @@ export class Contact implements ContactProps {
 
     async fetchJobRequests() {
         return JobRequestManager.fetch({ contactId: this.id! });
+    }
+
+    /** Fetch patients under this contact */
+    async fetchPatients() {
+        const response = await CRM("Relationship", "get", {
+            'select': [
+                'contact_id_a.first_name',
+                'contact_id_b.first_name',
+                'contact_id_a.phone_primary.phone',
+                'created_date',
+                'contact_id_a.address_primary.street_address',
+                'contact_id_a.address_primary.postal_code',
+                'contact_id_a.gender_id:label',
+            ],
+            where: [
+                ["relationship_type_id:name", "=", "Supervised by"],
+                ["contact_id_b", "=", this.id!]
+            ]
+        }).catch(() => null);
+        if (!response) return [] as Relationship[];
+        return (response.data as RelationshipProps[]).map(r => new Relationship(r));
     }
 }

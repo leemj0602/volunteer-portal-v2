@@ -6,6 +6,7 @@ import { JobRequest } from "../../../../utils/classes/JobRequest";
 import Loading from "../../../components/Loading";
 import JobRequests from "./components/JobRequests";
 import Header from "../../Volunteer/Dashboard/components/Header";
+import Patients from "./components/Patients";
 
 export default function Caregiver() {
     const email = (window as any).email;
@@ -28,6 +29,7 @@ export default function Caregiver() {
             {!contact ? <Loading className="h-screen items-center" /> : <div className="p-4 mb-12">
                 <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
                     <Header contact={contact} />
+                    <Patients contact={contact} />
                     <JobRequests contact={contact} requests={jobRequests!} setRequests={setJobRequests} />
                 </div>
             </div>}
