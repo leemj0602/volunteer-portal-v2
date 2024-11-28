@@ -27,10 +27,10 @@ const limit = 5;
 const order = ["Upcoming", "No Show", "Cancelled", "Cancelled By Organiser", "Completed"];
 
 const statusColor: { [key: string]: string } = {
-    "Upcoming": "bg-[#FFB656]",
-    "No Show": "bg-gray-400",
-    "Cancelled": "bg-[#f26a6a]",
-    "Completed": "bg-[#7bcf72]",
+    "Upcoming": "bg-[#FFB656] text-white",
+    "No Show": "bg-gray-400 text-white",
+    "Cancelled": "bg-[#f26a6a] text-white",
+    "Completed": "bg-[#7bcf72] text-white",
     "Cancelled By Organiser": "bg-gray-200 text-[#f26a6a]"
 };
 
