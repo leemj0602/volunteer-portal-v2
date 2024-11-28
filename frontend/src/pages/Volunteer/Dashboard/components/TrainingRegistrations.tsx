@@ -133,9 +133,9 @@ export default function TrainingRegistrations(props: TrainingRegistrationsProps)
                     return <tr key={index} className={cancelledByOrganisation ? "bg-gray-200" : ""}>
                         {/* Subject */}
                         <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
-                            <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/trainings/${trainingSchedule.training.id}`)}>
+                            {trainingSchedule.subject && <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/trainings/${trainingSchedule.training.id}`)}>
                                 {trainingSchedule.training.subject}{trainingSchedule.training.subject!.length > 37 ? "..." : ""}
-                            </button>
+                            </button>}
                         </Cell>
                         {/* Date and Time */}
                         <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
