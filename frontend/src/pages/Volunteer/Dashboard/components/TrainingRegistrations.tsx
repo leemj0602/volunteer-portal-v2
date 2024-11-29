@@ -133,7 +133,7 @@ export default function TrainingRegistrations(props: TrainingRegistrationsProps)
                     return <tr key={index} className={cancelledByOrganisation ? "bg-gray-200" : ""}>
                         {/* Subject */}
                         <Cell className={`whitespace-nowrap ${cancelledByOrganisation ? "text-gray-400" : ""}`}>
-                            {trainingSchedule.subject && <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/trainings/${trainingSchedule.training.id}`)}>
+                            {trainingSchedule.training.subject && <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/trainings/${trainingSchedule.training.id}`)}>
                                 {trainingSchedule.training.subject}{trainingSchedule.training.subject!.length > 37 ? "..." : ""}
                             </button>}
                         </Cell>
@@ -153,7 +153,7 @@ export default function TrainingRegistrations(props: TrainingRegistrationsProps)
                         </Cell>
                         {/* Action */}
                         <Cell>
-                            <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => openModal(registration)}>
+                            <button className={`flex ${cancellable ? "text-red-700 hover:text-red-400" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => openModal(registration)}>
                                 <AiOutlineStop className="mr-2" /> Cancel
                             </button>
                         </Cell>
