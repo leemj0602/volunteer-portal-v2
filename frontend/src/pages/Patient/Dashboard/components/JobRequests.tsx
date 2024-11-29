@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import moment from "moment";
 import Status from "../../../../components/Table/Status";
 import { AiOutlineEdit, AiOutlineStop } from "react-icons/ai";
+import CancelEvent from "../../../../../assets/undraw_cancel_re_pkdm.svg";
 import CustomFieldSetManager, { CustomField } from "../../../../../utils/managers/CustomFieldSetManager";
 import Modal from "../../../../components/Modal";
 import TextField from "../../../../components/Fields/TextField";
@@ -177,6 +178,38 @@ export default function JobRequests(props: JobRequestsProps) {
         })
     }
 
+    const handleCancel = async (request: JobRequest) => {
+        if (!["Requested", "Pending", "Accepted"].includes(request.status)) {
+            return;
+        }
+
+        const confirm = await Swal.fire({
+            imageUrl: CancelEvent,
+            imageHeight: 200,
+            imageWidth: 320,
+            width: 350,
+            text: "Are you sure you want to cancel this request?",
+            showCancelButton: true,
+            showCloseButton: true,
+            confirmButtonText: "Confirm",
+            confirmButtonColor: "#5a71b4",
+        });
+
+        if (confirm.isConfirmed) {
+            await JobRequestManager.cancelRequest(request.id);
+            props.setRequests(await props.contact.fetchJobRequests());
+
+            Swal.fire({
+                title: "Your request has been successfully cancelled.",
+                icon: "success",
+                confirmButtonText: "OK",
+                timer: 5000,
+                timerProgressBar: true
+            })
+        }
+
+    }
+
     return <div>
         <Table header="Job Requests">
             <Header>
@@ -192,7 +225,7 @@ export default function JobRequests(props: JobRequestsProps) {
                     {/* Slices and shows only 5 entities per page */}
                 </tr> : currRequests.slice(page * limit, page + ((page + 1) * limit)).map((request, index) => {
                     const editable = ["Pending"].includes(request.status);
-                    const cancellable = ["Pending", "Requested"].includes(request.status);
+                    const cancellable = ["Pending", "Requested", "Accepted"].includes(request.status);
                     const volunteerCancelled = request["accepted_job.status_id:name"] === "Cancelled";
 
                     return <tr key={index} className={volunteerCancelled ? "bg-gray-200" : ""}>
@@ -219,10 +252,10 @@ export default function JobRequests(props: JobRequestsProps) {
                         {/* Action */}
                         <Cell className={volunteerCancelled ? "text-gray-400" : ""}>
                             <div className="flex flex-row space-x-3">
-                                <button className={`flex ${editable ? "text-blue-700" : "text-gray-500"} items-center`} disabled={!editable} onClick={() => openEditModal(request)}>
+                                <button className={`flex ${editable ? "text-blue-700 hover:text-blue-400" : "text-gray-500"} items-center`} disabled={!editable} onClick={() => openEditModal(request)}>
                                     <AiOutlineEdit className="mr-2" /> Edit
                                 </button>
-                                <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => navigate("request")}>
+                                <button className={`flex ${cancellable ? "text-red-700 hover:text-red-400" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => handleCancel(request)}>
                                     <AiOutlineStop className="mr-2" /> Cancel
                                 </button>
                             </div>

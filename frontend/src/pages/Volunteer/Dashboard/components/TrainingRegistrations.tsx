@@ -153,7 +153,7 @@ export default function TrainingRegistrations(props: TrainingRegistrationsProps)
                         </Cell>
                         {/* Action */}
                         <Cell>
-                            <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => openModal(registration)}>
+                            <button className={`flex ${cancellable ? "text-red-700 hover:text-red-400" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => openModal(registration)}>
                                 <AiOutlineStop className="mr-2" /> Cancel
                             </button>
                         </Cell>

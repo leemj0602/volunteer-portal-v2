@@ -381,7 +381,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                         </Cell>
                         {/* Action */}
                         <Cell>
-                            <button className={`flex ${cancellable ? "text-red-700" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => promptCancelModal(registration)}>
+                            <button className={`flex ${cancellable ? "text-red-700 hover:text-red-400" : "text-gray-500"} items-center`} disabled={!cancellable} onClick={() => promptCancelModal(registration)}>
                                 <AiOutlineStop className="mr-2" /> Cancel
                             </button>
                         </Cell>

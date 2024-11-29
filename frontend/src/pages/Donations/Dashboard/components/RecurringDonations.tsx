@@ -73,7 +73,7 @@ export default function RecurringDonations(props: RecurringDonationsProps) {
                         <Cell>{moment(sub.current_period_start * 1000).format("DD/MM/yyyy")}</Cell>
                         <Cell>{moment(sub.current_period_end * 1000).format("DD/MM/yyyy")}</Cell>
                         <Cell className="flex justify-end">
-                            <button className="flex items-center text-red-700 gap-x-2" onClick={() => cancelSubscription(sub.id)}>
+                            <button className="flex items-center text-red-700 hover:text-red-400 gap-x-2" onClick={() => cancelSubscription(sub.id)}>
                                 <FcCancel /> Cancel
                             </button>
                         </Cell>

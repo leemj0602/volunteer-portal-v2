@@ -55,7 +55,7 @@ if (is_array($values) && !empty($values)) {
         $valuesArray[$v[0]] = $v[1];
     }
     // Automatically populates activity_date_time with current Singapore time
-    if (!array_key_exists('activity_date_time', $valuesArray)) {
+    if (!array_key_exists('activity_date_time', $valuesArray) && $action === 'create') {
         $valuesArray['activity_date_time'] = (new DateTime('now', new DateTimeZone('Asia/Singapore')))->format('Y-m-d H:i:s');
     }
     $params['values'] = $valuesArray;
