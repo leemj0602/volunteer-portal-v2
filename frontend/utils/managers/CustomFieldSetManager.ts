@@ -1,6 +1,7 @@
 import CRM from "../crm";
 
 export interface CustomFieldOptions {
+    id?: number;
     name?: string;
     label: string;
     value: string;
