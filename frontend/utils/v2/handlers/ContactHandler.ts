@@ -15,7 +15,10 @@ class ContactHandler {
                 "gender_id",
                 "first_name",
                 "last_name",
-                "Volunteer_Contact_Details.*"
+                "Volunteer_Contact_Details.*",
+                "Donator_Contact_Details.*",
+                "Caregiver_Contact_Details.*",
+                "Patient_Contact_Details.*"
             ],
             where: [["email_primary.email", "=", email]]
         });
