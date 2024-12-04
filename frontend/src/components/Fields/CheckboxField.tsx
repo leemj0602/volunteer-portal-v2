@@ -17,14 +17,16 @@ interface CheckboxFieldProps {
 export default function CheckboxField(props: CheckboxFieldProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
+    const [values, setValues] = useState(props.fields[props.id] as any[]);
 
     const toggleDropdown = () => setIsMenuOpen(!isMenuOpen);
-    const handleClick = (option: { id: number, label: string, value: any }) => {
+    const handleClick = (option: CustomFieldOptions) => {
         if (props.handleFields) {
-            const value = props.fields[props.id] as number[] ?? [];
-            if (!value.includes(option.value)) value.push(option.value);
-            else value.splice(value.indexOf(option.value), 1);
-            props.handleFields(props.id, value);
+            let newValues = values;
+            if (!values.includes(option.value)) newValues = [...values, option.value];
+            else newValues = values.filter((v, i) => i != values.indexOf(option.value));
+            setValues(newValues);
+            props.handleFields(props.id, newValues);
         }
     }
 
@@ -49,9 +51,9 @@ export default function CheckboxField(props: CheckboxFieldProps) {
                 </div>
                 {/* Dropdown menu */}
                 {!props.disabled && isMenuOpen && <div className="absolute z-[1] bg-white w-full rounded-b-[5px] flex flex-col py-2" role="menu" aria-orientation="vertical">
-                    {props.options.map((opt: any) => {
+                    {props.options.map((opt: CustomFieldOptions) => {
                         return <div className="inline-block px-4 py-2 items-center gap-x-3 cursor-pointer disabled:cursor-not-allowed hover:bg-gray-100 w-full" onClick={() => handleClick(opt)}>
-                            <input type="checkbox" id={`${props.id}-${opt.value}`} className="pointer-events-none" checked={props.fields[props.id]?.includes(opt.id) || props.fields[props.id]?.includes(opt.value)} />
+                            <input type="checkbox" id={`${props.id}-${opt.value}`} className="pointer-events-none" checked={values.includes(opt.id) || values.includes(opt.value)} />
                             <label htmlFor={`${props.id}-${opt.value}`} className="text-sm w-full text-gray-600 ml-4 cursor-pointer pointer-events-none">{opt.label}</label>
                         </div>
                     })}
