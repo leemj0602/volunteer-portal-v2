@@ -87,6 +87,7 @@ export default function DropdownField(props: DropdownFieldProps) {
                     {props.options.map((opt: { label: string, value: any }) => {
                         return <div className="inline-block">
                             <input type="radio" className="hidden" name={props.id} value={opt.value} id={`${props.id}-${opt.value}`} checked={props.fields[props.id] == opt.value} onChange={onChange} />
+                            <label htmlFor={`${props.id}-${opt.value}`} className={`px-4 py-2 text-sm block w-full cursor-pointer ${props.fields[props.id] == opt.value ? "bg-gray-100" : "hover:bg-gray-100"}`}>{opt.label}</label>
                         </div>
                     })}
                 </div>}
