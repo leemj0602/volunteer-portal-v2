@@ -1,5 +1,5 @@
 import axios from "axios";
-import Entity, { obj } from "./Entity";
+import Entity from "./Entity";
 import config from "../../../../config.json";
 import CRM from "../../crm";
 
@@ -9,7 +9,7 @@ export class RecurringDonation extends Entity {
         subject?: string;
     } = {};
 
-    constructor(data: obj) {
+    constructor(data: Record<string, any>) {
         super(data);
         for (const key in data)
             this.setNestedValue(this.data, key, data[key]);

@@ -1,14 +1,12 @@
-export type obj = { [key: string]: any };
-
 export default class Entity {
-    data: obj = {};
+    data: Record<string, any> = {};
 
-    constructor(data: obj) {
+    constructor(data: Record<string, any>) {
         this.data = data;
     }
 
     get flat() {
-        return this.flatten(this.data) as obj;
+        return this.flatten(this.data) as Record<string, any>;
     }
 
     public setNestedValue(obj: any, key: string, value: any) {

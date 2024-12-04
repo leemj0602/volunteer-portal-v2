@@ -1,6 +1,6 @@
 import CRM from "../../crm";
 import ContactHandler from "../handlers/ContactHandler";
-import Entity, { obj } from "./Entity";
+import Entity from "./Entity";
 
 export class Contact extends Entity {
     data: {
@@ -23,18 +23,25 @@ export class Contact extends Entity {
             Skills_Interests?: string[];
             [key: string]: any;
         }
+
+        Patient_Contact_Details?: {
+            Dietary_Preferences?: string[];
+        }
     } = {};
 
-    constructor(data: obj) {
+    constructor(data: Record<string, any>) {
         super(data);
         for (const key in data)
             this.setNestedValue(this.data, key, data[key]);
     }
 
-    async update(values: [string, any][]): Promise<Contact | null> {
+    async update(values: Record<string, any> | [string, any][]): Promise<Contact | null> {
+        if (!this.data.id) throw new Error("Contact does not have an ID.");
+        if (typeof values == 'object') values = Object.entries(values);
+
         const response = await CRM("Contact", "update", {
-            values,
-            where: [["email_primary.email", "=", this.data.email_primary?.email]]
+            values: values as [string, any][],
+            where: [["id", "=", this.data.id]]
         }).catch(() => null);
         if (!response) return null;
 

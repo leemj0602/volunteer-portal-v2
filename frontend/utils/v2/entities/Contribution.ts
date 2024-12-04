@@ -1,4 +1,4 @@
-import Entity, { obj } from "./Entity";
+import Entity from "./Entity";
 
 export class Contribution extends Entity {
     data: {
@@ -12,7 +12,7 @@ export class Contribution extends Entity {
         "payment_instrument_id:label"?: string;
     } = {};
 
-    constructor(data: obj) {
+    constructor(data: Record<string, any>) {
         super(data);
         for (const key in data)
             this.setNestedValue(this.data, key, data[key]);
