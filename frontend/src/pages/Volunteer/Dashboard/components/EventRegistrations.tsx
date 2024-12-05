@@ -361,7 +361,7 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
                     return <tr key={index} className={cancelledByOrganisation ? "bg-gray-200" : ""}>
                         {/* Subject */}
                         <Cell className={cancelledByOrganisation ? "text-gray-400" : ""}>
-                            <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/events/${eventRole.event.id}/${registration.eventRole["Volunteer_Event_Role_Details.Role"]}`)}>
+                            <button className={!cancelledByOrganisation ? "text-secondary hover:text-primary cursor-pointer" : ""} disabled={cancelledByOrganisation} onClick={() => navigate(`/volunteer/events/${eventRole.event.id}/${registration.eventRole["Volunteer_Event_Role_Details.Role"]}`)}>
                                 {subject}
                             </button>
                         </Cell>
