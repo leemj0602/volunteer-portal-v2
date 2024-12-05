@@ -10,6 +10,10 @@ export interface CardProps extends PropsWithChildren {
     url?: string;
     cancelled?: boolean;
     disableHover?: boolean;
+    disableButton?: boolean;
+    buttonText?: string;
+    buttonTextColour?: string;
+    buttonColour?: string;
 }
 
 export default function Card(props: CardProps) {
@@ -35,8 +39,8 @@ export default function Card(props: CardProps) {
                 {props.children}
             </div>
             {/* Button */}
-            {props.url?.length && <button className="text-white bg-secondary text-center w-full rounded-md text-sm mt-6 py-2" onClick={() => navigate(props.url!)}>
-                Read More
+            {props.url?.length && !props.disableButton && <button className={`${props.buttonTextColour ? `text-[${props.buttonTextColour}]` : "text-white"} ${props.buttonColour ? `bg-[${props.buttonColour}]` : 'bg-secondary'} text-center w-full rounded-md text-sm mt-6 py-2`} onClick={() => navigate(props.url!)}>
+                {props.buttonText ?? "Read More"}
             </button>}
         </div>
     </div>
