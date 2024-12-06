@@ -15,12 +15,16 @@ class NotificationHandler {
                 'registration.activity_type_id:name',
 
                 'eventRole.id',
+                'eventRole.activity_date_time',
+                'eventRole.Volunteer_Event_Role_Details.Event.location',
                 'eventRole.Volunteer_Event_Role_Details.Role',
                 'eventRole.Volunteer_Event_Role_Details.Role:label',
                 'eventRole.Volunteer_Event_Role_Details.Event.id',
                 'eventRole.Volunteer_Event_Role_Details.Event.subject',
 
                 'trainingSchedule.id',
+                'trainingSchedule.activity_date_time',
+                'trainingSchedule.location',
                 'trainingSchedule.Volunteer_Training_Schedule_Details.Training.id',
                 'trainingSchedule.Volunteer_Training_Schedule_Details.Training.subject',
             ],

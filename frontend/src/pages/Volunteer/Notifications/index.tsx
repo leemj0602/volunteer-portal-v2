@@ -3,8 +3,12 @@ import Wrapper from "../../../components/Wrapper";
 import { Notification } from "../../../../utils/v2/entities/Notification";
 import Loading from "../../../components/Loading";
 import ContactManager from "../../../../utils/managers/ContactManager";
+import { useNavigate } from "react-router-dom";
+import moment from "moment";
+import { CalendarIcon, MapPinIcon, UserIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
 
 export default function Notifications() {
+    const navigate = useNavigate();
     const [notifications, setNotifications] = useState<Notification[]>();
 
     useEffect(() => {
@@ -17,30 +21,110 @@ export default function Notifications() {
         })();
     }, []);
 
-    return <Wrapper>
-        {!notifications ? <Loading className="h-screen items-center" /> : <div className="p-4 mb-12">
-            <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
-                <h1 className="text-lg font-semibold">Notifications</h1>
-                {notifications.map((notification, index) => {
-                    return <div key={index}>
-                        <p>id: {notification.data.id}</p>
-                        <p>subject: {notification.data.subject}</p>
-                        <p>details: {notification.data.details}</p>
-                        <p>registration.id: {notification.data.registration?.id}</p>
-                        <p>registration.activity_type_id:name: {notification.data.registration?.["activity_type_id:name"]}</p>
-                        <p>eventRole.id: {notification.data.eventRole?.id}</p>
-                        <p>eventRole.Volunteer_Event_Role_Details.Role: {notification.data.eventRole?.Volunteer_Event_Role_Details?.Role}</p>
-                        <p>eventRole.Volunteer_Event_Role_Details.Role:label: {notification.data.eventRole?.Volunteer_Event_Role_Details?.["Role:label"]}</p>
-                        <p>eventRole.Volunteer_Event_Role_Details.Event.id: {notification.data.eventRole?.Volunteer_Event_Role_Details?.Event?.id}</p>
-                        <p>eventRole.Volunteer_Event_Role_Details.Event.subject: {notification.data.eventRole?.Volunteer_Event_Role_Details?.Event?.subject}</p>
-                        <p>trainingSchedule.id: {notification.data.trainingSchedule?.id}</p>
-                        <p>trainingSchedule.Volunteer_Training_Schedule_Details.Training.id: {notification.data.trainingSchedule?.Volunteer_Training_Schedule_Details?.Training?.id}</p>
-                        <p>trainingSchedule.Volunteer_Training_Schedule_Details.Training.subject: {notification.data.trainingSchedule?.Volunteer_Training_Schedule_Details?.Training?.subject}</p>
-                        <br />
-                        <br />
+    return (
+        <Wrapper>
+            {!notifications ? (
+                <Loading className="h-screen items-center" />
+            ) : (
+                <div className="p-4 mb-12">
+                    <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
+                        <ul className="space-y-6">
+                            {notifications.map((notification) => {
+                                const { eventRole, trainingSchedule } = notification.data;
+
+                                return (
+                                    <li
+                                        key={notification.data.id}
+                                        className="p-6 bg-white shadow-lg rounded-lg border border-gray-200"
+                                    >
+                                        <div className="flex flex-col md:flex-row md:justify-between md:items-start">
+                                            {/* Left Content: Notification Details */}
+                                            <div className="flex-1 md:mr-6 overflow-auto">
+                                                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                                                    {notification.data.subject}
+                                                </h3>
+
+                                                {/* Event Role Notifications */}
+                                                {eventRole?.id ? (
+                                                    <>
+                                                        <p className="text-md text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                                                            <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" />
+                                                            <b>Event:</b> {eventRole.Volunteer_Event_Role_Details?.Event?.subject || "N/A"}
+                                                        </p>
+                                                        <p className="text-md text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                                                            <UserIcon className="h-5 w-5 text-gray-500" />
+                                                            <b>Role:</b> {eventRole.Volunteer_Event_Role_Details?.["Role:label"] || "N/A"}
+                                                        </p>
+                                                        <p className="text-md text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                                                            <CalendarIcon className="h-5 w-5 text-gray-500" />
+                                                            <b>Date:</b> {moment(eventRole.activity_date_time).format("D MMM YYYY, h:mm A") || "N/A"}
+                                                        </p>
+                                                        <p className="text-md text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                                                            <MapPinIcon className="h-5 w-5 text-gray-500" />
+                                                            <b>Location:</b> {eventRole.Volunteer_Event_Role_Details?.Event?.location || "N/A"}
+                                                        </p>
+                                                    </>
+                                                ) : null}
+
+                                                {/* Training Schedule Notifications */}
+                                                {trainingSchedule?.id ? (
+                                                    <>
+                                                        <p className="text-md text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                                                            <ClipboardDocumentListIcon className="h-5 w-5 text-gray-500" />
+                                                            <b>Training:</b>{" "}
+                                                            {trainingSchedule.Volunteer_Training_Schedule_Details?.Training?.subject || "N/A"}
+                                                        </p>
+                                                        <p className="text-md text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                                                            <CalendarIcon className="h-5 w-5 text-gray-500" />
+                                                            <b>Date:</b> {moment(trainingSchedule.activity_date_time).format("D MMM YYYY, h:mm A") || "N/A"}
+                                                        </p>
+                                                        <p className="text-md text-gray-700 flex items-center gap-2 whitespace-nowrap">
+                                                            <MapPinIcon className="h-5 w-5 text-gray-500" />
+                                                            <b>Location:</b> {trainingSchedule.location || "N/A"}
+                                                        </p>
+                                                    </>
+                                                ) : null}
+
+                                                {/* Shared Message */}
+                                                <p className="text-md text-gray-600 mt-4">
+                                                    We look forward to seeing you there, thank you for making a difference!
+                                                </p>
+                                            </div>
+
+                                            {/* Right Content: Button */}
+                                            <div className="mt-4 md:mt-0 md:flex-none md:w-40">
+                                                {eventRole?.id ? (
+                                                    <button
+                                                        className="w-full px-6 py-2 bg-secondary text-white text-sm font-semibold rounded-md hover:bg-primary transition"
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/volunteer/events/${eventRole.Volunteer_Event_Role_Details?.Event?.id}/${eventRole.Volunteer_Event_Role_Details?.Role}`
+                                                            )
+                                                        }
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                ) : trainingSchedule?.id ? (
+                                                    <button
+                                                        className="w-full px-6 py-2 bg-secondary text-white text-sm font-semibold rounded-md hover:bg-primary transition"
+                                                        onClick={() =>
+                                                            navigate(
+                                                                `/volunteer/trainings/${trainingSchedule.Volunteer_Training_Schedule_Details?.Training?.id}`
+                                                            )
+                                                        }
+                                                    >
+                                                        View Details
+                                                    </button>
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                    </li>
+                                );
+                            })}
+                        </ul>
                     </div>
-                })}
-            </div>
-        </div>}
-    </Wrapper>
+                </div>
+            )}
+        </Wrapper>
+    );
 }

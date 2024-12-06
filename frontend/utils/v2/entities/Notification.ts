@@ -11,28 +11,27 @@ export class Notification extends Entity {
         }
         eventRole?: {
             id?: number;
+            activity_date_time?: string;
             Volunteer_Event_Role_Details?: {
                 Role?: string;
                 "Role:label"?: string;
                 Event?: {
                     id?: number;
+                    location?: string;
                     subject?: string
                 }
             }
-
         }
         trainingSchedule?: {
             id: number;
+            activity_date_time?: string;
+            location?: string;
             Volunteer_Training_Schedule_Details?: {
                 Training?: {
                     id?: number;
                     subject?: string;
                 };
             }
-        }
-        training?: {
-            id: number;
-            subject: string;
         }
     } = {}
 
