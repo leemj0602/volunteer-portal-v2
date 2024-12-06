@@ -2,6 +2,7 @@ import CRM from "../crm";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
 import JobRequestManager from "../managers/JobRequestManager";
 import TrainingRegistrationManager from "../managers/TrainingRegistrationManager";
+import NotificationHandler from "../v2/handlers/NotificationHandler";
 import { Relationship, RelationshipProps } from "./Relationship";
 
 interface MandatoryContactDetailProps {
@@ -99,5 +100,9 @@ export class Contact implements ContactProps {
         }).catch(() => null);
         if (!response) return [] as Relationship[];
         return (response.data as RelationshipProps[]).map(r => new Relationship(r));
+    }
+
+    async fetchNotifications() {
+        return NotificationHandler.fetch({ contactId: this.id! });
     }
 }

@@ -60,6 +60,7 @@ export default function Navbar(props: NavbarProps) {
                         <Item location={props.location} to="/volunteer/jobs" name="Jobs" />
                         <Item location={props.location} to="/volunteer/trainings" name="Trainings" />
                         <Item to="/volunteer/volunteer-info-pack" name="Volunteer Info Pack" />
+                        <Item to="/volunteer/notifications" name="Notifications" />
                     </Category>}
                     {subtypes.includes('Donator') && <Category location={props.location} to="/donor" icon={FaDonate} name="Donations">
                         <Item to="/donor/campaigns" name="Campaigns" />
@@ -83,7 +84,7 @@ export default function Navbar(props: NavbarProps) {
                     <button onClick={openModal} className="flex pl-9 py-2 items-center gap-x-4 text-secondary border-l-4 font-semibold hover:bg-primary/10 hover:text-secondary/90 border-l-transparent hover:border-l-secondary/70 w-full">
                         <PiSignOutBold />
                         <span>Sign Out</span>
-                    </button>                    
+                    </button>
                 </div>
             </div>
         </nav>
@@ -98,7 +99,7 @@ export default function Navbar(props: NavbarProps) {
                 <button className={`text ${menuOpen ? "text-secondary" : "text-primary"} hover:text-secondary`} onClick={() => setMenuOpen(!menuOpen)}>
                     <GiHamburgerMenu size={24} />
                 </button>
-            </div>      
+            </div>
             {menuOpen && <>
                 <hr />
                 <div className="flex flex-col pt-2 max-h-[200px] overflow-y-scroll">
