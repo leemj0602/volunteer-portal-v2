@@ -19,6 +19,7 @@ export class Campaign extends Entity {
       Financial_Goal?: number;
     },
     thumbnail?: {
+      uri?: string;
       url?: string;
     }
   } = {}; 
