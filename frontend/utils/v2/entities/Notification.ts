@@ -8,6 +8,7 @@ export class Notification extends Entity {
         details?: string;
         registration?: {
             id?: number;
+            activity_date_time?: string;
             "activity_type_id:name"?: string;
         }
         eventRole?: {

@@ -13,6 +13,7 @@ class NotificationHandler {
                 'details',
 
                 'registration.id',
+                'registration.activity_date_time',
                 'registration.activity_type_id:name',
 
                 'eventRole.id',
@@ -39,6 +40,9 @@ class NotificationHandler {
             where: [
                 ['activity_type_id:name', '=', 'Reminder Sent'],
                 ["target_contact_id", "=", options?.contactId],
+            ],
+            order: [
+                ['registration.activity_date_time', 'DESC'],
             ]
         }).catch(console.log);
 
