@@ -50,7 +50,7 @@ export default function CampaignPage() {
       });
       // In the scenario where you think that they'll still be on the same page and want to re-set the amount
       // Remove if this is not the case
-      setAmount(-1);
+      setAmount(undefined);
     }
   }, [amount]);
 
