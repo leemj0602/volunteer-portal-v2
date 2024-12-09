@@ -18,7 +18,7 @@ class CampaignHandler {
           ["activity_type_id:name", "=", "Donation Campaign"],
           ...(options?.where ?? [])
         ],
-        select: ['*', 'status_id:name', 'Donation_Campaign_Details.*', 'thumbnail.url'],
+        select: ['*', 'status_id:name', 'Donation_Campaign_Details.*', 'thumbnail.*', 'thumbnail.url'],
         join: [["File AS thumbnail", "LEFT", ["thumbnail.id", "=", "Donation_Campaign_Details.Thumbnail"]]],
         order: options?.sort
       });

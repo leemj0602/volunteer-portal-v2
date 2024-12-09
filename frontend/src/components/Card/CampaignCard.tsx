@@ -14,7 +14,7 @@ export default function CampaignCard(props: CampaignCardProps) {
   return <Card
     className={props.className}
     url={`/donor/campaigns/${props.campaign.data.id}`}
-    thumbnail={props.campaign.data.thumbnail?.url}
+    thumbnail={props.campaign.data.thumbnail?.uri}
     cancelled={props.campaign.data["status_id:name"] == CampaignStatus.CANCELLED}
   >
     <h1 className="font-semibold mb-4">{props.campaign.data.subject}</h1>
