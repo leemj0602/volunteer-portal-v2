@@ -17,6 +17,18 @@ export default function Notifications() {
             const contact = await ContactManager.fetch(email);
 
             const notifications = await contact.fetchNotifications();
+            notifications.sort((a, b) => {
+                // Get activity_date_time for trainingSchedule or eventRole for both a and b
+                const aDate = a.data.trainingSchedule?.activity_date_time || a.data.eventRole?.activity_date_time;
+                const bDate = b.data.trainingSchedule?.activity_date_time || b.data.eventRole?.activity_date_time;
+
+                // Convert to timestamps for comparison
+                const aTime = aDate ? new Date(aDate).getTime() : 0; // Default to 0 if date is missing
+                const bTime = bDate ? new Date(bDate).getTime() : 0; // Default to 0 if date is missing
+
+                // Compare timestamps
+                return bTime - aTime; // Descending order
+            });
             setNotifications(notifications);
         })();
     }, []);
@@ -40,6 +52,9 @@ export default function Notifications() {
                                         <div className="flex flex-col md:flex-row md:justify-between md:items-start">
                                             {/* Left Content: Notification Details */}
                                             <div className="flex-1 md:mr-6 overflow-auto">
+                                                <p>
+                                                    <b>Sent On:</b> {moment(notification.data.activity_date_time).format("D MMM YYYY, h:mm A") || "N/A"}
+                                                </p>
                                                 <h3 className="text-xl font-bold text-gray-900 mb-3">
                                                     {notification.data.subject}
                                                 </h3>

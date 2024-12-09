@@ -8,6 +8,7 @@ class NotificationHandler {
     async fetch(options?: { contactId?: number }): Promise<Notification[]> {
         const response = await CRM(this.entity, "get", {
             select: [
+                'activity_date_time',
                 'subject',
                 'details',
 
@@ -16,10 +17,10 @@ class NotificationHandler {
 
                 'eventRole.id',
                 'eventRole.activity_date_time',
-                'eventRole.Volunteer_Event_Role_Details.Event.location',
                 'eventRole.Volunteer_Event_Role_Details.Role',
                 'eventRole.Volunteer_Event_Role_Details.Role:label',
                 'eventRole.Volunteer_Event_Role_Details.Event.id',
+                'eventRole.Volunteer_Event_Role_Details.Event.location',
                 'eventRole.Volunteer_Event_Role_Details.Event.subject',
 
                 'trainingSchedule.id',
