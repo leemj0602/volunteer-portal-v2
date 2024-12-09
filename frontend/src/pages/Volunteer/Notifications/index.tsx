@@ -3,10 +3,6 @@ import Wrapper from "../../../components/Wrapper";
 import { Notification } from "../../../../utils/v2/entities/Notification";
 import Loading from "../../../components/Loading";
 import ContactManager from "../../../../utils/managers/ContactManager";
-import { useNavigate } from "react-router-dom";
-import moment from "moment";
-import { CalendarIcon, MapPinIcon, UserIcon, ClipboardDocumentListIcon } from "@heroicons/react/24/outline";
-import PageNavigation from "../../../components/PageNavigation";
 import NotificationsList from "./components/NotificationsList";
 
 export default function Notifications() {
