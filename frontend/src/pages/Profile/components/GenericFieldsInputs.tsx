@@ -28,7 +28,7 @@ export default function GenericFieldsInputs(props: GenericFieldsInputsProps) {
     {/* Address */}
     <TextField className="flex justify-center" label="Address" id="address_primary.street_address" fields={props.flat_contact} handleFields={props.handleFieds} disabled={props.disabled} />
     {/* Postal Code */}
-    <TextField className="flex justify-center" label="Address" id="address_primary.postal_code" fields={props.flat_contact} disabled={props.disabled} />
+    <TextField className="flex justify-center" label="Postal" id="address_primary.postal_code" fields={props.flat_contact} handleFields={props.handleFieds} disabled={props.disabled} />
     {/* Gender */}
     <DropdownField className="flex justify-center" label="Gender" id="gender_id" placeholder="Please choose your gender" fields={props.flat_contact} disabled={props.disabled} options={[
           { label: "Male", value: "2" },

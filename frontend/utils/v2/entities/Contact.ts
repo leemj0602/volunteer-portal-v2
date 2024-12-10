@@ -25,7 +25,7 @@ export class Contact extends Entity {
         }
 
         Patient_Contact_Details?: {
-            Dietary_Preferences?: string[];
+            [key: string]: any;
         }
     } = {};
 
@@ -43,11 +43,10 @@ export class Contact extends Entity {
             values: values as [string, any][],
             where: [["id", "=", this.data.id]]
         }).catch(() => null);
+
         if (!response) return null;
 
         const contact = await ContactHandler.fetch(this.data.email_primary!.email!);
-        for (const key in contact) this.setNestedValue(this.data, key, (this.data as any)[key]);
-        
-        return this;
+        return contact;
     }
 }

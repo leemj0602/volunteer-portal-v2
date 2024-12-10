@@ -20,13 +20,13 @@ interface DropdownFieldProps {
 
 export default function DropdownField(props: DropdownFieldProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const [selectedOption, setSelectedOption] = useState<CustomFieldOptions | null>(null);
+    const [selectedOption, setSelectedOption] = useState<CustomFieldOptions | null>(props.options.find(o => o.value == props.fields[props.id]) ?? null);
     const [isHovering, setIsHovering] = useState(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
 
     const toggleDropdown = () => setIsMenuOpen(!isMenuOpen);
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const selected = props.options.find((opt) => opt.value === e.target.value) || null;
+        const selected = props.options.find((opt) => opt.value == e.target.value) ?? null;
         setSelectedOption(selected);
         if (props.handleFields) {
             toggleDropdown();
@@ -34,11 +34,6 @@ export default function DropdownField(props: DropdownFieldProps) {
         }
         setIsMenuOpen(false);
     }
-
-    useEffect(() => {
-        const selected = props.options.find((opt) => opt.value === props.fields[props.id]) || null;
-        setSelectedOption(selected);
-    }, [props.fields, props.id, props.options]);
 
     useEffect(() => {
         const handleClickOutside = (e: MouseEvent) => {
@@ -79,7 +74,7 @@ export default function DropdownField(props: DropdownFieldProps) {
             <div className="relative" ref={dropdownRef}>
                 {/* Input */}
                 <div className="relative flex items-center">
-                    <input type="text" id={props.id} placeholder={props.disabled ? props.options.find(o => o.value == props.fields[props.id])?.label ?? "None provided" : props.placeholder ?? "Please select an option"} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:cursor-not-allowed`} onClick={toggleDropdown} value={selectedOption?.label || ""} disabled={props.disabled} required={props.required} />
+                    <input type="text" id={props.id} placeholder={props.disabled ? props.options.find(o => o.value == props.fields[props.id])?.label ?? "None provided" : props.placeholder ?? "Please select an option"} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white disabled:text-gray-500 caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:cursor-not-allowed`} onClick={toggleDropdown} value={selectedOption?.label || ""} disabled={props.disabled} required={props.required} />
                     {!props.disabled && <IoIosArrowDown className="text-secondary absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />}
                 </div>
                 {/* Dropdown menu */}

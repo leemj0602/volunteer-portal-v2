@@ -14,9 +14,9 @@ export default function Header({ contact }: HeaderProps) {
 
         </div>
         {/* Text */}
-        <div className="grid grid-cols-1 gap-y-6">
+        <div className="grid-cols-1 gap-y-6 hidden lg:grid">
           <h1 className="font-bold text-2xl">{contact.data.first_name} {contact.data.last_name ?? ""}</h1>
-          <h2 className="font-semibold text-transparent lg:text-black">{contact.data.address_primary?.street_address}</h2>
+          <h2 className="font-semibold">{contact.data.address_primary?.street_address}</h2>
         </div>
       </div>
     </div>
