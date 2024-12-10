@@ -1,3 +1,4 @@
+import moment from "moment";
 import CRM from "../crm.ts";
 import ContactManager from "../managers/ContactManager.ts";
 import TrainingRegistrationManager from "../managers/TrainingRegistrationManager.ts";
@@ -76,11 +77,13 @@ export class TrainingSchedule implements TrainingScheduleProps {
         const register = await CRM("Activity", "create", {
             values: [
                 ["activity_type_id:name", "Volunteer Training Registration"],
+                ["activity_date_time", this.activity_date_time],
                 ["target_contact_id", [contact.id]],
                 ["source_contact_id", contact.id],
-                ["subject", this.subject],
+                ["subject", this.training.subject],
                 ["status_id:name", "Scheduled"],
                 ["Volunteer_Training_Registration_Details.Training_Schedule", this.id],
+                ["Volunteer_Training_Registration_Details.Registration_Date", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")],
             ]
         }).catch(() => null);
 
@@ -94,7 +97,7 @@ export class TrainingSchedule implements TrainingScheduleProps {
             ],
             where: [['Volunteer_Training_Registration_Details.Training_Schedule', '=', trainingSchedule]],
         })
-        
+
         return response?.data.length;
     }
 }

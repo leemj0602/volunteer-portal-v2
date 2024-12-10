@@ -16,8 +16,8 @@ export default function UpcomingEvents({ registrations }: UpcomingEventsProps) {
         (async () => {
             setEventRoles(await EventRoleManager.fetchUnregistered(registrations.map(r => r.eventRole.id!), 3));
         })();
-    })
-    
+    }, []);
+
     return <div className="mt-8">
         <div className="flex justify-between">
             <h2 className="text-xl font-semibold">Upcoming Events</h2>

@@ -48,7 +48,7 @@ export default function Event() {
 
             // #region Parsing data for event roles table
             const eventRolesTable = await Promise.all(eventRoles.map(async (eventRole: EventRole) => {
-                console.log(eventRole);
+                // console.log(eventRole);
                 const registrations = await eventRole.fetchRegistrations();
 
                 const ID = eventRole.id ?? null;

@@ -3,10 +3,12 @@ import Entity from "./Entity";
 export class Notification extends Entity {
     data: {
         id?: number;
+        activity_date_time?: string;
         subject?: string;
         details?: string;
         registration?: {
             id?: number;
+            activity_date_time?: string;
             "activity_type_id:name"?: string;
         }
         eventRole?: {

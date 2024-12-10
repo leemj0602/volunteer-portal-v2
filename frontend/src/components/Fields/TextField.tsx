@@ -26,7 +26,7 @@ export default function TextField(props: TextFieldProps) {
     const [isHovering, setIsHovering] = useState(false);
     const [currentValue, setCurrentValue] = useState(props.value ?? props.fields?.[props.id]);
 
-    const countWords = (text: string) => text.trim().split(/\s+/).length;
+    const countWords = (text: string) => (text ?? "").trim().split(/\s+/).length;
     const [wordCount, setWordCount] = useState(countWords(props.value ?? props.fields?.[props.id]) ?? 0);
     const handleHovering = () => setIsHovering(!isHovering);
 

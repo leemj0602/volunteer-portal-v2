@@ -8,18 +8,20 @@ class NotificationHandler {
     async fetch(options?: { contactId?: number }): Promise<Notification[]> {
         const response = await CRM(this.entity, "get", {
             select: [
+                'activity_date_time',
                 'subject',
                 'details',
 
                 'registration.id',
+                'registration.activity_date_time',
                 'registration.activity_type_id:name',
 
                 'eventRole.id',
                 'eventRole.activity_date_time',
-                'eventRole.Volunteer_Event_Role_Details.Event.location',
                 'eventRole.Volunteer_Event_Role_Details.Role',
                 'eventRole.Volunteer_Event_Role_Details.Role:label',
                 'eventRole.Volunteer_Event_Role_Details.Event.id',
+                'eventRole.Volunteer_Event_Role_Details.Event.location',
                 'eventRole.Volunteer_Event_Role_Details.Event.subject',
 
                 'trainingSchedule.id',
@@ -38,6 +40,9 @@ class NotificationHandler {
             where: [
                 ['activity_type_id:name', '=', 'Reminder Sent'],
                 ["target_contact_id", "=", options?.contactId],
+            ],
+            order: [
+                ['registration.activity_date_time', 'DESC'],
             ]
         }).catch(console.log);
 

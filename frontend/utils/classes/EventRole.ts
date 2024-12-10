@@ -1,3 +1,4 @@
+import moment from "moment";
 import CRM, { ComparisonOperator } from "../crm";
 import ContactManager from "../managers/ContactManager";
 import EventRegistrationManager from "../managers/EventRegistrationManager";
@@ -71,11 +72,13 @@ export class EventRole implements EventRoleProps {
         await CRM("Activity", "create", {
             values: [
                 ["activity_type_id:name", "Volunteer Event Registration"],
+                ["activity_date_time", this.activity_date_time],
                 ["target_contact_id", [contact.id]],
                 ["source_contact_id", contact.id],
                 ["subject", `${this["Volunteer_Event_Role_Details.Role:label"]} - ${this.event.subject}`],
                 ["status_id:name", this["Volunteer_Event_Role_Details.Approval_Required"] ? RegistrationStatus.ApprovalRequired : RegistrationStatus.Approved],
-                ["Volunteer_Event_Registration_Details.Event_Role", this.id]
+                ["Volunteer_Event_Registration_Details.Event_Role", this.id],
+                ["Volunteer_Event_Registration_Details.Registration_Date", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")],
             ]
         }).catch(() => null);
 
