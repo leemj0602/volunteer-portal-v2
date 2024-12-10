@@ -83,10 +83,10 @@ export default function EventRegistrations(props: EventRegistrationsProps) {
             }
             // IF the event has started
             else if (now >= start) {
-                console.log(`Now: ${now}`);
-                console.log(`End: ${end}`);
+                // console.log(`Now: ${now}`);
+                // console.log(`End: ${end}`);
                 if (now > end) {
-                    console.log("long ended");
+                    // console.log("long ended");
                     if (!registration.attendance) registration.status = "No Show";
                     else registration.status = "Completed";
                 }
