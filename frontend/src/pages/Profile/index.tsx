@@ -10,7 +10,7 @@ import { FiEdit } from "react-icons/fi";
 import { ResetPasswordButton } from "./components/ResetPasswordButton";
 import { MdSaveAlt } from "react-icons/md";
 import GenericFieldsInputs from "./components/GenericFieldsInputs";
-import CustomFieldsInputs from "./components/CustomFIeldsInputs";
+import CustomFieldsInputs from "./components/CustomFieldsInputs";
 import Swal from "sweetalert2";
 
 export default function Profile2() {
@@ -41,6 +41,10 @@ export default function Profile2() {
       }
     })();
   }, [subtypes]);
+
+  useEffect(() => {
+    console.log(volunteer);
+  }, [volunteer]);
 
   const handleFields = (id: string, value: any) => {
     if (post) {
