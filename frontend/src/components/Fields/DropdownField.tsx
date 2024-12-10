@@ -24,7 +24,12 @@ export default function DropdownField(props: DropdownFieldProps) {
     const [isHovering, setIsHovering] = useState(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
 
+    useEffect(() => {
+        setSelectedOption(props.options.find((o) => o.value == props.fields[props.id]) ?? null);
+    }, [props.fields[props.id]]);
+
     const toggleDropdown = () => setIsMenuOpen(!isMenuOpen);
+
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
         const selected = props.options.find((opt) => opt.value == e.target.value) ?? null;
         setSelectedOption(selected);
