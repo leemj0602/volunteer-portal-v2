@@ -18,7 +18,7 @@ interface CheckboxFieldProps {
 export default function CheckboxField(props: CheckboxFieldProps) {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement | null>(null);
-    const [values, setValues] = useState(props.fields[props.id] as any[]);
+    const [values, setValues] = useState((props.fields[props.id] ?? []) as any[]);
 
     const toggleDropdown = () => setIsMenuOpen(!isMenuOpen);
     const handleClick = (option: CustomFieldOptions) => {
@@ -50,14 +50,14 @@ export default function CheckboxField(props: CheckboxFieldProps) {
             <div className="relative mt-1" ref={dropdownRef}>
                 {/* Input */}
                 <div className="relative flex items-center">
-                    <input type="text" id={props.id} placeholder="None selected" value={`${props.fields[props.id].map((v: any) => props.options.find(o => o.value == v)?.label).join(', ')}`} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white disabled:cursor-not-allowed caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:text-gray-500`} onClick={toggleDropdown} disabled={props.disabled} required={props.required} />
+                    <input type="text" id={props.id} placeholder="None selected" value={`${values.map(v => props.options.find(o => o.value == v)?.label).join(', ')}`} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white disabled:cursor-not-allowed caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:text-gray-500`} onClick={toggleDropdown} disabled={props.disabled} required={props.required} />
                     {!props.disabled && <IoIosArrowDown className="text-secondary absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />}
                 </div>
                 {/* Dropdown menu */}
                 {!props.disabled && isMenuOpen && <div className="absolute z-[1] bg-white w-full rounded-b-[5px] flex flex-col py-2" role="menu" aria-orientation="vertical">
                     {props.options.map((opt: CustomFieldOptions) => {
                         return <div className="inline-block px-4 py-2 items-center gap-x-3 cursor-pointer disabled:cursor-not-allowed hover:bg-gray-100 w-full" onClick={() => handleClick(opt)}>
-                            <input type="checkbox" id={`${props.id}-${opt.value}`} className="pointer-events-none" checked={values.includes(opt.id) || values.includes(opt.value)} />
+                            <input type="checkbox" id={`${props.id}-${opt.value}`} className="pointer-events-none" checked={values.some(v => v == opt.id || v == opt.value)} />
                             <label htmlFor={`${props.id}-${opt.value}`} className="text-sm w-full text-gray-600 ml-4 cursor-pointer pointer-events-none">{opt.label}</label>
                         </div>
                     })}

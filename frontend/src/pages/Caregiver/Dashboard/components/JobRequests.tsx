@@ -224,7 +224,7 @@ export default function JobRequests(props: JobRequestsProps) {
                     <Cell colSpan={5} className="text-center text-lg text-gray-500">No job request history available</Cell>
                     {/* Slices and shows only 5 entities per page */}
                 </tr> : currRequests.slice(page * limit, page + ((page + 1) * limit)).map((request, index) => {
-                    const editable = ["Pending"].includes(request.status);
+                    const editable = ["Pending", "Requested"].includes(request.status);
                     const cancellable = ["Pending", "Requested", "Accepted"].includes(request.status);
                     const volunteerCancelled = request["accepted_job.status_id:name"] === "Cancelled";
 
