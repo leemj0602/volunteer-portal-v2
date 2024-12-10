@@ -27,13 +27,13 @@ export default function CustomFieldsInputs(props: CustomFieldsInputsProps) {
 
         switch (field.html_type) {
           case "Text":
-            return <TextField className="flex justify-center" label={field.label} id={id} disabled={props.disabled} handleFields={props.handleFields} />
+            return <TextField className="flex justify-center" label={field.label} id={id} fields={props.flat_contact} disabled={props.disabled} handleFields={props.handleFields} required={field.is_required} />
           case "Radio":
-            return <DropdownField className="flex justify-center" label={field.label} id={id} fields={props.flat_contact} options={field.options} disabled={props.disabled} handleFields={props.handleFields}/>
+            return <DropdownField className="flex justify-center" label={field.label} id={id} fields={props.flat_contact} options={field.options} disabled={props.disabled} handleFields={props.handleFields} required={field.is_required} />
           case "Select":
-            return <DropdownField className="flex justify-center" label={field.label} id={id} fields={props.flat_contact} options={field.options} disabled={props.disabled} handleFields={props.handleFields} />
+            return <DropdownField className="flex justify-center" label={field.label} id={id} fields={props.flat_contact} options={field.options} disabled={props.disabled} handleFields={props.handleFields} required={field.is_required} />
           case "CheckBox":
-            return <CheckboxField className="flex justify-center" label={field.label} id={id} fields={props.flat_contact} options={field.options} disabled={props.disabled} handleFields={props.handleFields} />
+            return <CheckboxField className="flex justify-center" label={field.label} id={id} fields={props.flat_contact} options={field.options} disabled={props.disabled} handleFields={props.handleFields} required={field.is_required} />
         }
       })}
     </div>

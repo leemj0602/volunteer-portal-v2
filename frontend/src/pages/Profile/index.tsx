@@ -10,7 +10,7 @@ import { FiEdit } from "react-icons/fi";
 import { ResetPasswordButton } from "./components/ResetPasswordButton";
 import { MdSaveAlt } from "react-icons/md";
 import GenericFieldsInputs from "./components/GenericFieldsInputs";
-import CustomFieldsInputs from "./components/CustomFIeldsInputs";
+import CustomFieldsInputs from "./components/CustomFieldsInputs";
 import Swal from "sweetalert2";
 
 export default function Profile2() {
@@ -75,7 +75,7 @@ export default function Profile2() {
       <div className="p-4">
         <form className="max-w-[1000px]" onSubmit={update}>
           {/* Buttons */}
-          <div className="flex w-full justify-center md:justify-end mb:10 lg:mb-20">
+          <div className="flex w-full justify-center md:justify-end mb-10 lg:mb-20">
             <div className="flex flex-col sm:flex-row gap-3">
               {!editing && <button onClick={() => setEditing(true)} type="button" className="text-white font-semibold text-sm rounded-md py-[6px] px-4 bg-secondary flex justify-center sm:justify-between items-center gap-x-3">
                 <FiEdit />

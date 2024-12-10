@@ -12,6 +12,7 @@ interface CheckboxFieldProps {
     placeholder?: string;
     options: CustomFieldOptions[];
     label: string;
+    required?: boolean;
 }
 
 export default function CheckboxField(props: CheckboxFieldProps) {
@@ -42,11 +43,14 @@ export default function CheckboxField(props: CheckboxFieldProps) {
     return <div className={props.className}>
         <div className="w-full md:w-[300px]">
             {/* Label */}
-            <label htmlFor={props.id} className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}>{props.label}</label>
+            <label htmlFor={props.id} className={`font-semibold ${props.disabled ? "opacity-40" : ""}`}>
+                {props.label}
+                {props.required && <span className="text-red-500 ml-1">*</span>}
+            </label>
             <div className="relative mt-1" ref={dropdownRef}>
                 {/* Input */}
                 <div className="relative flex items-center">
-                    <input type="text" id={props.id} placeholder={`${props.fields[props.id] ? props.fields[props.id].length > 0 ? props.fields[props.id].length : "None" : "None"} selected`} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white disabled:cursor-not-allowed caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer`} onClick={toggleDropdown} disabled={props.disabled} />
+                    <input type="text" id={props.id} placeholder="None selected" value={`${props.fields[props.id].map((v: any) => props.options.find(o => o.value == v)?.label).join(', ')}`} className={`w-full py-2 px-4 rounded-t-[5px] disabled:bg-white disabled:cursor-not-allowed caret-transparent outline-none select-none ${!isMenuOpen ? "rounded-b-[5px]" : ""} cursor-pointer disabled:text-gray-500`} onClick={toggleDropdown} disabled={props.disabled} required={props.required} />
                     {!props.disabled && <IoIosArrowDown className="text-secondary absolute right-2 top-1/2 transform -translate-y-1/2 pointer-events-none" />}
                 </div>
                 {/* Dropdown menu */}
@@ -62,3 +66,5 @@ export default function CheckboxField(props: CheckboxFieldProps) {
         </div>
     </div>
 }
+
+// `${props.fields[props.id] ? props.fields[props.id].length > 0 ? props.fields[props.id].length : "None" : "None"} selected`

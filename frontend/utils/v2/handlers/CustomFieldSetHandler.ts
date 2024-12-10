@@ -17,6 +17,7 @@ export interface CustomField {
   "option_group_id:name": string;
   options: CustomFieldOptions[];
   data_type: string;
+  is_required: boolean;
 }
 
 class CustomFieldSetHandler {
@@ -26,7 +27,7 @@ class CustomFieldSetHandler {
   async fetch(name: string) {
     const response = await CRM(this.entity, "get", {
       where: [["custom_group_id:name", "=", name]],
-      select: ["name", "label", "html_type", "option_group_id", "option_group_id:name", "data_type"],
+      select: ['*', 'option_group_id:name'],
     });
 
     const customFields = response?.data as CustomField[];

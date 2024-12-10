@@ -24,35 +24,22 @@ interface TextFieldProps {
 
 export default function TextField(props: TextFieldProps) {
     const [isHovering, setIsHovering] = useState(false);
-    const [currentValue, setCurrentValue] = useState(props.value || "");
-    const [wordCount, setWordCount] = useState(0);
-
-    useEffect(() => {
-        setCurrentValue(props.value || "");
-        setWordCount(props.value ? countWords(props.value) : 0);
-    }, [props.value]);
-
-
-    const handleHovering = () => setIsHovering(!isHovering);
+    const [currentValue, setCurrentValue] = useState(props.value ?? props.fields?.[props.id]);
 
     const countWords = (text: string) => text.trim().split(/\s+/).length;
+    const [wordCount, setWordCount] = useState(countWords(props.value ?? props.fields?.[props.id]) ?? 0);
+    const handleHovering = () => setIsHovering(!isHovering);
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const inputText = e.target.value;
-        const words = countWords(inputText);
+        const words = countWords(e.target.value);
 
-        if (props.wordLimit && words > props.wordLimit) {
-            return; // Prevent input if word limit is exceeded
-        }
+        if (props.wordLimit && words > props.wordLimit) return;
 
-        setCurrentValue(inputText);
+        setCurrentValue(e.target.value);
         setWordCount(words);
 
-        if (props.handleChange) {
-            props.handleChange(e);
-        } else if (props.handleFields) {
-            props.handleFields(props.id, inputText);
-        }
+        if (props.handleChange) props.handleChange(e);
+        else if (props.handleFields) props.handleFields(props.id, e.target.value);
     };
 
     return (
@@ -91,13 +78,8 @@ export default function TextField(props: TextFieldProps) {
                     <input
                         type="text"
                         id={props.id}
-                        className="w-full py-2 px-4 rounded-[5px] disabled:bg-white disabled:cursor-not-allowed outline-none"
+                        className="w-full py-2 px-4 rounded-[5px] disabled:bg-white disabled:text-gray-500 disabled:cursor-not-allowed outline-none"
                         value={currentValue}
-                        placeholder={
-                            props.value !== undefined
-                                ? props.value
-                                : props.fields?.[props.id]
-                        }
                         disabled={props.disabled}
                         onChange={onChange}
                         required={props.required}
