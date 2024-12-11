@@ -6,15 +6,17 @@ import { CiFileOff } from "react-icons/ci";
 import Swal from "sweetalert2";
 import CharityHandler from "../../../utils/v2/handlers/CharityHandler";
 import { Charity } from "../../../utils/v2/entities/Charity";
+import config from "../../../../config.json";
 
 export default function Donate() {
   const navigate = useNavigate();
   const [amount, setAmount] = useState<number>();
   const [charity, setCharity] = useState<Charity>();
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
-      const charity = await CharityHandler.fetchCharity("charity@octopus8.com");
+      const charity = await CharityHandler.fetchCharity(config.charityEmail);
       if (!charity) alert("Cannot fetch charity");
       setCharity(charity);
       console.log(charity);
@@ -42,7 +44,7 @@ export default function Donate() {
         icon: "success",
         timer: 3000,
         timerProgressBar: true,
-        title: `Thank you for donating $${amount}!`
+        title: `Thank you for donating $${amount}${isRecurring ? '/mo' : ''}!`
       });
       // In the scenario where you think that they'll still be on the same page and want to re-set the amount
       // Remove if this is not the case
@@ -63,7 +65,7 @@ export default function Donate() {
         {/* Name, Description, and Contact Details */}
         <div className="md:mt-4 grid md:grid-cols-3 gap-x-8">
           {/* Name and Description */}
-          <div className="col-span-2">
+          <div className="md:col-span-2">
             <h2 className="text-2xl text-secondary font-semibold">
               {charity.data.organization_name}
             </h2>
@@ -77,8 +79,8 @@ export default function Donate() {
             )}
           </div>
           {/* Contact Details */}
-          <div className="bg-gray-50 p-4 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700">Contact Details</h3>
+          <div className="bg-gray-50 p-4 rounded-lg shadow-md md:col-span-1 mt-6 md:mt-0">
+            <h3 className="text-lg font-semibold text-gray-700">Contact & Address Details</h3>
             <div className="mt-2 text-black/70">
               {charity.data.email_primary?.email && (
                 <p>
@@ -107,12 +109,24 @@ export default function Donate() {
             </div>
           </div>
         </div>
+        {/* Recurring Donation Option */}
+        <div className="mt-6">
+          <label className="flex items-center gap-x-2">
+            <input
+              type="checkbox"
+              className="form-checkbox"
+              checked={isRecurring}
+              onChange={(e) => setIsRecurring(e.target.checked)}
+            />
+            <span className="text-gray-700 font-medium">Make this a recurring donation (monthly)</span>
+          </label>
+        </div>
         {/* Prices */}
         <h2 className="font-semibold text-2xl text-gray-700 mt-12">Donate</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 mt-2">
           {[10, 25, 50, 100].map(value => {
             return <button onClick={() => setAmount(value)} className="p-2 rounded-lg border-2 hover:border-secondary shadow-md hover:bg-secondary text-center cursor-pointer text-gray-700 hover:text-white">
-              <p className="text-xl font-bold">${value}</p>
+              <p className="text-xl font-bold">${value}{isRecurring ? "/mo" : ""}</p>
             </button>
           })}
         </div>
