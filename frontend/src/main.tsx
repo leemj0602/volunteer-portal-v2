@@ -25,6 +25,7 @@ import Jobs from "./pages/Volunteer/Jobs";
 import Notifications from "./pages/Volunteer/Notifications";
 import Campaigns from "./pages/Donations/Campaigns";
 import CampaignPage from "./pages/Donations/Campaign";
+import Donate from "./pages/Donations/Donate";
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -40,12 +41,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/volunteer/trainings" element={<VolunteerTrainings />} />
 					<Route path="/volunteer/trainings/:id" element={<VolunteerTrainingPage />} />
 					<Route path="/volunteer/volunteer-info-pack" element={<VolunteerInfoPack />} />
-					<Route path="/volunteer/notifications" element={<Notifications/>}/>
+					<Route path="/volunteer/notifications" element={<Notifications />} />
 
 					<Route path="/donor" element={<Donations />} />
 					<Route path="/donor/donor-info-pack" element={<DonorInfoPack />} />
 					<Route path="/donor/campaigns" element={<Campaigns />} />
 					<Route path="/donor/campaigns/:id" element={<CampaignPage />} />
+					<Route path="/donor/donate" element={<Donate />} />
 
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/checkin/:encrypted" element={<CheckIn />} />

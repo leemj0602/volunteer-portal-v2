@@ -28,6 +28,12 @@ export default function TextField(props: TextFieldProps) {
 
     const countWords = (text: string) => (text ?? "").trim().split(/\s+/).length;
     const [wordCount, setWordCount] = useState(countWords(props.value ?? props.fields?.[props.id]) ?? 0);
+
+    useEffect(() => {
+        setCurrentValue(props.value ?? props.fields?.[props.id]);
+        setWordCount(countWords(props.value ?? props.fields?.[props.id]) ?? 0);
+    }, [props.value, props.fields?.[props.id]]);
+
     const handleHovering = () => setIsHovering(!isHovering);
 
     const onChange = (e: ChangeEvent<HTMLInputElement>) => {

@@ -82,10 +82,12 @@ export default function CaregiverRequest() {
             const resetValues: { [key: string]: any } = {
                 details: "",
                 activity_date_time: null,
+                location: "",
             };
             customFieldData?.forEach((_, id) => {
                 resetValues[id] = ""; // Reset dynamic fields to empty
             });
+
             setFormValues(resetValues);
         }
         else if (resultStatus === JobRequestStatus.ApprovalRequired) {
@@ -100,10 +102,12 @@ export default function CaregiverRequest() {
             const resetValues: { [key: string]: any } = {
                 details: "",
                 activity_date_time: null,
+                location: "",
             };
             customFieldData?.forEach((_, id) => {
                 resetValues[id] = ""; // Reset dynamic fields to empty
             });
+
             setFormValues(resetValues);
         } else {
             Swal.fire({

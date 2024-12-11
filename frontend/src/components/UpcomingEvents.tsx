@@ -21,7 +21,7 @@ export default function UpcomingEvents({ eventRoles }: UpcomingEventsProps) {
     <div className="mt-8 rounded-lg">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-semibold">Upcoming Events!</h2>
-        <a className="text-blue-500 hover:text-blue-700 text-lg font-medium cursor-pointer" onClick={() => { navigate('/events') }}>View All Events &gt;</a>
+        <a className="text-blue-500 hover:text-blue-700 text-lg font-medium cursor-pointer" onClick={() => { navigate('/volunteer/events') }}>View All Events &gt;</a>
       </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 mt-6">
         {eventRoles && eventRoles.length > 0 ? (
