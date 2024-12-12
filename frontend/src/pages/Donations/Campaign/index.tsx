@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
-import Wrapper from "../../components/Wrapper";
+import Wrapper from "../../../components/Wrapper";
 import { FormEvent, KeyboardEvent, useEffect, useState } from "react";
-import CampaignHandler from "../../../utils/v2/handlers/CampaignHandler";
-import { Campaign } from "../../../utils/v2/entities/Campaign";
-import Loading from "../../components/Loading";
+import CampaignHandler from "../../../../utils/v2/handlers/CampaignHandler";
+import { Campaign } from "../../../../utils/v2/entities/Campaign";
+import Loading from "../../../components/Loading";
 import { CiFileOff } from "react-icons/ci";
 import { Progress } from "flowbite-react";
 import numeral from "numeral";
@@ -38,20 +38,42 @@ export default function CampaignPage() {
     }
   }
 
+  let tdrInput: HTMLInputElement;
   // What to do after setting the amount
   useEffect(() => {
-    console.log(amount);
-    if (amount) {
-      Swal.fire({
-        icon: "success",
-        timer: 3000,
-        timerProgressBar: true,
-        title: `Thank you for donating $${amount}!`
+    if (!amount) return;
+    (async () => {
+      const result = await Swal.fire({
+        title: 'Confirm your donation',
+        confirmButtonText: 'PROCEED',
+        showCloseButton: true,
+        html: `
+          <p style="font-weight: semibold;">Donation Amount:</p>
+          <p style="font-weight: bold; font-size: 24px;">$${numeral(amount).format('0,0')}</p>
+          ${campaign?.data.Donation_Campaign_Details?.["Financial_Type:label"] == 'TDR' ? `<div style="font-weight: semibold; align-items: center; margin-top: 12px;">
+            <input type="checkbox" id="tdr" name="tdr" />
+            <label htmlFor="tdr" for="tdr" style="color: #5A71B4; cursor: pointer;">I would like a tax deductible receipt</label>
+          </div>` : ''}
+        `,
+        customClass: {
+          htmlContainer: "!text-left"
+        },
+        didOpen: () => {
+          const popup = Swal.getPopup()!;
+          tdrInput = popup.querySelector('#tdr') as HTMLInputElement;
+        },
+        preConfirm: () => {
+          const tdr = tdrInput.checked;
+          return { tdr };
+        }
       });
-      // In the scenario where you think that they'll still be on the same page and want to re-set the amount
-      // Remove if this is not the case
+
+      if (!result.isConfirmed) return setAmount(undefined);
+
+      const { value } = result;
+      console.log(value.tdr, amount);
       setAmount(undefined);
-    }
+    })();
   }, [amount]);
 
 
