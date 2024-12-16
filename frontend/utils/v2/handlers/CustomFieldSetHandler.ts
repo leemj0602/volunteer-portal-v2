@@ -26,7 +26,11 @@ class CustomFieldSetHandler {
   /** Fetch custom fields by the custom field set's name */
   async fetch(name: string) {
     const response = await CRM(this.entity, "get", {
-      where: [["custom_group_id:name", "=", name]],
+      where: [
+        ["custom_group_id:name", "=", name],
+        ["is_active", "=", true],
+        ['custom_group_id.is_active', '=', true],
+      ],
       select: ['*', 'option_group_id:name'],
     });
 
@@ -39,7 +43,7 @@ class CustomFieldSetHandler {
     });
     const customFieldOptionValues = _response!.data as CustomFieldOptions[];
 
-    return customFields.map(field => ({ 
+    return customFields.map(field => ({
       ...field,
       options: customFieldOptionValues.filter(opt => opt.option_group_id == field.option_group_id)
     }));

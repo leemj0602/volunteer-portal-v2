@@ -23,17 +23,21 @@ export default function GenericFieldsInputs(props: GenericFieldsInputsProps) {
     <TextField className="flex justify-center" label="Email" id="email_primary.email" fields={props.flat_contact} info="Please contact an administrator to have your Email changed" showInfo={!props.disabled} disabled />
     {/* Phone */}
     <TextField className="flex justify-center" label="Phone" id="phone_primary.phone_numeric" fields={props.flat_contact} info="Please contact an administrator to have your Contact Number changed" showInfo={!props.disabled} disabled />
-    {/* Name */}
-    <TextField className="flex justify-center" label="Name" id="name" value={name} handleFields={handleName} disabled={props.disabled} />
+    {/* First Name */}
+    <TextField className="flex justify-center" label="First Name" id="first_name" fields={props.flat_contact} handleFields={props.handleFieds} disabled={props.disabled} />
+    {/* Last Name */}
+    <TextField className="flex justify-center" label="Last Name" id="last_name" fields={props.flat_contact} handleFields={props.handleFieds} disabled={props.disabled} />
+    {/* NRIC/FIN */}
+    <TextField className="flex justify-center" label="NRIC/FIN" id="external_identifier" fields={props.flat_contact} handleFields={props.handleFieds} disabled={props.disabled} />
+    {/* Gender */}
+    <DropdownField className="flex justify-center" label="Gender" id="gender_id" placeholder="Please choose your gender" fields={props.flat_contact} disabled={props.disabled} options={[
+      { label: "Male", value: "2" },
+      { label: "Female", value: "1" },
+      { label: "Others", value: "0" }
+    ]} handleFields={props.handleFieds} />
     {/* Address */}
     <TextField className="flex justify-center" label="Address" id="address_primary.street_address" fields={props.flat_contact} handleFields={props.handleFieds} disabled={props.disabled} />
     {/* Postal Code */}
     <TextField className="flex justify-center" label="Postal" id="address_primary.postal_code" fields={props.flat_contact} handleFields={props.handleFieds} disabled={props.disabled} />
-    {/* Gender */}
-    <DropdownField className="flex justify-center" label="Gender" id="gender_id" placeholder="Please choose your gender" fields={props.flat_contact} disabled={props.disabled} options={[
-          { label: "Male", value: "2" },
-          { label: "Female", value: "1" },
-          { label: "Others", value: "0" }
-        ]} handleFields={props.handleFieds} />
   </div>
 }
