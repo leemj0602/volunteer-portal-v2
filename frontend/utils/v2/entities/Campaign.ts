@@ -17,6 +17,8 @@ export class Campaign extends Entity {
       End_Date?: string;
       "Financial_Type:label"?: string;
       Financial_Goal?: number;
+      Minimum_Donation_Amount?: number;
+      TDR_Minimum_Requirement?: number;
     },
     thumbnail?: {
       uri?: string;
