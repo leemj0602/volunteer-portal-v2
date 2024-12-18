@@ -1,9 +1,9 @@
 import { useNavigate, useParams } from "react-router-dom";
-import Wrapper from "../../../components/Wrapper";
+import Wrapper from "../../components/Wrapper";
 import { FormEvent, KeyboardEvent, useEffect, useState } from "react";
-import CampaignHandler from "../../../../utils/v2/handlers/CampaignHandler";
-import { Campaign } from "../../../../utils/v2/entities/Campaign";
-import Loading from "../../../components/Loading";
+import CampaignHandler from "../../../utils/v2/handlers/CampaignHandler";
+import { Campaign } from "../../../utils/v2/entities/Campaign";
+import Loading from "../../components/Loading";
 import { CiFileOff } from "react-icons/ci";
 import { Progress } from "flowbite-react";
 import numeral from "numeral";
@@ -28,6 +28,15 @@ export default function CampaignPage() {
   const handleForm = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const input = e.currentTarget.elements.namedItem('amount') as HTMLInputElement;
+    const value = parseFloat(input.value);
+    if (campaign?.data.Donation_Campaign_Details?.Minimum_Donation_Amount && value < campaign?.data.Donation_Campaign_Details?.Minimum_Donation_Amount) {
+      return Swal.fire({
+        icon: 'error',
+        text: `You can only donate a minimum of $${numeral(campaign.data.Donation_Campaign_Details.Minimum_Donation_Amount).format('0,0')}`,
+        timer: 3000,
+        timerProgressBar: true
+      });
+    }
     setAmount(parseFloat(input.value));
   }
 
@@ -50,10 +59,10 @@ export default function CampaignPage() {
         html: `
           <p style="font-weight: semibold;">Donation Amount:</p>
           <p style="font-weight: bold; font-size: 24px;">$${numeral(amount).format('0,0')}</p>
-          ${campaign?.data.Donation_Campaign_Details?.["Financial_Type:label"] == 'TDR' ? `<div style="font-weight: semibold; align-items: center; margin-top: 12px;">
+          ${campaign?.data.Donation_Campaign_Details?.["Financial_Type:label"] == 'TDR' ? amount >= (campaign?.data.Donation_Campaign_Details.TDR_Minimum_Requirement ?? 0) ? `<div style="font-weight: semibold; align-items: center; margin-top: 8px;">
             <input type="checkbox" id="tdr" name="tdr" />
             <label htmlFor="tdr" for="tdr" style="color: #5A71B4; cursor: pointer;">I would like a tax deductible receipt</label>
-          </div>` : ''}
+          </div>` : `<p style="color: red;  font-style: italic">Tax-deductible receipt is only eligible for donations starting from $${numeral(campaign.data.Donation_Campaign_Details.TDR_Minimum_Requirement).format('0,0')}.</p>` : ''}
         `,
         customClass: {
           htmlContainer: "!text-left"
@@ -63,7 +72,7 @@ export default function CampaignPage() {
           tdrInput = popup.querySelector('#tdr') as HTMLInputElement;
         },
         preConfirm: () => {
-          const tdr = tdrInput.checked;
+          const tdr = tdrInput?.checked ?? false;
           return { tdr };
         }
       });
@@ -71,7 +80,7 @@ export default function CampaignPage() {
       if (!result.isConfirmed) return setAmount(undefined);
 
       const { value } = result;
-      console.log(value.tdr, amount);
+      console.log(amount, value.tdr);
       setAmount(undefined);
     })();
   }, [amount]);
@@ -94,17 +103,18 @@ export default function CampaignPage() {
           <div className="px-4 w-full lg:w-1/3 mt-4 lg:mt-8">
             {/* Text */}
             <div className="text-center text-xl text-secondary">
-              <h3 className="font-bold text-2xl">${numeral(23205).format('0,0')}</h3>
+              <h3 className="font-bold text-2xl">${numeral(0).format('0,0')}</h3>
               <p className="font-semibold text-xl mb-2">raised of ${numeral(campaign.data.Donation_Campaign_Details?.Financial_Goal).format('0,0')}</p>
             </div>
             {/* Progress Bar */}
-            <Progress progress={(23205 / campaign.data.Donation_Campaign_Details!.Financial_Goal!) * 100} className="text-secondary mb-6" />
+            <Progress progress={(0 / campaign.data.Donation_Campaign_Details!.Financial_Goal!) * 100} className="text-secondary mb-6" />
             <form onSubmit={handleForm}>
               <div className="font-semibold flex items-center border rounded-lg px-4">
                 <span className="text-gray-700">$</span>
-                <input onKeyDown={handleKeyDown} className="ml-2 focus:ring-0 w-full" type="number" name="amount" step="0.01" min={1} max={10000000} />
+                <input onKeyDown={handleKeyDown} className="ml-2 focus:ring-0 w-full" type="number" name="amount" step="0.01" min={campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 1} />
               </div>
               <button className="w-full rounded-lg bg-secondary hover:bg-primary text-white font-semibold p-2 mt-3">Donate</button>
+              {(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 0) > 0 && <p className="text-sm text-gray-500 mt-1">Minimum donations start from ${numeral(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount).format('0,0')}</p>}
             </form>
           </div>
         </div>
@@ -128,10 +138,11 @@ export default function CampaignPage() {
           <div className="w-full flex items-center gap-x-6">
             <div className="flex-grow rounded-lg border flex items-center">
               <span className="text-gray-700 font-semibold pl-4">$</span>
-              <input onKeyDown={handleKeyDown} type="number" placeholder="Set custom value" className="ml-2 p-2 focus:ring-0 w-full" step="0.01" min={1} max={10000000} name="amount" />
+              <input onKeyDown={handleKeyDown} type="number" placeholder="Set custom value" className="ml-2 p-2 focus:ring-0 w-full" step="0.01" min={campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 1} name="amount" />
             </div>
             <button className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-lg transition">Donate</button>
           </div>
+          {(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 0) > 0 && <p className="text-sm text-gray-500 mt-1">Minimum donations start from ${numeral(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount).format('0,0')}</p>}
         </form>
       </div>
     </div>}
