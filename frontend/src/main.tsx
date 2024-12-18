@@ -26,7 +26,7 @@ import Notifications from "./pages/Volunteer/Notifications";
 import Campaigns from "./pages/Donations/Campaigns";
 import CampaignPage from "./pages/Donations/Campaign";
 import Donate from "./pages/Donations/Donate";
-
+import Payment from "./pages/Donations/Payment";
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
 	<React.StrictMode>
@@ -48,6 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/donor/campaigns" element={<Campaigns />} />
 					<Route path="/donor/campaigns/:id" element={<CampaignPage />} />
 					<Route path="/donor/donate" element={<Donate />} />
+					<Route path="/donor/donate/payment" element={<Payment />} />
 
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/checkin/:encrypted" element={<CheckIn />} />
