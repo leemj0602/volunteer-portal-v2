@@ -159,6 +159,7 @@ export default function Donate() {
           paymentMethod: paymentMethodName,
           amount: amount,
           isRecurring: isRecurring,
+          scontact: contact,
         }
       });
       setAmount(undefined);

@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import Wrapper from "../../components/Wrapper";
 import StripeLogo from "../../../assets/stripe_logo.png";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import axios from "axios";
+import config from "../../../../config.json";
+import { Contact } from "../../../utils/v2/entities/Contact";
 
 enum PaymentMethod {
     CREDIT_CARD = "Credit Card",
@@ -14,8 +17,11 @@ enum PaymentMethod {
 
 export default function Payment() {
     const location = useLocation();
-    const { paymentMethod, amount, isRecurring } = location.state || {};
+    const { paymentMethod, amount, isRecurring, scontact } = location.state || {};
 
+    const navigate = useNavigate();
+
+    const contact: Contact = scontact;
     const [stripe, setStripe] = useState<Stripe | null>(null);
     const [elements, setElements] = useState<StripeElements | null>(null);
     const [cardElement, setCardElement] = useState<StripeCardElement | null>(null);
@@ -25,6 +31,7 @@ export default function Payment() {
     const [processingFee, setProcessingFee] = useState<number>(0);
     const [totalAmount, setTotalAmount] = useState<number>(amount);
     const [absorbFee, setAbsorbFee] = useState<boolean>(true);
+    const [paymentMethodId, setPaymentMethodId] = useState<string>();
 
     useEffect(() => {
         const initialiseStripe = async () => {
@@ -99,7 +106,7 @@ export default function Payment() {
         }
     }
 
-    const handleCardPayment = async () => {
+    const handleCardValidation = async () => {
         if (!stripe || !cardElement) {
             console.error("Stripe has not been initialised");
             return;
@@ -113,6 +120,7 @@ export default function Payment() {
         if (error) {
             console.error("Payment error:", error.message);
         } else {
+            setPaymentMethodId(paymentMethod.id);
             console.log("Payment Method ID: ", paymentMethod.id);
             // Determine domestic or international
             const cardCountry = paymentMethod.card?.country;
@@ -124,10 +132,56 @@ export default function Payment() {
         }
     };
 
-    // Send paymentMethod.id to backend to create payment intent
+    // Send paymentMethod.id to backend to create payment
     const handleMakePayment = async () => {
-        alert("Creating Payment Intent...");
-        alert("Payment Success!");
+        if (!stripe) return;
+
+        if (!isRecurring) {
+            const email = contact?.data.email_primary?.email;
+            const name = `${contact?.data.first_name} ${contact?.data.last_name}`;
+            const amount = Math.round(totalAmount * 100);
+            const applicationFeeAmount = processingFee;
+            const paymentIntentData = {
+                email: email,
+                name: name,
+                amount: amount,
+                applicationFeeAmount: applicationFeeAmount,
+                paymentMethodId: paymentMethodId || null,
+                paymentMethodDataType: paymentMethod === PaymentMethod.PAYNOW ? "paynow" : paymentMethod === PaymentMethod.GRABPAY ? "grabpay" : null,
+            }
+            try {
+                const response = await axios.post(`${config.domain}/portal/api/stripe/create_payment_intent.php`, { paymentIntentData });
+
+                const { client_secret, payment_intent_id } = response.data;
+
+                if (client_secret) {
+                    if (paymentMethod === PaymentMethod.CREDIT_CARD) {
+                        stripe.confirmCardPayment(client_secret).then((result) => {
+                            if (result.error) {
+                                console.error("Error:", result.error.message);
+                                navigate("/payment-status?status=failed");
+                            } else {
+                                navigate(`/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`);
+                            }
+                        });
+                    } else if (paymentMethod === PaymentMethod.PAYNOW || paymentMethod === PaymentMethod.GRABPAY) {
+                        console.log("clientSecret:", client_secret);
+                        stripe.confirmPayment({
+                            clientSecret: client_secret,
+                            confirmParams: {
+                                return_url: `${config.domain}/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`,
+                            },
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Error creating payment intent:", error);
+                navigate("/payment-status?status=failed");
+            }
+        } else {
+            alert("Creating Subscription...");
+            alert("Subscribe Success!")
+        }
     }
 
     return <Wrapper>
@@ -145,12 +199,12 @@ export default function Payment() {
                         step === 1 ? (
                             // Card Details
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
                                     Card Details
                                 </label>
                                 <div id="card-element" className="p-3 border rounded-lg shadow-inner bg-gray-50"></div>
                                 <button
-                                    onClick={handleCardPayment}
+                                    onClick={handleCardValidation}
                                     className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
                                 >
                                     Continue
@@ -160,11 +214,11 @@ export default function Payment() {
                             // Payment Summary
                             <div className="space-y-4">
                                 <div className="flex justify-between">
-                                    <span className="text-sm text-gray-700">Donation Amount</span>
+                                    <span className="text-md text-gray-700 font-semibold">Donation Amount</span>
                                     <span className="text-lg font-semibold">${amount.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-sm text-gray-700">Processing Fee</span>
+                                    <span className="text-md text-gray-700 font-semibold">Processing Fee</span>
                                     <span className="text-lg font-semibold">${processingFee.toFixed(2)}</span>
                                 </div>
                                 <div className="flex justify-between border-t pt-2">
@@ -176,7 +230,7 @@ export default function Payment() {
                                         type="checkbox"
                                         checked={absorbFee}
                                         onChange={() => setAbsorbFee(!absorbFee)}
-                                        className="h-5 w-5 text-primary rounded focus:ring-primary-dark"
+                                        className="h-5 w-5 text-secondary rounded focus:ring-primary-dark"
                                     />
                                     <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>
                                 </label>
@@ -189,7 +243,7 @@ export default function Payment() {
                                     onClick={handleMakePayment}
                                     className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
                                 >
-                                    Make Payment
+                                    Make Payment with {paymentMethod}
                                 </button>
                             </div>
                         )
