@@ -12,7 +12,7 @@ import UpcomingEvents from "./components/UpcomingEvents";
 import { TrainingRegistration } from "../../../../utils/classes/TrainingRegistration";
 import AcceptedJobs from "./components/AcceptedJobs";
 
-export default function Home3() {
+export default function Volunteer() {
     const email = (window as any).email;
     const [contact, setContact] = useState<Contact>();
     const [eventRegistrations, setEventRegistrations] = useState<EventRegistration[]>();
@@ -30,7 +30,7 @@ export default function Home3() {
         })();
     }, []);
 
-    return <Wrapper>
+    return <Wrapper location='/volunteer'>
         {!contact ? <Loading className="h-screen items-center" /> : <div className="p-4 mb-12">
             <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
                 {/* Displays their name and email */}
