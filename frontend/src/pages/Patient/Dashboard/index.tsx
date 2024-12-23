@@ -23,14 +23,12 @@ export default function Patient() {
         })();
     }, []);
 
-    return (
-        <Wrapper>
-            {!contact ? <Loading className="h-screen items-center" /> : <div className="p-4 mb-12">
-                <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
-                    <Header contact={contact} />
-                    <JobRequests contact={contact} requests={jobRequests!} setRequests={setJobRequests} />
-                </div>
-            </div>}
-        </Wrapper>
-    );
+    return <Wrapper location='/patient'>
+        {!contact ? <Loading className="h-screen items-center" /> : <div className="p-4 mb-12">
+            <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
+                <Header contact={contact} />
+                <JobRequests contact={contact} requests={jobRequests!} setRequests={setJobRequests} />
+            </div>
+        </div>}
+    </Wrapper>
 }
