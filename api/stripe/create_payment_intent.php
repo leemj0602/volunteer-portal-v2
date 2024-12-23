@@ -39,6 +39,7 @@ try {
             'destination' => "acct_1OwxMY4FX1qEleoP",
         ),
         'payment_method_types' => ['card', 'grabpay', 'paynow'],
+        'description' => "One-Time Payment from {$paymentIntentData['name']}({$paymentIntentData['email']})"
     ];
 
     // Add payment_method or payment_method_data based on the condition

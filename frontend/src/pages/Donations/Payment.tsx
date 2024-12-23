@@ -8,6 +8,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import config from "../../../../config.json";
 import { Contact } from "../../../utils/v2/entities/Contact";
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 enum PaymentMethod {
     CREDIT_CARD = "Credit Card",
@@ -15,9 +16,27 @@ enum PaymentMethod {
     GRABPAY = "GrabPay",
 }
 
+interface PaymentDetails {
+    amount: number;
+    currency: string;
+    customerName: string;
+    customerEmail: string;
+    paymentMethodType: string;
+    status: string;
+    description: string;
+    applicationFeeAmount: number;
+}
+
 export default function Payment() {
     const location = useLocation();
     const { paymentMethod, amount, isRecurring, scontact } = location.state || {};
+
+    const hash = window.location.hash; // Get the full hash including the fragment
+    const queryString = hash.includes("?") ? hash.split("?")[1] : ""; // Extract query string after `?`
+    const decodedQueryString = queryString.replace(/&amp;/g, "&"); // Decode any `&amp;` to `&`
+    const queryParams = new URLSearchParams(decodedQueryString); // Parse the query parameters
+    const status = queryParams.get('status');
+    const paymentIntentId = queryParams.get('payment_intent');
 
     const navigate = useNavigate();
 
@@ -32,6 +51,10 @@ export default function Payment() {
     const [totalAmount, setTotalAmount] = useState<number>(amount);
     const [absorbFee, setAbsorbFee] = useState<boolean>(true);
     const [paymentMethodId, setPaymentMethodId] = useState<string>();
+    const [afterPayment, setAfterPayment] = useState<boolean>(false);
+    const [loadingAfterPayment, setLoadingAfterPayment] = useState<boolean>(true);
+    const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const initialiseStripe = async () => {
@@ -61,10 +84,53 @@ export default function Payment() {
             }
         };
 
+        const initialisePaymentStatus = async () => {
+            if (status && status.length > 0) {
+                setAfterPayment(true);
+                setLoadingAfterPayment(true);
+                if (status === "success") {
+                    try {
+                        const response = await axios.post(`${config.domain}/portal/api/stripe/get_payment_intent.php`, { paymentIntentId: paymentIntentId });
+                        const { payment_intent_details: details } = response.data;
+
+                        const paymentMethodType =
+                            details.payment_method?.type === "card"
+                                ? "Credit Card"
+                                : details.payment_method?.type === "paynow"
+                                    ? "PayNow"
+                                    : details.payment_method?.type === "grabpay"
+                                        ? "GrabPay"
+                                        : "Other";
+
+                        const paymentDetails: PaymentDetails = {
+                            amount: details.amount / 100,
+                            currency: details.currency.toUpperCase(),
+                            customerName: details.customer?.name || "N/A",
+                            customerEmail: details.customer?.email || "N/A",
+                            paymentMethodType,
+                            status: details.status,
+                            description: details.description || "N/A",
+                            applicationFeeAmount: details.application_fee_amount / 100,
+                        };
+                        setPaymentDetails(paymentDetails);
+                    } catch (error) {
+                        console.error("Error fetching payment intent:", error);
+                        setErrorMessage("Failed to fetch payment details.");
+                    } finally {
+                        setLoadingAfterPayment(false);
+                    }
+                } else if (status === "failed") {
+                    setErrorMessage("Payment Failed");
+                    setLoadingAfterPayment(false);
+                }
+            }
+        }
+
         initialiseStripe();
         calculateFees();
+        initialisePaymentStatus();
         setLoading(false);
-    }, [absorbFee]);
+    }, [absorbFee, status, paymentIntentId]);
 
     useEffect(() => {
         // Wait for loading to be false and then mount the card element
@@ -159,7 +225,7 @@ export default function Payment() {
                         stripe.confirmCardPayment(client_secret).then((result) => {
                             if (result.error) {
                                 console.error("Error:", result.error.message);
-                                navigate("/payment-status?status=failed");
+                                navigate("donor/donate/payment?status=failed");
                             } else {
                                 navigate(`/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`);
                             }
@@ -169,14 +235,19 @@ export default function Payment() {
                         stripe.confirmPayment({
                             clientSecret: client_secret,
                             confirmParams: {
-                                return_url: `${config.domain}/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`,
+                                return_url: `${config.domain}/portal/#/donor/donate/payment?status=success`,
                             },
+                        }).then((result) => {
+                            if (result.error) {
+                                console.log("Error:", result.error.message);
+                                navigate("donor/donate/payment?status=failed");
+                            }
                         });
                     }
                 }
             } catch (error) {
                 console.error("Error creating payment intent:", error);
-                navigate("/payment-status?status=failed");
+                navigate("donor/donate/payment?status=failed");
             }
         } else {
             alert("Creating Subscription...");
@@ -190,106 +261,169 @@ export default function Payment() {
         ) : (
             <div className="p-4">
                 <div className="bg-white shadow-md rounded-md py-6 px-4 max-w-[600px] gap-x-8 mx-auto">
-                    {/* Header */}
-                    <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
-                        {step === 1 ? "Enter Your Payment Details" : step === 2 && "Payment Summary"}
-                    </h1>
-
-                    {paymentMethod === PaymentMethod.CREDIT_CARD ? (
-                        step === 1 ? (
-                            // Card Details
-                            <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    Card Details
-                                </label>
-                                <div id="card-element" className="p-3 border rounded-lg shadow-inner bg-gray-50"></div>
-                                <button
-                                    onClick={handleCardValidation}
-                                    className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
-                                >
-                                    Continue
-                                </button>
-                            </div>
-                        ) : (
-                            // Payment Summary
-                            <div className="space-y-4">
-                                <div className="flex justify-between">
-                                    <span className="text-md text-gray-700 font-semibold">Donation Amount</span>
-                                    <span className="text-lg font-semibold">${amount.toFixed(2)}</span>
+                    {afterPayment ? (
+                        <>
+                            {loadingAfterPayment ? (
+                                <div className="flex flex-col items-center">
+                                    <h1 className="text-2xl font-semibold text-center text-gray-600 mb-6">Processing payment details...</h1>
                                 </div>
-                                <div className="flex justify-between">
-                                    <span className="text-md text-gray-700 font-semibold">Processing Fee</span>
-                                    <span className="text-lg font-semibold">${processingFee.toFixed(2)}</span>
-                                </div>
-                                <div className="flex justify-between border-t pt-2">
-                                    <span className="text-lg font-semibold">Total Amount</span>
-                                    <span className="text-lg font-semibold">${totalAmount.toFixed(2)}{isRecurring ? '/month' : ''}</span>
-                                </div>
-                                <label className="flex items-center mt-4">
-                                    <input
-                                        type="checkbox"
-                                        checked={absorbFee}
-                                        onChange={() => setAbsorbFee(!absorbFee)}
-                                        className="h-5 w-5 text-secondary rounded focus:ring-primary-dark"
+                            ) : paymentDetails && paymentDetails.status === "succeeded" ? (
+                                <div className="flex flex-col items-center">
+                                    <DotLottieReact
+                                        src="https://lottie.host/795d5f7a-2bf1-4c41-b941-b534b93aaaa6/9140lNHqgI.json"
+                                        autoplay
+                                        style={{ width: "150px", height: "150px" }}
                                     />
-                                    <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>
-                                </label>
-                                {/* Info Message */}
-                                <div className="bg-[#ffc107] text-black text-sm rounded-md p-3 mt-4 shadow">
-                                    <strong>Important: </strong>
-                                    Please do not close or navigate away from this page during the payment process. You will be redirected to the payment details page after completing the payment.
+                                    <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+                                        Thank you for donating!
+                                    </h1>
+                                    <div className="text-left space-y-4 w-full max-w-md">
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Customer Name:</span>
+                                            <span className="font-semibold text-gray-800">{paymentDetails.customerName}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Customer Email:</span>
+                                            <span className="font-semibold text-gray-800">{paymentDetails.customerEmail}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Payment Method:</span>
+                                            <span className="font-semibold text-gray-800">
+                                                {paymentDetails.paymentMethodType}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-gray-600">Amount Paid{paymentDetails.applicationFeeAmount ? ` (Inclusive of ${paymentDetails.currency} $${paymentDetails.applicationFeeAmount.toFixed(2)})` : ''}:</span>
+                                            <span className="font-semibold text-gray-800">
+                                                {paymentDetails.currency} ${paymentDetails.amount.toFixed(2)}
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span className="text-sm text-gray-600 block">Description:</span>
+                                            <span className="font-semibold text-gray-800 block mt-1">
+                                                {paymentDetails.description}
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button
-                                    onClick={handleMakePayment}
-                                    className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
-                                >
-                                    Make Payment with {paymentMethod}
-                                </button>
+                            ) : (
+                                <div className="flex flex-col items-center">
+                                    <DotLottieReact
+                                        src="https://lottie.host/57eadeda-b4f0-4b35-a1d4-4f8950fc1143/dzSUhsrmGc.json"
+                                        autoplay
+                                        style={{ width: "150px", height: "150px" }}
+                                    />
+                                    <h1 className="text-2xl font-semibold text-center text-red-600 mb-6">
+                                        Payment Unsuccessful
+                                    </h1>
+                                    <p className="text-center text-gray-600">{errorMessage}</p>
+                                </div>
+                            )}
+                        </>
+                    ) : (
+                        <>
+                            {/* Header */}
+                            <h1 className="text-2xl font-semibold text-center text-gray-800 mb-6">
+                                {step === 1 ? "Enter Your Payment Details" : step === 2 && "Payment Summary"}
+                            </h1>
+
+                            {paymentMethod === PaymentMethod.CREDIT_CARD ? (
+                                step === 1 ? (
+                                    // Card Details
+                                    <div>
+                                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                            Card Details
+                                        </label>
+                                        <div id="card-element" className="p-3 border rounded-lg shadow-inner bg-gray-50"></div>
+                                        <button
+                                            onClick={handleCardValidation}
+                                            className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
+                                        >
+                                            Continue
+                                        </button>
+                                    </div>
+                                ) : (
+                                    // Payment Summary
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between">
+                                            <span className="text-md text-gray-700 font-semibold">Donation Amount</span>
+                                            <span className="text-lg font-semibold">${amount.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-md text-gray-700 font-semibold">Processing Fee</span>
+                                            <span className="text-lg font-semibold">${processingFee.toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between border-t pt-2">
+                                            <span className="text-lg font-semibold">Total Amount</span>
+                                            <span className="text-lg font-semibold">${totalAmount.toFixed(2)}{isRecurring ? '/month' : ''}</span>
+                                        </div>
+                                        <label className="flex items-center mt-4">
+                                            <input
+                                                type="checkbox"
+                                                checked={absorbFee}
+                                                onChange={() => setAbsorbFee(!absorbFee)}
+                                                className="h-5 w-5 text-secondary rounded focus:ring-primary-dark"
+                                            />
+                                            <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>
+                                        </label>
+                                        {/* Info Message */}
+                                        <div className="bg-[#ffc107] text-black text-sm rounded-md p-3 mt-4 shadow">
+                                            <strong>Important: </strong>
+                                            Please do not close or navigate away from this page during the payment process. You will be redirected to the payment details page after completing the payment.
+                                        </div>
+                                        <button
+                                            onClick={handleMakePayment}
+                                            className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
+                                        >
+                                            Make Payment with {paymentMethod}
+                                        </button>
+                                    </div>
+                                )
+                            ) : (paymentMethod === PaymentMethod.PAYNOW || paymentMethod === PaymentMethod.GRABPAY) && (
+                                <div className="space-y-4">
+                                    <div className="flex justify-between">
+                                        <span className="text-sm text-gray-700">Donation Amount</span>
+                                        <span className="text-lg font-semibold">${amount.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between">
+                                        <span className="text-sm text-gray-700">Processing Fee</span>
+                                        <span className="text-lg font-semibold">${processingFee.toFixed(2)}</span>
+                                    </div>
+                                    <div className="flex justify-between border-t pt-2">
+                                        <span className="text-lg font-semibold">Total Amount</span>
+                                        <span className="text-lg font-semibold">${totalAmount.toFixed(2)}{isRecurring ? '/month' : ''}</span>
+                                    </div>
+                                    <label className="flex items-center mt-4">
+                                        <input
+                                            type="checkbox"
+                                            checked={absorbFee}
+                                            onChange={() => setAbsorbFee(!absorbFee)}
+                                            className="h-5 w-5 text-primary rounded focus:ring-primary-dark"
+                                        />
+                                        <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>
+                                    </label>
+                                    {/* Info Message */}
+                                    <div className="bg-[#ffc107] text-black text-sm rounded-md p-3 mt-4 shadow">
+                                        <strong>Important: </strong>
+                                        Please do not close or navigate away from this page during the payment process. You will be redirected to the payment details page after completing the payment.
+                                    </div>
+                                    <button
+                                        onClick={handleMakePayment}
+                                        className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
+                                    >
+                                        Make Payment with {paymentMethod}
+                                    </button>
+                                </div>
+                            )}
+
+
+                            {/* Footer */}
+                            <div className="text-center mt-6 text-sm text-gray-600">
+                                Powered by
+                                <img src={StripeLogo} alt="Stripe Logo" className="inline-block h-6 ml-2" />
                             </div>
-                        )
-                    ) : (paymentMethod === PaymentMethod.PAYNOW || paymentMethod === PaymentMethod.GRABPAY) && (
-                        <div className="space-y-4">
-                            <div className="flex justify-between">
-                                <span className="text-sm text-gray-700">Donation Amount</span>
-                                <span className="text-lg font-semibold">${amount.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between">
-                                <span className="text-sm text-gray-700">Processing Fee</span>
-                                <span className="text-lg font-semibold">${processingFee.toFixed(2)}</span>
-                            </div>
-                            <div className="flex justify-between border-t pt-2">
-                                <span className="text-lg font-semibold">Total Amount</span>
-                                <span className="text-lg font-semibold">${totalAmount.toFixed(2)}{isRecurring ? '/month' : ''}</span>
-                            </div>
-                            <label className="flex items-center mt-4">
-                                <input
-                                    type="checkbox"
-                                    checked={absorbFee}
-                                    onChange={() => setAbsorbFee(!absorbFee)}
-                                    className="h-5 w-5 text-primary rounded focus:ring-primary-dark"
-                                />
-                                <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>
-                            </label>
-                            {/* Info Message */}
-                            <div className="bg-[#ffc107] text-black text-sm rounded-md p-3 mt-4 shadow">
-                                <strong>Important: </strong>
-                                Please do not close or navigate away from this page during the payment process. You will be redirected to the payment details page after completing the payment.
-                            </div>
-                            <button
-                                onClick={handleMakePayment}
-                                className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
-                            >
-                                Make Payment with {paymentMethod}
-                            </button>
-                        </div>
+                        </>
                     )}
-
-
-                    {/* Footer */}
-                    <div className="text-center mt-6 text-sm text-gray-600">
-                        Powered by
-                        <img src={StripeLogo} alt="Stripe Logo" className="inline-block h-6 ml-2" />
-                    </div>
                 </div>
             </div>
         )}
