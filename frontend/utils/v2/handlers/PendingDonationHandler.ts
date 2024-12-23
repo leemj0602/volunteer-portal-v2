@@ -66,7 +66,7 @@ class PendingDonationHandler {
                 ['pencon_customgroup.pencon_cf_fintype', finType],
                 ['pencon_customgroup.pencon_cf_ammount', amount],
                 ['pencon_customgroup.pencon_cf_source', 'Donor Portal'],
-                ['pencon_customgroup.pencon_cf_paymeth:name', paymentMethod],
+                ['pencon_customgroup.pencon_cf_paymeth', paymentMethod],
                 [nricField, nric],
                 [pdpaField, [1]],
                 [recurringField, recurring],

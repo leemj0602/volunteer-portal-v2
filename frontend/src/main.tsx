@@ -25,7 +25,8 @@ import Notifications from "./pages/Volunteer/Notifications";
 import Campaigns from "./pages/Donations/Campaigns";
 import CampaignPage from "./pages/Donations/Campaign";
 import Donate from "./pages/Donations/Donate";
-import Payment from "./pages/Donations/Payment";import Home from './pages/Home';
+import Payment from "./pages/Donations/Payment";
+import Home from './pages/Home';
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

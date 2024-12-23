@@ -23,7 +23,6 @@ export default function Donate() {
   const [charity, setCharity] = useState<Charity>();
   const [isRecurring, setIsRecurring] = useState<boolean>(false);
   const [penconCustomFields, setPenconCustomFields] = useState<CustomField[]>();
-  const [supportedPaymentMethods, setSupportedPaymentMethods] = useState<CustomFieldOptions[]>();
 
   useEffect(() => {
     (async () => {
@@ -41,16 +40,9 @@ export default function Donate() {
       if (penconCustomFields) {
         setPenconCustomFields(penconCustomFields);
         console.log("Custom Fields Fetched: ", penconCustomFields);
-
-        const paymentMethodsArr = penconCustomFields.find(field => field.name === 'pencon_cf_paymeth')?.options;
-        console.log("All Payment Methods: ", paymentMethodsArr);
-
-        const supportedPaymentMethods = paymentMethodsArr?.filter(method => ['Credit Card', 'PayNow', 'GrabPay'].includes(method.name!));
-        console.log("Supported Payment Method: ", supportedPaymentMethods);
-        setSupportedPaymentMethods(supportedPaymentMethods);
       }
     })();
-  }, []);
+  }, [isRecurring, penconCustomFields]);
 
   const handleForm = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -74,6 +66,12 @@ export default function Donate() {
     let selectedPaymentMethod: string | null = null; // To capture dropdown selection
 
     (async () => {
+      // Dynamically filter supported payment methods based on isRecurring
+      const paymentMethodsArr = penconCustomFields?.find(field => field.name === 'pencon_cf_paymeth')?.options;
+      const filteredPaymentMethods = paymentMethodsArr?.filter(method =>
+        isRecurring ? ['Credit Card'].includes(method.name!) : ['Credit Card', 'PayNow', 'GrabPay'].includes(method.name!)
+      );
+
       const result = await Swal.fire({
         title: 'Confirm your donation',
         confirmButtonText: 'PROCEED',
@@ -94,16 +92,16 @@ export default function Donate() {
         didOpen: () => {
           const popup = Swal.getPopup()!;
           tdrInput = popup.querySelector('#tdr') as HTMLInputElement;
-          console.log(supportedPaymentMethods);
+          console.log(filteredPaymentMethods);
           // Dynamically render DropdownField into the placeholder
           const container = document.getElementById("dropdown-container");
-          if (container && supportedPaymentMethods) {
+          if (container && filteredPaymentMethods) {
             ReactDOM.render(
               <DropdownField
                 id="payment-method"
                 className="mt-3"
                 fields={{ paymentMethod: selectedPaymentMethod }}
-                options={supportedPaymentMethods}
+                options={filteredPaymentMethods}
                 handleFields={(id, value) => {
                   selectedPaymentMethod = value; // Capture the selected payment method
                 }}
@@ -156,13 +154,13 @@ export default function Donate() {
         finType = 5;
       }
 
-      const paymentMethodName = supportedPaymentMethods?.find(method => method.value === paymentMethod)?.name
+      const paymentMethodName = filteredPaymentMethods?.find(method => method.value === paymentMethod)?.name
       console.log(`Payment Method Selected: ${paymentMethodName}, Amount: ${amount}, Recurring: ${isRecurring}, TDR: ${tdr}`);
 
       // Create pending donation activity
       const recurring = isRecurring ? 1 : 2;
 
-      const response = await PendingDonationHandler.create(email, finType, amount, paymentMethodName!, nric, recurring);
+      const response = await PendingDonationHandler.create(email, finType, amount, paymentMethod!, nric, recurring);
       if (response) {
         // Stripe
         navigate('/donor/donate/payment', {
@@ -177,7 +175,7 @@ export default function Donate() {
 
       setAmount(undefined);
     })();
-  }, [amount, supportedPaymentMethods]);
+  }, [amount]);
 
 
   return <Wrapper location="/donor/donate">
