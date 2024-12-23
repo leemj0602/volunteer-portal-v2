@@ -50,11 +50,11 @@ export default function Payment() {
     const [processingFee, setProcessingFee] = useState<number>(0);
     const [totalAmount, setTotalAmount] = useState<number>(amount);
     const [absorbFee, setAbsorbFee] = useState<boolean>(true);
+    const [isDomestic, setIsDomestic] = useState<boolean>(false);
     const [paymentMethodId, setPaymentMethodId] = useState<string>();
     const [afterPayment, setAfterPayment] = useState<boolean>(false);
     const [loadingAfterPayment, setLoadingAfterPayment] = useState<boolean>(true);
     const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
         const initialiseStripe = async () => {
@@ -115,31 +115,30 @@ export default function Payment() {
                         setPaymentDetails(paymentDetails);
                     } catch (error) {
                         console.error("Error fetching payment intent:", error);
-                        setErrorMessage("Failed to fetch payment details.");
                     } finally {
                         setLoadingAfterPayment(false);
                     }
                 } else if (status === "failed") {
-                    setErrorMessage("Payment Failed");
                     setLoadingAfterPayment(false);
                 }
             }
         }
 
         initialiseStripe();
-        calculateFees();
         initialisePaymentStatus();
         setLoading(false);
-    }, [absorbFee, status, paymentIntentId]);
+    }, [status, paymentIntentId]);
 
     useEffect(() => {
         // Wait for loading to be false and then mount the card element
-        if (cardElement && !loading) {
+        if (cardElement && !loading && step === 1) {
             cardElement.mount("#card-element");
+        } else if (cardElement && step !== 1){
+            cardElement.unmount();
         }
-    }, [cardElement, loading]);
+    }, [cardElement, loading, step]);
 
-    const calculateFees = async (isDomestic?: boolean) => {
+    const calculateFees = async (newAbsorbFee: boolean) => {
         console.log("paymentMethod:", paymentMethod);
         let feeRate = 0;
         if (paymentMethod === PaymentMethod.CREDIT_CARD) {
@@ -151,13 +150,13 @@ export default function Payment() {
                 const fee = (amount * 100 + 65) / (1 - feeRate / 100) / 100; // Add fixed 65 cents
                 const calculatedFee = fee - amount; // Processing fee
                 setProcessingFee(calculatedFee);
-                setTotalAmount(absorbFee ? fee : amount); // Total amount with fee
+                setTotalAmount(newAbsorbFee ? fee : amount); // Total amount with fee
             } else {
                 // Recurring donation logic
                 const fee = (amount + 0.65) / (1 - (feeRate / 100 + 0.5 / 100)); // Includes extra 0.5% fee for recurring
                 const calculatedFee = fee - amount;
                 setProcessingFee(calculatedFee);
-                setTotalAmount(absorbFee ? fee : amount);
+                setTotalAmount(newAbsorbFee ? fee : amount);
             }
         } else {
             // PayNow or GrabPay Fee Logic
@@ -168,7 +167,7 @@ export default function Payment() {
             const calculatedFee = fee - amount;
             console.log(calculatedFee);
             setProcessingFee(calculatedFee);
-            setTotalAmount(absorbFee ? fee : amount);
+            setTotalAmount(newAbsorbFee ? fee : amount);
         }
     }
 
@@ -192,8 +191,9 @@ export default function Payment() {
             const cardCountry = paymentMethod.card?.country;
             console.log("Card Country:", cardCountry);
             let isDomestic = cardCountry === "SG";
+            setIsDomestic(isDomestic);
 
-            calculateFees(isDomestic);
+            calculateFees(absorbFee);
             setStep(2);
         }
     };
@@ -235,7 +235,7 @@ export default function Payment() {
                         stripe.confirmPayment({
                             clientSecret: client_secret,
                             confirmParams: {
-                                return_url: `${config.domain}/portal/#/donor/donate/payment?status=success`,
+                                return_url: `${config.domain}/portal/#/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`,
                             },
                         }).then((result) => {
                             if (result.error) {
@@ -254,6 +254,12 @@ export default function Payment() {
             alert("Subscribe Success!")
         }
     }
+
+    const handleAbsorbFeeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newAbsorbFee = e.target.checked;
+        setAbsorbFee(newAbsorbFee);
+        calculateFees(newAbsorbFee,);
+    };
 
     return <Wrapper>
         {loading ? (
@@ -316,7 +322,6 @@ export default function Payment() {
                                     <h1 className="text-2xl font-semibold text-center text-red-600 mb-6">
                                         Payment Unsuccessful
                                     </h1>
-                                    <p className="text-center text-gray-600">{errorMessage}</p>
                                 </div>
                             )}
                         </>
@@ -342,7 +347,7 @@ export default function Payment() {
                                             Continue
                                         </button>
                                     </div>
-                                ) : (
+                                ) : step === 2 ? (
                                     // Payment Summary
                                     <div className="space-y-4">
                                         <div className="flex justify-between">
@@ -361,7 +366,7 @@ export default function Payment() {
                                             <input
                                                 type="checkbox"
                                                 checked={absorbFee}
-                                                onChange={() => setAbsorbFee(!absorbFee)}
+                                                onChange={handleAbsorbFeeChange}
                                                 className="h-5 w-5 text-secondary rounded focus:ring-primary-dark"
                                             />
                                             <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>
@@ -378,7 +383,7 @@ export default function Payment() {
                                             Make Payment with {paymentMethod}
                                         </button>
                                     </div>
-                                )
+                                ) : null
                             ) : (paymentMethod === PaymentMethod.PAYNOW || paymentMethod === PaymentMethod.GRABPAY) && (
                                 <div className="space-y-4">
                                     <div className="flex justify-between">
@@ -397,7 +402,7 @@ export default function Payment() {
                                         <input
                                             type="checkbox"
                                             checked={absorbFee}
-                                            onChange={() => setAbsorbFee(!absorbFee)}
+                                            onChange={handleAbsorbFeeChange}
                                             className="h-5 w-5 text-primary rounded focus:ring-primary-dark"
                                         />
                                         <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>

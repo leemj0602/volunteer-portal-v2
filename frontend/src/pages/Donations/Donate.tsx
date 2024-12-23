@@ -13,6 +13,7 @@ import ContactHandler from "../../../utils/v2/handlers/ContactHandler";
 import { Contact } from "../../../utils/v2/entities/Contact";
 import DropdownField from "../../components/Fields/DropdownField";
 import ReactDOM from "react-dom";
+import PendingDonationHandler from "../../../utils/v2/handlers/PendingDonationHandler";
 
 export default function Donate() {
   const navigate = useNavigate();
@@ -129,8 +130,10 @@ export default function Donate() {
       if (!result.isConfirmed) return setAmount(undefined);
 
       const { tdr, paymentMethod } = result.value;
+      let finType = 0;
+      let nric = '';
       if (tdr) {
-        console.log('external id: ', contact?.data.external_identifier);
+        finType = 1;
         if (!contact?.data.external_identifier) {
           await Swal.fire({
             icon: "warning",
@@ -145,23 +148,33 @@ export default function Donate() {
             }
           });
           return;
+        } else {
+          nric = contact?.data.external_identifier;
         }
+      }
+      else {
+        finType = 5;
       }
 
       const paymentMethodName = supportedPaymentMethods?.find(method => method.value === paymentMethod)?.name
       console.log(`Payment Method Selected: ${paymentMethodName}, Amount: ${amount}, Recurring: ${isRecurring}, TDR: ${tdr}`);
 
-      // Create pending contribution activity
+      // Create pending donation activity
+      const recurring = isRecurring ? 1 : 2;
 
-      // Stripe
-      navigate('/donor/donate/payment', {
-        state: {
-          paymentMethod: paymentMethodName,
-          amount: amount,
-          isRecurring: isRecurring,
-          scontact: contact,
-        }
-      });
+      const response = await PendingDonationHandler.create(email, finType, amount, paymentMethodName!, nric, recurring);
+      if (response) {
+        // Stripe
+        navigate('/donor/donate/payment', {
+          state: {
+            paymentMethod: paymentMethodName,
+            amount: amount,
+            isRecurring: isRecurring,
+            scontact: contact,
+          }
+        });
+      }
+
       setAmount(undefined);
     })();
   }, [amount, supportedPaymentMethods]);
