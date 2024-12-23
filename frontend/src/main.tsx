@@ -3,9 +3,8 @@ import ReactDOM from "react-dom/client";
 import { HashRouter, Route, Routes } from "react-router-dom";
 import "./main.css";
 
-import Home3 from "./pages/Volunteer/Dashboard";
-
 import Profile from "./pages/Profile";
+import Volunteer from "./pages/Volunteer/Dashboard";
 import VolunteerTrainings from "./pages/Volunteer/Trainings";
 import VolunteerTrainingPage from "./pages/Volunteer/Training";
 import Events from "./pages/Volunteer/Events";
@@ -26,6 +25,7 @@ import Notifications from "./pages/Volunteer/Notifications";
 import Campaigns from "./pages/Donations/Campaigns";
 import CampaignPage from "./pages/Donations/Campaign";
 import Donate from "./pages/Donations/Donate";
+import Home from './pages/Home';
 
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -33,8 +33,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 		<SubtypesProvider>
 			<HashRouter>
 				<Routes>
-					<Route index path="/" element={<Home3 />} />
-					<Route path="/volunteer" element={<Home3 />} />
+					<Route index path="/" element={<Home />} />
+					<Route path="/volunteer" element={<Volunteer />} />
 					<Route path="/volunteer/events" element={<Events />} />
 					<Route path="/volunteer/events/:eventId/:roleId" element={<Event />} />
 					<Route path="/volunteer/jobs" element={<Jobs />} />
