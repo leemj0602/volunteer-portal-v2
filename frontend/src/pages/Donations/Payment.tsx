@@ -9,6 +9,7 @@ import axios from "axios";
 import config from "../../../../config.json";
 import { Contact } from "../../../utils/v2/entities/Contact";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import RecurringDonationHandler from "../../../utils/v2/handlers/RecurringDonationHandler";
 
 enum PaymentMethod {
     CREDIT_CARD = "Credit Card",
@@ -133,7 +134,7 @@ export default function Payment() {
         // Wait for loading to be false and then mount the card element
         if (cardElement && !loading && step === 1) {
             cardElement.mount("#card-element");
-        } else if (cardElement && step !== 1){
+        } else if (cardElement && step !== 1) {
             cardElement.unmount();
         }
     }, [cardElement, loading, step]);
@@ -198,15 +199,13 @@ export default function Payment() {
         }
     };
 
-    // Send paymentMethod.id to backend to create payment
     const handleMakePayment = async () => {
         if (!stripe) return;
-
+        const email = contact?.data.email_primary?.email;
+        const name = `${contact?.data.first_name} ${contact?.data.last_name}`;
+        const amount = Math.round(totalAmount * 100);
+        const applicationFeeAmount = processingFee;
         if (!isRecurring) {
-            const email = contact?.data.email_primary?.email;
-            const name = `${contact?.data.first_name} ${contact?.data.last_name}`;
-            const amount = Math.round(totalAmount * 100);
-            const applicationFeeAmount = processingFee;
             const paymentIntentData = {
                 email: email,
                 name: name,
@@ -215,6 +214,7 @@ export default function Payment() {
                 paymentMethodId: paymentMethodId || null,
                 paymentMethodDataType: paymentMethod === PaymentMethod.PAYNOW ? "paynow" : paymentMethod === PaymentMethod.GRABPAY ? "grabpay" : null,
             }
+
             try {
                 const response = await axios.post(`${config.domain}/portal/api/stripe/create_payment_intent.php`, { paymentIntentData });
 
@@ -250,8 +250,32 @@ export default function Payment() {
                 navigate("donor/donate/payment?status=failed");
             }
         } else {
-            alert("Creating Subscription...");
-            alert("Subscribe Success!")
+            const subscriptionData = {
+                email: email,
+                name: name,
+                amount: amount,
+                applicationFeeAmount: applicationFeeAmount,
+                paymentMethodId: paymentMethodId || null,
+            }
+
+            try {
+                const response = await axios.post(`${config.domain}/portal/api/stripe/create_subscription.php`, { subscriptionData });
+
+                const { subscription_id, client_secret, payment_intent_id, payment_status } = response.data;
+
+                if (client_secret) {
+                    if (payment_status === "succeeded") {
+                        const response = await RecurringDonationHandler.create(email!, subscription_id);
+                        if (response) navigate(`/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`);
+                    } else {
+                        console.error("Payment not successful:", payment_status);
+                        navigate("donor/donate/payment?status=failed");
+                    };
+                }
+            } catch (error) {
+                console.error("Error creating subcription:", error);
+                navigate("donor/donate/payment?status=failed")
+            }
         }
     }
 
@@ -324,6 +348,9 @@ export default function Payment() {
                                     </h1>
                                 </div>
                             )}
+                            <div className="mt-6 text-center">
+                                <button className="block bg-secondary text-white py-2 px-6 rounded-lg hover:bg-primary transition shadow-md w-full text-center" onClick={() => navigate("/donor")}>Return to Home</button>
+                            </div>
                         </>
                     ) : (
                         <>

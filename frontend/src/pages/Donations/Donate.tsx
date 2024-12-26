@@ -39,7 +39,6 @@ export default function Donate() {
 
       if (penconCustomFields) {
         setPenconCustomFields(penconCustomFields);
-        console.log("Custom Fields Fetched: ", penconCustomFields);
       }
     })();
   }, [isRecurring, penconCustomFields]);
@@ -60,7 +59,6 @@ export default function Donate() {
   let tdrInput: HTMLInputElement;
   // What to do after setting the amount
   useEffect(() => {
-    console.log(amount);
     if (!amount) return;
 
     let selectedPaymentMethod: string | null = null; // To capture dropdown selection
@@ -92,7 +90,6 @@ export default function Donate() {
         didOpen: () => {
           const popup = Swal.getPopup()!;
           tdrInput = popup.querySelector('#tdr') as HTMLInputElement;
-          console.log(filteredPaymentMethods);
           // Dynamically render DropdownField into the placeholder
           const container = document.getElementById("dropdown-container");
           if (container && filteredPaymentMethods) {

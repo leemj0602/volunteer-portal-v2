@@ -39,7 +39,7 @@ try {
             'destination' => "acct_1OwxMY4FX1qEleoP",
         ),
         'payment_method_types' => ['card', 'grabpay', 'paynow'],
-        'description' => "One-Time Payment from {$paymentIntentData['name']}({$paymentIntentData['email']})"
+        'description' => "One-Time Payment from {$paymentIntentData['name']} ({$paymentIntentData['email']})"
     ];
 
     // Add payment_method or payment_method_data based on the condition
@@ -56,7 +56,7 @@ try {
     // logToConsole("Payment Intent created: " . print_r($paymentIntent, true));
 
     http_response_code(200);
-    echo json_encode(['client_secret' => $paymentIntent['client_secret'], 'payment_intent_id' => $paymentIntent['id'], 'payment_intent' => $paymentIntent]);
+    echo json_encode(['client_secret' => $paymentIntent->client_secret, 'payment_intent_id' => $paymentIntent->id]);
 } catch (\Stripe\Exception\ApiErrorException $e) {
     // logToConsole("Stripe API Error: " . $e->getMessage());
     http_response_code(500);
