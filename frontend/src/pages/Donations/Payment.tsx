@@ -10,6 +10,8 @@ import config from "../../../../config.json";
 import { Contact } from "../../../utils/v2/entities/Contact";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import RecurringDonationHandler from "../../../utils/v2/handlers/RecurringDonationHandler";
+import Swal from "sweetalert2";
+import { Spinner } from "flowbite-react";
 
 enum PaymentMethod {
     CREDIT_CARD = "Credit Card",
@@ -43,11 +45,9 @@ export default function Payment() {
 
     const contact: Contact = scontact;
     const [stripe, setStripe] = useState<Stripe | null>(null);
-    const [elements, setElements] = useState<StripeElements | null>(null);
     const [cardElement, setCardElement] = useState<StripeCardElement | null>(null);
     const [loading, setLoading] = useState(true);
     const [step, setStep] = useState<number>(1);
-    const [clientSecret, setClientSecret] = useState<string | null>(null);
     const [processingFee, setProcessingFee] = useState<number>(0);
     const [totalAmount, setTotalAmount] = useState<number>(amount);
     const [absorbFee, setAbsorbFee] = useState<boolean>(true);
@@ -56,6 +56,23 @@ export default function Payment() {
     const [afterPayment, setAfterPayment] = useState<boolean>(false);
     const [loadingAfterPayment, setLoadingAfterPayment] = useState<boolean>(true);
     const [paymentDetails, setPaymentDetails] = useState<PaymentDetails | null>(null);
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
+    const fetchPaymentIntentWithRetry = async (paymentIntentId: string, retries = 3, delay = 2000) => {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const response = await axios.post(`${config.domain}/portal/api/stripe/get_payment_intent.php`, { paymentIntentId });
+                return response.data; // Success, return the data
+            } catch (error) {
+                console.error(`Attempt ${i + 1} failed:`, error);
+                if (i < retries - 1) {
+                    await new Promise(resolve => setTimeout(resolve, delay)); // Wait before retrying
+                } else {
+                    throw error; // Throw error after max retries
+                }
+            }
+        }
+    };
 
     useEffect(() => {
         const initialiseStripe = async () => {
@@ -65,7 +82,6 @@ export default function Payment() {
 
                 if (paymentMethod === PaymentMethod.CREDIT_CARD && stripeInstance) {
                     const elementsInstance = stripeInstance.elements();
-                    setElements(elementsInstance);
 
                     const cardElementInstance = elementsInstance.create("card", {
                         style: {
@@ -78,7 +94,6 @@ export default function Payment() {
                         },
                         hidePostalCode: true,
                     });
-                    console.log(cardElementInstance);
 
                     setCardElement(cardElementInstance);
                 }
@@ -89,10 +104,10 @@ export default function Payment() {
             if (status && status.length > 0) {
                 setAfterPayment(true);
                 setLoadingAfterPayment(true);
-                if (status === "success") {
-                    try {
-                        const response = await axios.post(`${config.domain}/portal/api/stripe/get_payment_intent.php`, { paymentIntentId: paymentIntentId });
-                        const { payment_intent_details: details } = response.data;
+                try {
+                    if (status === "success") {
+                        const data = await fetchPaymentIntentWithRetry(paymentIntentId!);
+                        const { payment_intent_details: details } = data;
 
                         const paymentMethodType =
                             details.payment_method?.type === "card"
@@ -114,21 +129,26 @@ export default function Payment() {
                             applicationFeeAmount: details.application_fee_amount / 100,
                         };
                         setPaymentDetails(paymentDetails);
-                    } catch (error) {
-                        console.error("Error fetching payment intent:", error);
-                    } finally {
-                        setLoadingAfterPayment(false);
                     }
-                } else if (status === "failed") {
+                } catch (error) {
+                    console.error("Error fetching payment intent:", error);
+                } finally {
                     setLoadingAfterPayment(false);
                 }
             }
-        }
+        };
+
+        const initialiseFees = () => {
+            if (paymentMethod && amount) {
+                calculateFees(absorbFee); // Trigger fee calculation
+            }
+        };
 
         initialiseStripe();
         initialisePaymentStatus();
+        initialiseFees();
         setLoading(false);
-    }, [status, paymentIntentId]);
+    }, [status, paymentIntentId, paymentMethod, amount]);
 
     useEffect(() => {
         // Wait for loading to be false and then mount the card element
@@ -140,10 +160,8 @@ export default function Payment() {
     }, [cardElement, loading, step]);
 
     const calculateFees = async (newAbsorbFee: boolean) => {
-        console.log("paymentMethod:", paymentMethod);
         let feeRate = 0;
         if (paymentMethod === PaymentMethod.CREDIT_CARD) {
-            console.log("isDomestic:", isDomestic);
             feeRate = isDomestic ? 2.6 : 4;
 
             if (!isRecurring) {
@@ -166,7 +184,6 @@ export default function Payment() {
 
             const fee = (amount * 100) / (1 - feeRate / 100) / 100;
             const calculatedFee = fee - amount;
-            console.log(calculatedFee);
             setProcessingFee(calculatedFee);
             setTotalAmount(newAbsorbFee ? fee : amount);
         }
@@ -187,10 +204,8 @@ export default function Payment() {
             console.error("Payment error:", error.message);
         } else {
             setPaymentMethodId(paymentMethod.id);
-            console.log("Payment Method ID: ", paymentMethod.id);
             // Determine domestic or international
             const cardCountry = paymentMethod.card?.country;
-            console.log("Card Country:", cardCountry);
             let isDomestic = cardCountry === "SG";
             setIsDomestic(isDomestic);
 
@@ -200,7 +215,17 @@ export default function Payment() {
     };
 
     const handleMakePayment = async () => {
-        if (!stripe) return;
+        if (!stripe || isProcessing) return;
+        setIsProcessing(true);
+        Swal.fire({
+            title: 'Processing...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
         const email = contact?.data.email_primary?.email;
         const name = `${contact?.data.first_name} ${contact?.data.last_name}`;
         const amount = Math.round(totalAmount * 100);
@@ -223,6 +248,8 @@ export default function Payment() {
                 if (client_secret) {
                     if (paymentMethod === PaymentMethod.CREDIT_CARD) {
                         stripe.confirmCardPayment(client_secret).then((result) => {
+                            Swal.close();
+
                             if (result.error) {
                                 console.error("Error:", result.error.message);
                                 navigate("donor/donate/payment?status=failed");
@@ -231,15 +258,16 @@ export default function Payment() {
                             }
                         });
                     } else if (paymentMethod === PaymentMethod.PAYNOW || paymentMethod === PaymentMethod.GRABPAY) {
-                        console.log("clientSecret:", client_secret);
                         stripe.confirmPayment({
                             clientSecret: client_secret,
                             confirmParams: {
                                 return_url: `${config.domain}/portal/#/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`,
                             },
                         }).then((result) => {
+                            Swal.close();
+
                             if (result.error) {
-                                console.log("Error:", result.error.message);
+                                console.error("Error:", result.error.message);
                                 navigate("donor/donate/payment?status=failed");
                             }
                         });
@@ -247,6 +275,7 @@ export default function Payment() {
                 }
             } catch (error) {
                 console.error("Error creating payment intent:", error);
+                Swal.close();
                 navigate("donor/donate/payment?status=failed");
             }
         } else {
@@ -268,7 +297,6 @@ export default function Payment() {
                         const response = await RecurringDonationHandler.create(email!, subscription_id);
                         if (response) navigate(`/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`);
                     } else {
-                        console.error("Payment not successful:", payment_status);
                         navigate("donor/donate/payment?status=failed");
                     };
                 }
@@ -295,6 +323,7 @@ export default function Payment() {
                         <>
                             {loadingAfterPayment ? (
                                 <div className="flex flex-col items-center">
+                                    <Spinner className="text-2xl fill-secondary" />
                                     <h1 className="text-2xl font-semibold text-center text-gray-600 mb-6">Processing payment details...</h1>
                                 </div>
                             ) : paymentDetails && paymentDetails.status === "succeeded" ? (
@@ -346,6 +375,8 @@ export default function Payment() {
                                     <h1 className="text-2xl font-semibold text-center text-red-600 mb-6">
                                         Payment Unsuccessful
                                     </h1>
+                                    <p>We are unable to verify the payment at the moment.</p>
+                                    <p> Please try again or refresh the page.</p>
                                 </div>
                             )}
                             <div className="mt-6 text-center">
@@ -369,8 +400,7 @@ export default function Payment() {
                                         <div id="card-element" className="p-3 border rounded-lg shadow-inner bg-gray-50"></div>
                                         <button
                                             onClick={handleCardValidation}
-                                            className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
-                                        >
+                                            className="w-full mt-6 bg-secondary text-white py-2 rounded-lg transition shadow-md hover:bg-primary"                                        >
                                             Continue
                                         </button>
                                     </div>
@@ -405,8 +435,8 @@ export default function Payment() {
                                         </div>
                                         <button
                                             onClick={handleMakePayment}
-                                            className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
-                                        >
+                                            className="w-full mt-6 bg-secondary text-white py-2 rounded-lg transition shadow-md hover:bg-primary"
+                                            disabled={isProcessing}                                        >
                                             Make Payment with {paymentMethod}
                                         </button>
                                     </div>
@@ -430,7 +460,7 @@ export default function Payment() {
                                             type="checkbox"
                                             checked={absorbFee}
                                             onChange={handleAbsorbFeeChange}
-                                            className="h-5 w-5 text-primary rounded focus:ring-primary-dark"
+                                            className="h-5 w-5 text-secondary rounded focus:ring-primary-dark"
                                         />
                                         <span className="ml-2 text-sm text-gray-700">Absorb Processing Fee</span>
                                     </label>
@@ -441,8 +471,8 @@ export default function Payment() {
                                     </div>
                                     <button
                                         onClick={handleMakePayment}
-                                        className="w-full mt-6 bg-secondary text-white py-2 rounded-lg hover:bg-primary transition shadow-md"
-                                    >
+                                        className="w-full mt-6 bg-secondary text-white py-2 rounded-lg transition shadow-md hover:bg-primary"
+                                        disabled={isProcessing}                                        >
                                         Make Payment with {paymentMethod}
                                     </button>
                                 </div>
@@ -458,6 +488,7 @@ export default function Payment() {
                     )}
                 </div>
             </div>
-        )}
-    </Wrapper>
+        )
+        }
+    </Wrapper >
 }

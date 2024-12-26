@@ -23,6 +23,7 @@ export default function Donate() {
   const [charity, setCharity] = useState<Charity>();
   const [isRecurring, setIsRecurring] = useState<boolean>(false);
   const [penconCustomFields, setPenconCustomFields] = useState<CustomField[]>();
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
@@ -41,7 +42,7 @@ export default function Donate() {
         setPenconCustomFields(penconCustomFields);
       }
     })();
-  }, [isRecurring, penconCustomFields]);
+  }, []);
 
   const handleForm = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -72,7 +73,7 @@ export default function Donate() {
 
       const result = await Swal.fire({
         title: 'Confirm your donation',
-        confirmButtonText: 'PROCEED',
+        confirmButtonText: 'Proceed',
         showCloseButton: true,
         html: `
           <p style="font-weight: 600;">You are about to donate $${numeral(amount).format('0,0')}${isRecurring ? '/month' : ''}</p>
@@ -151,14 +152,25 @@ export default function Donate() {
         finType = 5;
       }
 
+      setIsProcessing(true); // Disable fields and show "Processing" popup
+      Swal.fire({
+        title: 'Processing...',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+
       const paymentMethodName = filteredPaymentMethods?.find(method => method.value === paymentMethod)?.name
-      console.log(`Payment Method Selected: ${paymentMethodName}, Amount: ${amount}, Recurring: ${isRecurring}, TDR: ${tdr}`);
 
       // Create pending donation activity
       const recurring = isRecurring ? 1 : 2;
 
       const response = await PendingDonationHandler.create(email, finType, amount, paymentMethod!, nric, recurring);
       if (response) {
+        Swal.close(); // Close the "Processing" popup
+        setIsProcessing(false);
         // Stripe
         navigate('/donor/donate/payment', {
           state: {
@@ -243,13 +255,14 @@ export default function Donate() {
               className="form-checkbox"
               checked={isRecurring}
               onChange={(e) => setIsRecurring(e.target.checked)}
+              disabled={isProcessing}
             />
             <span className="text-gray-700 font-medium">Make this a recurring donation (monthly)</span>
           </label>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 mt-2">
           {(isRecurring ? [50, 100, 150] : [10, 25, 50, 100]).map(value => {
-            return <button onClick={() => setAmount(value)} className="p-2 rounded-lg border-2 hover:border-secondary shadow-md hover:bg-secondary text-center cursor-pointer text-gray-700 hover:text-white">
+            return <button onClick={() => setAmount(value)} className={`p-2 rounded-lg border-2 text-center cursor-pointer text-gray-700 ${isProcessing ? "cursor-not-allowed opacity-50" : "hover:border-secondary shadow-md hover:bg-secondary hover:text-white"}`} disabled={isProcessing}>
               <p className="text-xl font-bold">${value}{isRecurring ? "/month" : ""}</p>
             </button>
           })}
@@ -259,9 +272,9 @@ export default function Donate() {
             <div className="w-full flex items-center gap-x-6">
               <div className="flex-grow rounded-lg border flex items-center">
                 <span className="text-gray-700 font-semibold pl-4">$</span>
-                <input onKeyDown={handleKeyDown} type="number" placeholder="Set custom value" className="ml-2 p-2 focus:ring-0 w-full" step="0.01" min={1} max={10000000} name="amount" />
+                <input onKeyDown={handleKeyDown} type="number" placeholder="Set custom value" className="ml-2 p-2 focus:ring-0 w-full" step="0.01" min={1} max={10000000} name="amount" disabled={isProcessing} />
               </div>
-              <button className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-lg transition">Donate</button>
+              <button className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-lg transition" disabled={isProcessing}>Donate</button>
             </div>
           </form>
         )}
