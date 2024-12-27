@@ -178,6 +178,7 @@ export default function Donate() {
             amount: amount,
             isRecurring: isRecurring,
             scontact: contact,
+            processingActivity: response,
           }
         });
       }

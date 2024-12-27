@@ -16,15 +16,20 @@ try {
         'expand' => ['charges.data', 'customer', 'payment_method'],
     ]);
 
-    $charge = $stripe->charges->retrieve($paymentIntent->latest_charge, ['expand' => ['transfer']]);
+    if (!empty($paymentIntent->latest_charge)) {
+        $charge = $stripe->charges->retrieve($paymentIntent->latest_charge, ['expand' => ['transfer']]);
 
-    $destination_payment = $charge->transfer->destination_payment;
+        if (!empty($charge->transfer) && !empty($charge->transfer->destination_payment)) {
+            $destination_payment = $charge->transfer->destination_payment;
 
-    $update_charge = $stripe->charges->update(
-        $destination_payment,
-        ['description' => $paymentIntent->description],
-        ['stripe_account' => $paymentIntent->transfer_data->destination]
-    );
+            $stripe->charges->update(
+                $destination_payment,
+                ['description' => $paymentIntent->description],
+                ['stripe_account' => $paymentIntent->transfer_data->destination]
+            );
+        }
+    }
+
 
     echo json_encode(['payment_intent_details' => $paymentIntent]);
 } catch (\Stripe\Exception\ApiErrorException $e) {

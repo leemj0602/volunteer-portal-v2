@@ -82,6 +82,26 @@ class PendingDonationHandler {
             throw new Error("Failed to create pending donation");
         }
 
+        return (response.data[0].id);
+    }
+
+    async update(id: number) {
+        const response = await CRM(this.entity, "update", {
+            values: [
+                ['status_id:name', 'Payment Successful'],
+            ],
+            where: [
+                ['id', '=', id],
+            ]
+        }).catch((error: any) => {
+            console.error("CRM create error:", error);
+            throw new Error("CRM create request failed");
+        });
+
+        if (!response) {
+            throw new Error("Failed to create pending donation");
+        }
+
         return (response.data.length > 0);
     }
 }

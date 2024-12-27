@@ -12,6 +12,7 @@ import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import RecurringDonationHandler from "../../../utils/v2/handlers/RecurringDonationHandler";
 import Swal from "sweetalert2";
 import { Spinner } from "flowbite-react";
+import PendingDonationHandler from "../../../utils/v2/handlers/PendingDonationHandler";
 
 enum PaymentMethod {
     CREDIT_CARD = "Credit Card",
@@ -32,13 +33,12 @@ interface PaymentDetails {
 
 export default function Payment() {
     const location = useLocation();
-    const { paymentMethod, amount, isRecurring, scontact } = location.state || {};
+    const { paymentMethod, amount, isRecurring, scontact, processingActivity } = location.state || {};
 
     const hash = window.location.hash; // Get the full hash including the fragment
     const queryString = hash.includes("?") ? hash.split("?")[1] : ""; // Extract query string after `?`
     const decodedQueryString = queryString.replace(/&amp;/g, "&"); // Decode any `&amp;` to `&`
     const queryParams = new URLSearchParams(decodedQueryString); // Parse the query parameters
-    const status = queryParams.get('status');
     const paymentIntentId = queryParams.get('payment_intent');
 
     const navigate = useNavigate();
@@ -101,40 +101,49 @@ export default function Payment() {
         };
 
         const initialisePaymentStatus = async () => {
-            if (status && status.length > 0) {
-                setAfterPayment(true);
-                setLoadingAfterPayment(true);
-                try {
-                    if (status === "success") {
-                        const data = await fetchPaymentIntentWithRetry(paymentIntentId!);
-                        const { payment_intent_details: details } = data;
+            setAfterPayment(true);
+            setLoadingAfterPayment(true);
+            try {
+                const data = await fetchPaymentIntentWithRetry(paymentIntentId!);
+                const { payment_intent_details: details } = data;
 
-                        const paymentMethodType =
-                            details.payment_method?.type === "card"
-                                ? "Credit Card"
-                                : details.payment_method?.type === "paynow"
-                                    ? "PayNow"
-                                    : details.payment_method?.type === "grabpay"
-                                        ? "GrabPay"
-                                        : "Other";
+                const paymentMethodType =
+                    details.payment_method?.type === "card"
+                        ? "Credit Card"
+                        : details.payment_method?.type === "paynow"
+                            ? "PayNow"
+                            : details.payment_method?.type === "grabpay"
+                                ? "GrabPay"
+                                : "Other";
 
-                        const paymentDetails: PaymentDetails = {
-                            amount: details.amount / 100,
-                            currency: details.currency.toUpperCase(),
-                            customerName: details.customer?.name || "N/A",
-                            customerEmail: details.customer?.email || "N/A",
-                            paymentMethodType,
-                            status: details.status,
-                            description: details.description || "N/A",
-                            applicationFeeAmount: details.application_fee_amount / 100,
-                        };
-                        setPaymentDetails(paymentDetails);
+                const paymentDetails: PaymentDetails = {
+                    amount: details.amount / 100,
+                    currency: details.currency.toUpperCase(),
+                    customerName: details.customer?.name || "N/A",
+                    customerEmail: details.customer?.email || "N/A",
+                    paymentMethodType,
+                    status: details.status,
+                    description: details.description || "N/A",
+                    applicationFeeAmount: details.application_fee_amount / 100,
+                };
+                setPaymentDetails(paymentDetails);
+
+                if (details.status === 'succeeded') {
+                    const processingActivityId = sessionStorage.getItem('processingActivityId');
+                    if (processingActivityId) {
+                        try {
+                            await PendingDonationHandler.update(Number(processingActivityId));
+                        } catch (error) {
+                            console.error("Failed to update pending donation:", error);
+                        } finally {
+                            sessionStorage.removeItem('processingActivityId');
+                        }
                     }
-                } catch (error) {
-                    console.error("Error fetching payment intent:", error);
-                } finally {
-                    setLoadingAfterPayment(false);
                 }
+            } catch (error) {
+                console.error("Error fetching payment intent:", error);
+            } finally {
+                setLoadingAfterPayment(false);
             }
         };
 
@@ -144,11 +153,15 @@ export default function Payment() {
             }
         };
 
-        initialiseStripe();
-        initialisePaymentStatus();
+        if (location.state) {
+            initialiseStripe();
+        } else {
+            initialisePaymentStatus();
+        }
+
         initialiseFees();
         setLoading(false);
-    }, [status, paymentIntentId, paymentMethod, amount]);
+    }, [paymentIntentId, paymentMethod, amount]);
 
     useEffect(() => {
         // Wait for loading to be false and then mount the card element
@@ -246,29 +259,31 @@ export default function Payment() {
                 const { client_secret, payment_intent_id } = response.data;
 
                 if (client_secret) {
+                    sessionStorage.setItem('processingActivityId', processingActivity.toString());
+
                     if (paymentMethod === PaymentMethod.CREDIT_CARD) {
-                        stripe.confirmCardPayment(client_secret).then((result) => {
+                        stripe.confirmCardPayment(client_secret).then(async (result) => {
                             Swal.close();
 
                             if (result.error) {
                                 console.error("Error:", result.error.message);
-                                navigate("donor/donate/payment?status=failed");
+                                navigate("donor/donate/payment");
                             } else {
-                                navigate(`/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`);
+                                navigate(`/donor/donate/payment?payment_intent=${payment_intent_id}`);
                             }
                         });
                     } else if (paymentMethod === PaymentMethod.PAYNOW || paymentMethod === PaymentMethod.GRABPAY) {
                         stripe.confirmPayment({
                             clientSecret: client_secret,
                             confirmParams: {
-                                return_url: `${config.domain}/portal/#/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`,
+                                return_url: `${config.domain}/portal/#/donor/donate/payment?payment_intent=${payment_intent_id}`,
                             },
-                        }).then((result) => {
+                        }).then(async (result) => {
                             Swal.close();
 
                             if (result.error) {
                                 console.error("Error:", result.error.message);
-                                navigate("donor/donate/payment?status=failed");
+                                navigate("donor/donate/payment");
                             }
                         });
                     }
@@ -276,7 +291,7 @@ export default function Payment() {
             } catch (error) {
                 console.error("Error creating payment intent:", error);
                 Swal.close();
-                navigate("donor/donate/payment?status=failed");
+                navigate("donor/donate/payment");
             }
         } else {
             const subscriptionData = {
@@ -293,16 +308,21 @@ export default function Payment() {
                 const { subscription_id, client_secret, payment_intent_id, payment_status } = response.data;
 
                 if (client_secret) {
+                    sessionStorage.setItem('processingActivityId', processingActivity.toString());
                     if (payment_status === "succeeded") {
                         const response = await RecurringDonationHandler.create(email!, subscription_id);
-                        if (response) navigate(`/donor/donate/payment?status=success&payment_intent=${payment_intent_id}`);
+                        if (response) {
+                            Swal.close();
+                            navigate(`/donor/donate/payment?payment_intent=${payment_intent_id}`);
+                        }
                     } else {
-                        navigate("donor/donate/payment?status=failed");
+                        navigate("donor/donate/payment");
                     };
                 }
             } catch (error) {
                 console.error("Error creating subcription:", error);
-                navigate("donor/donate/payment?status=failed")
+                Swal.close();
+                navigate("donor/donate/payment")
             }
         }
     }
@@ -376,7 +396,7 @@ export default function Payment() {
                                         Payment Unsuccessful
                                     </h1>
                                     <p>We are unable to verify the payment at the moment.</p>
-                                    <p> Please try again or refresh the page.</p>
+                                    <p>Please try again or refresh the page.</p>
                                 </div>
                             )}
                             <div className="mt-6 text-center">
