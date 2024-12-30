@@ -8,20 +8,39 @@ import { CiFileOff } from "react-icons/ci";
 import { Progress } from "flowbite-react";
 import numeral from "numeral";
 import Swal from "sweetalert2";
+import { Contact } from "../../../utils/v2/entities/Contact";
+import CustomFieldSetHandler, { CustomField } from "../../../utils/v2/handlers/CustomFieldSetHandler";
+import DonationOptions from "./components/DonationOptions";
+import PendingDonationHandler from "../../../utils/v2/handlers/PendingDonationHandler";
+import ContactHandler from "../../../utils/v2/handlers/ContactHandler";
 
 export default function CampaignPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const email = (window as any).email;
   const [campaign, setCampaign] = useState<Campaign>();
   const [amount, setAmount] = useState<number>();
+  const [contact, setContact] = useState<Contact>();
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [penconCustomFields, setPenconCustomFields] = useState<CustomField[]>();
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
+
 
   useEffect(() => {
     (async () => {
+      const contact = await ContactHandler.fetch(email);
+      setContact(contact);
+
       // #region If the campaign cannot be found with the provided ID
       const campaigns = await CampaignHandler.fetch({ where: [["id", "=", id]] });
       if (!campaigns?.length) return navigate("/donor/campaigns");
       // #endregion
       setCampaign(campaigns[0]);
+
+      const penconCustomFields = await CustomFieldSetHandler.fetch('pencon_customgroup');
+      if (penconCustomFields) {
+        setPenconCustomFields(penconCustomFields);
+      }
     })();
   }, []);
 
@@ -46,45 +65,6 @@ export default function CampaignPage() {
       e.currentTarget.form?.requestSubmit();
     }
   }
-
-  let tdrInput: HTMLInputElement;
-  // What to do after setting the amount
-  useEffect(() => {
-    if (!amount) return;
-    (async () => {
-      const result = await Swal.fire({
-        title: 'Confirm your donation',
-        confirmButtonText: 'PROCEED',
-        showCloseButton: true,
-        html: `
-          <p style="font-weight: semibold;">Donation Amount:</p>
-          <p style="font-weight: bold; font-size: 24px;">$${numeral(amount).format('0,0')}</p>
-          ${campaign?.data.Donation_Campaign_Details?.["Financial_Type:label"] == 'TDR' ? amount >= (campaign?.data.Donation_Campaign_Details.TDR_Minimum_Requirement ?? 0) ? `<div style="font-weight: semibold; align-items: center; margin-top: 8px;">
-            <input type="checkbox" id="tdr" name="tdr" />
-            <label htmlFor="tdr" for="tdr" style="color: #5A71B4; cursor: pointer;">I would like a tax deductible receipt</label>
-          </div>` : `<p style="color: red;  font-style: italic">Tax-deductible receipt is only eligible for donations starting from $${numeral(campaign.data.Donation_Campaign_Details.TDR_Minimum_Requirement).format('0,0')}.</p>` : ''}
-        `,
-        customClass: {
-          htmlContainer: "!text-left"
-        },
-        didOpen: () => {
-          const popup = Swal.getPopup()!;
-          tdrInput = popup.querySelector('#tdr') as HTMLInputElement;
-        },
-        preConfirm: () => {
-          const tdr = tdrInput?.checked ?? false;
-          return { tdr };
-        }
-      });
-
-      if (!result.isConfirmed) return setAmount(undefined);
-
-      const { value } = result;
-      console.log(amount, value.tdr);
-      setAmount(undefined);
-    })();
-  }, [amount]);
-
 
   return <Wrapper location="/donor/campaigns">
     {!campaign ? <Loading className="h-screen items-center" /> : <div className="p-4">
@@ -125,25 +105,43 @@ export default function CampaignPage() {
           {(campaign.data.details?.length ?? 0) > 0 && <div className="max-w-[780px] mt-4 text-black/70" dangerouslySetInnerHTML={{ __html: campaign.data.details! }}>
           </div>}
         </div>
-        {/* Prices */}
-        <h2 className="font-semibold text-2xl text-gray-700 mt-12">Donate</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 mt-2">
-          {[10, 25, 50, 100].map(value => {
-            return <button onClick={() => setAmount(value)} className="p-2 rounded-lg border-2 hover:border-secondary shadow-md hover:bg-secondary text-center cursor-pointer text-gray-700 hover:text-white">
-              <p className="text-xl font-bold">${value}</p>
-            </button>
-          })}
-        </div>
-        <form onSubmit={handleForm} className="mt-4">
-          <div className="w-full flex items-center gap-x-6">
-            <div className="flex-grow rounded-lg border flex items-center">
-              <span className="text-gray-700 font-semibold pl-4">$</span>
-              <input onKeyDown={handleKeyDown} type="number" placeholder="Set custom value" className="ml-2 p-2 focus:ring-0 w-full" step="0.01" min={campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 1} name="amount" />
-            </div>
-            <button className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-lg transition">Donate</button>
-          </div>
-          {(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 0) > 0 && <p className="text-sm text-gray-500 mt-1">Minimum donations start from ${numeral(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount).format('0,0')}</p>}
-        </form>
+        <DonationOptions
+          isRecurring={isRecurring}
+          setIsRecurring={setIsRecurring}
+          setAmount={setAmount}
+          handleForm={handleForm}
+          handleKeyDown={handleKeyDown}
+          penconCustomFields={penconCustomFields}
+          amount={amount}
+          contact={contact}
+          isProcessing={isProcessing}
+          setIsProcessing={setIsProcessing}
+          handlePendingDonation={async (data) => {
+            const response = await PendingDonationHandler.create(
+              data.email,
+              data.finType,
+              data.amount,
+              data.paymentMethod,
+              data.nric,
+              data.isRecurring,
+              Number(id),
+            );
+            if (response) {
+              navigate("/donor/payment", {
+                state: {
+                  paymentMethod: data.paymentMethodName,
+                  amount: data.amount,
+                  isRecurring: data.isRecurring === 1,
+                  scontact: contact,
+                  processingActivity: response,
+                },
+              });
+            }
+          }}
+          applicableForTDR={campaign.data.Donation_Campaign_Details?.["Financial_Type:label"] === 'TDR'}
+          minimumTDRAmount={campaign.data.Donation_Campaign_Details?.TDR_Minimum_Requirement}
+          minimumDonationAmount={campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount}
+        />
       </div>
     </div>}
   </Wrapper>

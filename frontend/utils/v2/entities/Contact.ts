@@ -18,6 +18,7 @@ export class Contact extends Entity {
         gender_id?: number;
         first_name?: string;
         last_name?: string;
+        external_identifier?: string;
 
         Volunteer_Contact_Details?: {
             Skills_Interests?: string[];
@@ -42,7 +43,9 @@ export class Contact extends Entity {
         const response = await CRM("Contact", "update", {
             values: values as [string, any][],
             where: [["id", "=", this.data.id]]
-        }).catch(() => null);
+        }).catch(console.log);
+
+        console.log(response);
 
         if (!response) return null;
 

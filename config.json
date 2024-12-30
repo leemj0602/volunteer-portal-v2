@@ -1,4 +1,5 @@
 {
     "domain": "http://localhost/wordpress",
-    "donate": "https://demo.socialservicesconnect.com/donation-page"
+    "donate": "https://demo.socialservicesconnect.com/donation-page",
+    "charityEmail": "charity@octopus8.com"
 }

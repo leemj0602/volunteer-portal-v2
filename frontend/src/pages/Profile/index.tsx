@@ -12,6 +12,7 @@ import { MdSaveAlt } from "react-icons/md";
 import GenericFieldsInputs from "./components/GenericFieldsInputs";
 import CustomFieldsInputs from "./components/CustomFieldsInputs";
 import Swal from "sweetalert2";
+import NRIC from "singapore-nric";
 
 export default function Profile2() {
   const [contact, setContact] = useState<Contact>();
@@ -51,7 +52,25 @@ export default function Profile2() {
 
   const update = async function (e: FormEvent<HTMLFormElement>) {
     if (contact && post) {
+      console.log('post: ', post);
       e.preventDefault();
+
+      const nricFin = post.external_identifier;
+      if (
+        nricFin &&
+        nricFin !== 0 &&
+        !new NRIC(nricFin).isValid
+      ) {
+        Swal.fire({
+          title: "Error!",
+          text: "NRIC provided is invalid.",
+          icon: "error",
+          confirmButtonText: "OK",
+        });
+
+        return;
+      }
+
       setSaving(true);
       const result = await contact.update(post);
       setSaving(false);

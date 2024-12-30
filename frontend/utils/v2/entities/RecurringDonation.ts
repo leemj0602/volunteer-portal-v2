@@ -17,11 +17,14 @@ export class RecurringDonation extends Entity {
 
     async fetchStripe() {
         const response = await axios.post(`${config.domain}/portal/api/stripe/get_subscription.php`, { subscriptionId: this.data.subject! }).catch(() => null);
-        if (!response) return null;
-        await CRM("Activity", "update", {
-            where: [["id", "=", this.data.id]],
-            values: [["status_id:name", "Cancelled"]]
-        });;
+        if (!response) {
+            await CRM("Activity", "update", {
+                where: [["id", "=", this.data.id]],
+                values: [["status_id:name", "Cancelled"]]
+            });
+            return null;
+        }
+
         return response.data;
     }
 }

@@ -1,0 +1,38 @@
+<?php
+require '../../vendor/autoload.php';
+$stripe = new \Stripe\StripeClient("sk_test_51MPGQtKYbFmGi644nIDwNr4SpbgdCG2FOkJwtRnfcAQ7qpDNcMAKbdbY3jjjPLpl6eTI5G9kFtJo8SlaHPW18K1i00OfcXShCM");
+
+// Grabbing the paymentIntentId from Post Query
+$query = array();
+if (strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+    $query = json_decode(file_get_contents("php://input"), true);
+} else {
+    $query = $_POST;
+}
+
+try {
+    $paymentIntentId = $query['paymentIntentId'];
+    $paymentIntent = $stripe->paymentIntents->retrieve($paymentIntentId, [
+        'expand' => ['charges.data', 'customer', 'payment_method'],
+    ]);
+
+    if (!empty($paymentIntent->latest_charge)) {
+        $charge = $stripe->charges->retrieve($paymentIntent->latest_charge, ['expand' => ['transfer']]);
+
+        if (!empty($charge->transfer) && !empty($charge->transfer->destination_payment)) {
+            $destination_payment = $charge->transfer->destination_payment;
+
+            $stripe->charges->update(
+                $destination_payment,
+                ['description' => $paymentIntent->description],
+                ['stripe_account' => $paymentIntent->transfer_data->destination]
+            );
+        }
+    }
+
+
+    echo json_encode(['payment_intent_details' => $paymentIntent]);
+} catch (\Stripe\Exception\ApiErrorException $e) {
+    http_response_code(500);
+    echo json_encode(['error' => 'Failed to retrieve payment intent details', 'message' => $e->getMessage()]);
+}

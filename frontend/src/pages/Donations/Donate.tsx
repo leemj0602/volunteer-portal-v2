@@ -3,21 +3,41 @@ import Wrapper from "../../components/Wrapper";
 import { FormEvent, KeyboardEvent, useEffect, useState } from "react";
 import Loading from "../../components/Loading";
 import { CiFileOff } from "react-icons/ci";
-import Swal from "sweetalert2";
 import CharityHandler from "../../../utils/v2/handlers/CharityHandler";
 import { Charity } from "../../../utils/v2/entities/Charity";
+import config from "../../../../config.json";
+import CustomFieldSetHandler, { CustomField } from "../../../utils/v2/handlers/CustomFieldSetHandler";
+import ContactHandler from "../../../utils/v2/handlers/ContactHandler";
+import { Contact } from "../../../utils/v2/entities/Contact";
+import PendingDonationHandler from "../../../utils/v2/handlers/PendingDonationHandler";
+import DonationOptions from "./components/DonationOptions";
 
 export default function Donate() {
   const navigate = useNavigate();
+  const email = (window as any).email;
   const [amount, setAmount] = useState<number>();
+  const [contact, setContact] = useState<Contact>();
   const [charity, setCharity] = useState<Charity>();
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [penconCustomFields, setPenconCustomFields] = useState<CustomField[]>();
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
 
   useEffect(() => {
     (async () => {
-      const charity = await CharityHandler.fetchCharity("charity@octopus8.com");
-      if (!charity) alert("Cannot fetch charity");
+      const contact = await ContactHandler.fetch(email);
+      setContact(contact);
+
+      const charity = await CharityHandler.fetchCharity(config.charityEmail);
+      if (!charity) {
+        alert("Cannot fetch charity");
+        return;
+      };
       setCharity(charity);
-      console.log(charity);
+
+      const penconCustomFields = await CustomFieldSetHandler.fetch('pencon_customgroup');
+      if (penconCustomFields) {
+        setPenconCustomFields(penconCustomFields);
+      }
     })();
   }, []);
 
@@ -34,26 +54,9 @@ export default function Donate() {
     }
   }
 
-  // What to do after setting the amount
-  useEffect(() => {
-    console.log(amount);
-    if (amount) {
-      Swal.fire({
-        icon: "success",
-        timer: 3000,
-        timerProgressBar: true,
-        title: `Thank you for donating $${amount}!`
-      });
-      // In the scenario where you think that they'll still be on the same page and want to re-set the amount
-      // Remove if this is not the case
-      setAmount(undefined);
-    }
-  }, [amount]);
-
-
   return <Wrapper location="/donor/donate">
     {!charity ? <Loading className="h-screen items-center" /> : <div className="p-4">
-      <div className="bg-white rounded-md mt-4 py-6 px-4 max-w-[1600px] gap-x-8">
+      <div className="bg-white rounded-md py-6 px-4 max-w-[1600px] gap-x-8">
         {/* Image */}
         <div className="h-[200px] md:h-[265px] rounded-lg relative border border-gray-50 bg-gray-200">
           {charity.data.thumbnail?.url ? <img src={charity.data.thumbnail.url} className="w-full h-full object-contain rounded-lg" /> : <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -63,7 +66,7 @@ export default function Donate() {
         {/* Name, Description, and Contact Details */}
         <div className="md:mt-4 grid md:grid-cols-3 gap-x-8">
           {/* Name and Description */}
-          <div className="col-span-2">
+          <div className="md:col-span-2">
             <h2 className="text-2xl text-secondary font-semibold">
               {charity.data.organization_name}
             </h2>
@@ -77,8 +80,8 @@ export default function Donate() {
             )}
           </div>
           {/* Contact Details */}
-          <div className="bg-gray-50 p-4 rounded-lg shadow-md">
-            <h3 className="text-lg font-semibold text-gray-700">Contact Details</h3>
+          <div className="bg-gray-50 p-4 rounded-lg shadow-md md:col-span-1 mt-6 md:mt-0">
+            <h3 className="text-lg font-semibold text-gray-700">Contact & Address Details</h3>
             <div className="mt-2 text-black/70">
               {charity.data.email_primary?.email && (
                 <p>
@@ -107,24 +110,41 @@ export default function Donate() {
             </div>
           </div>
         </div>
-        {/* Prices */}
-        <h2 className="font-semibold text-2xl text-gray-700 mt-12">Donate</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-3 mt-2">
-          {[10, 25, 50, 100].map(value => {
-            return <button onClick={() => setAmount(value)} className="p-2 rounded-lg border-2 hover:border-secondary shadow-md hover:bg-secondary text-center cursor-pointer text-gray-700 hover:text-white">
-              <p className="text-xl font-bold">${value}</p>
-            </button>
-          })}
-        </div>
-        <form onSubmit={handleForm} className="mt-4">
-          <div className="w-full flex items-center gap-x-6">
-            <div className="flex-grow rounded-lg border flex items-center">
-              <span className="text-gray-700 font-semibold pl-4">$</span>
-              <input onKeyDown={handleKeyDown} type="number" placeholder="Set custom value" className="ml-2 p-2 focus:ring-0 w-full" step="0.01" min={1} max={10000000} name="amount" />
-            </div>
-            <button className="bg-secondary hover:bg-primary text-white px-6 py-2 rounded-lg transition">Donate</button>
-          </div>
-        </form>
+
+        <DonationOptions
+          isRecurring={isRecurring}
+          setIsRecurring={setIsRecurring}
+          setAmount={setAmount}
+          handleForm={handleForm}
+          handleKeyDown={handleKeyDown}
+          penconCustomFields={penconCustomFields}
+          amount={amount}
+          contact={contact}
+          isProcessing={isProcessing}
+          setIsProcessing={setIsProcessing}
+          handlePendingDonation={async (data) => {
+            const response = await PendingDonationHandler.create(
+              data.email,
+              data.finType,
+              data.amount,
+              data.paymentMethod,
+              data.nric,
+              data.isRecurring,
+            );
+            if (response) {
+              navigate("/donor/payment", {
+                state: {
+                  paymentMethod: data.paymentMethodName,
+                  amount: data.amount,
+                  isRecurring: data.isRecurring === 1,
+                  scontact: contact,
+                  processingActivity: response,
+                },
+              });
+            }
+          }}
+          applicableForTDR={true}
+        />
       </div>
     </div>}
   </Wrapper>
