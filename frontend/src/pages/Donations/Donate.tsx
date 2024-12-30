@@ -129,10 +129,10 @@ export default function Donate() {
               data.amount,
               data.paymentMethod,
               data.nric,
-              data.isRecurring
+              data.isRecurring,
             );
             if (response) {
-              navigate("/donor/donate/payment", {
+              navigate("/donor/payment", {
                 state: {
                   paymentMethod: data.paymentMethodName,
                   amount: data.amount,
@@ -143,6 +143,7 @@ export default function Donate() {
               });
             }
           }}
+          applicableForTDR={true}
         />
       </div>
     </div>}

@@ -19,6 +19,9 @@ interface DonationOptionsProps {
     isProcessing: boolean;
     setIsProcessing: (value: boolean) => void;
     handlePendingDonation: (data: any) => Promise<void>;
+    applicableForTDR: boolean;
+    minimumTDRAmount?: number | undefined;
+    minimumDonationAmount?: number | undefined;
 }
 
 const DonationOptions: React.FC<DonationOptionsProps> = ({
@@ -33,11 +36,14 @@ const DonationOptions: React.FC<DonationOptionsProps> = ({
     isProcessing,
     setIsProcessing,
     handlePendingDonation,
+    applicableForTDR,
+    minimumTDRAmount = 50, // Default
+    minimumDonationAmount = 1, // Default
 }) => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!amount) return;
+        if (!amount || amount < minimumDonationAmount) return;
 
         let selectedPaymentMethod: string | null = null;
         let tdrInput: HTMLInputElement;
@@ -62,13 +68,16 @@ const DonationOptions: React.FC<DonationOptionsProps> = ({
                     "0,0"
                 )}${isRecurring ? "/month" : ""}</p>
               <div id="dropdown-container"></div>
-              ${amount >= 50
-                        ? `<div style="font-weight: 600; align-items: center; margin-top: 12px;">
-                      <input type="checkbox" id="tdr" name="tdr" />
-                      <label htmlFor="tdr" for="tdr" style="color: #5A71B4; cursor: pointer;">I would like a tax deductible receipt</label>
-                    </div>`
+              <div style="font-weight: 600; align-items: center; margin-top: 12px;">
+              ${applicableForTDR
+                        ? amount >= minimumTDRAmount
+                            ? `<input type="checkbox" id="tdr" name="tdr" />
+                                <label htmlFor="tdr" for="tdr" style="color: #5A71B4; cursor: pointer;">I would like a tax deductible receipt</label>`
+                            : `<p style="color: #5A71B4;  font-style: italic">Tax-deductible receipt is only eligible for donations starting from $${numeral(minimumTDRAmount).format('0,0')}.</p>`
                         : ""
                     }
+              </div>
+              
             `,
                 customClass: {
                     htmlContainer: "!text-left",
@@ -115,8 +124,8 @@ const DonationOptions: React.FC<DonationOptionsProps> = ({
             if (tdr && !contact?.data.external_identifier) {
                 await Swal.fire({
                     icon: "warning",
-                    title: "Missing NRIC/FIN details!",
-                    html: `<p>Please provide your NRIC/FIN details in the profile page.</p>`,
+                    title: "Missing/Invalid NRIC/FIN details!",
+                    html: `<p>Please provide a valid NRIC/FIN in the profile page.</p>`,
                     confirmButtonText: "Go to Profile Page",
                     showCancelButton: true,
                     cancelButtonText: "Cancel",
@@ -124,7 +133,7 @@ const DonationOptions: React.FC<DonationOptionsProps> = ({
                 });
                 return;
             }
-            let nric = contact?.data.external_identifier;
+            const nric = tdr ? contact?.data.external_identifier : ' ';
 
             setIsProcessing(true);
             Swal.fire({
@@ -161,8 +170,9 @@ const DonationOptions: React.FC<DonationOptionsProps> = ({
             {/* Heading */}
             <h2 className="font-semibold text-2xl text-gray-700 mt-12">Donate</h2>
             <p className="mt-2">
-                Please note: Donations of $50 or more are eligible for a tax deduction & NRIC/FIN
-                details must be provided in the{" "}
+                {applicableForTDR &&
+                    `Please note: Donations of $${numeral(minimumTDRAmount).format("0,0")} or more are eligible for a tax deduction.`}{" "}
+                Valid NRIC/FIN details must be provided in the{" "}
                 <button className="text-secondary" onClick={() => navigate('/profile')}>
                     profile page
                 </button>.
@@ -216,7 +226,7 @@ const DonationOptions: React.FC<DonationOptionsProps> = ({
                                 placeholder="Set custom value"
                                 className="ml-2 p-2 focus:ring-0 w-full"
                                 step="0.01"
-                                min={1}
+                                min={minimumDonationAmount}
                                 max={10000000}
                                 name="amount"
                                 disabled={isProcessing}
@@ -229,6 +239,7 @@ const DonationOptions: React.FC<DonationOptionsProps> = ({
                             Donate
                         </button>
                     </div>
+                    {minimumDonationAmount > 0 && <p className="text-sm text-gray-500 mt-1">Minimum donations start from ${numeral(minimumDonationAmount).format('0,0')}</p>}
                 </form>
             )}
         </div>

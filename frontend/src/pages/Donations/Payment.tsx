@@ -267,23 +267,23 @@ export default function Payment() {
 
                             if (result.error) {
                                 console.error("Error:", result.error.message);
-                                navigate("donor/donate/payment");
+                                navigate("donor/payment");
                             } else {
-                                navigate(`/donor/donate/payment?payment_intent=${payment_intent_id}`);
+                                navigate(`/donor/payment?payment_intent=${payment_intent_id}`);
                             }
                         });
                     } else if (paymentMethod === PaymentMethod.PAYNOW || paymentMethod === PaymentMethod.GRABPAY) {
                         stripe.confirmPayment({
                             clientSecret: client_secret,
                             confirmParams: {
-                                return_url: `${config.domain}/portal/#/donor/donate/payment?payment_intent=${payment_intent_id}`,
+                                return_url: `${config.domain}/portal/#/donor/payment?payment_intent=${payment_intent_id}`,
                             },
                         }).then(async (result) => {
                             Swal.close();
 
                             if (result.error) {
                                 console.error("Error:", result.error.message);
-                                navigate("donor/donate/payment");
+                                navigate("donor/payment");
                             }
                         });
                     }
@@ -291,7 +291,7 @@ export default function Payment() {
             } catch (error) {
                 console.error("Error creating payment intent:", error);
                 Swal.close();
-                navigate("donor/donate/payment");
+                navigate("donor/payment");
             }
         } else {
             const subscriptionData = {
@@ -313,16 +313,16 @@ export default function Payment() {
                         // const response = await RecurringDonationHandler.create(email!, subscription_id);
                         // if (response) {
                         Swal.close();
-                        navigate(`/donor/donate/payment?payment_intent=${payment_intent_id}`);
+                        navigate(`/donor/payment?payment_intent=${payment_intent_id}`);
                         // }
                     } else {
-                        navigate("donor/donate/payment");
+                        navigate("donor/payment");
                     };
                 }
             } catch (error) {
                 console.error("Error creating subcription:", error);
                 Swal.close();
-                navigate("donor/donate/payment")
+                navigate("donor/payment")
             }
         }
     }

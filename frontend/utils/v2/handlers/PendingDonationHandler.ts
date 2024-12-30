@@ -17,7 +17,8 @@ class PendingDonationHandler {
                     ['label', '=', 'Personal Data Protection Act'],
                     ['label', '=', 'Recurring Payment'],
                     ['label', '=', 'Anonymity Preference'],
-                    ['label', '=', 'Marketing Consent']
+                    ['label', '=', 'Marketing Consent'],
+                    ['label', '=', 'Donation Campaign'],
                 ]],
                 ['custom_group_id:name', '=', 'pencon_customgroup'],
             ],
@@ -37,7 +38,7 @@ class PendingDonationHandler {
         return fieldMapping;
     }
 
-    async create(email: string, finType: number, amount: number, paymentMethod: string, nric: string, recurring: number) {
+    async create(email: string, finType: number, amount: number, paymentMethod: string, nric: string, recurring: number, campaignId?: number) {
         // Fetch contact
         const contact = await ContactHandler.fetch(email);
         if (!contact || !contact.data?.id) {
@@ -51,30 +52,34 @@ class PendingDonationHandler {
         const recurringField = customFieldsMapped['Recurring Payment'];
         const marketingField = customFieldsMapped['Marketing Consent'];
         const anonymityField = customFieldsMapped['Anonymity Preference'];
+        const campaignField = customFieldsMapped['Donation Campaign'];
 
         // Ensure required fields are present
         if (!nricField || !pdpaField || !recurringField) {
             throw new Error("Required custom fields not found");
         }
 
-        const response = await CRM(this.entity, "create", {
-            values: [
-                ['activity_type_id:name', 'pencon_activitytype'],
-                ['status_id:name', 'Scheduled'],
-                ['source_contact_id', contact.data.id],
-                ['target_contact_id', contact.data.id],
-                ['pencon_customgroup.pencon_cf_fintype', finType],
-                ['pencon_customgroup.pencon_cf_ammount', amount],
-                ['pencon_customgroup.pencon_cf_source', 'Donor Portal'],
-                ['pencon_customgroup.pencon_cf_paymeth', paymentMethod],
-                [nricField, nric],
-                // nric ? [nricField, nric] : [nricField, ''],
-                [pdpaField, [1]],
-                [recurringField, recurring],
-                [marketingField, ''],
-                [anonymityField, ''],
-            ]
-        }).catch((error: any) => {
+        const values: [string, any][] = [
+            ['activity_type_id:name', 'pencon_activitytype'],
+            ['status_id:name', 'Scheduled'],
+            ['source_contact_id', contact.data.id],
+            ['target_contact_id', contact.data.id],
+            ['pencon_customgroup.pencon_cf_fintype', finType],
+            ['pencon_customgroup.pencon_cf_ammount', amount],
+            ['pencon_customgroup.pencon_cf_source', 'Donor Portal'],
+            ['pencon_customgroup.pencon_cf_paymeth', paymentMethod],
+            [nricField, nric],
+            [pdpaField, [1]],
+            [recurringField, recurring],
+            [marketingField, ''],
+            [anonymityField, ''],
+        ]
+
+        if (campaignId) {
+            values.push([campaignField, campaignId]);
+        }
+
+        const response = await CRM(this.entity, "create", { values }).catch((error: any) => {
             console.error("CRM create error:", error);
             throw new Error("CRM create request failed");
         });

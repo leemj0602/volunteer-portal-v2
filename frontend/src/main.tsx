@@ -49,7 +49,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 					<Route path="/donor/campaigns" element={<Campaigns />} />
 					<Route path="/donor/campaigns/:id" element={<CampaignPage />} />
 					<Route path="/donor/donate" element={<Donate />} />
-					<Route path="/donor/donate/payment" element={<Payment />} />
+					<Route path="/donor/payment" element={<Payment />} />
 
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/checkin/:encrypted" element={<CheckIn />} />
