@@ -68,6 +68,7 @@ class PendingDonationHandler {
                 ['pencon_customgroup.pencon_cf_source', 'Donor Portal'],
                 ['pencon_customgroup.pencon_cf_paymeth', paymentMethod],
                 [nricField, nric],
+                // nric ? [nricField, nric] : [nricField, ''],
                 [pdpaField, [1]],
                 [recurringField, recurring],
                 [marketingField, ''],
@@ -99,7 +100,7 @@ class PendingDonationHandler {
         });
 
         if (!response) {
-            throw new Error("Failed to create pending donation");
+            throw new Error("Failed to update pending donation");
         }
 
         return (response.data.length > 0);

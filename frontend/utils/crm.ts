@@ -25,6 +25,6 @@ export default async function CRM(entity: string, action: string, params?: CRMPa
     const url = `${config.domain}/portal/api/crm.php`;
     const result = await axios.post(url, {
         entity, action, ...params
-    }).catch(() => null);
+    }).catch(console.log);
     return result;
 }

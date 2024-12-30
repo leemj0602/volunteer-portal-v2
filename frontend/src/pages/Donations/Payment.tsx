@@ -310,11 +310,11 @@ export default function Payment() {
                 if (client_secret) {
                     sessionStorage.setItem('processingActivityId', processingActivity.toString());
                     if (payment_status === "succeeded") {
-                        const response = await RecurringDonationHandler.create(email!, subscription_id);
-                        if (response) {
-                            Swal.close();
-                            navigate(`/donor/donate/payment?payment_intent=${payment_intent_id}`);
-                        }
+                        // const response = await RecurringDonationHandler.create(email!, subscription_id);
+                        // if (response) {
+                        Swal.close();
+                        navigate(`/donor/donate/payment?payment_intent=${payment_intent_id}`);
+                        // }
                     } else {
                         navigate("donor/donate/payment");
                     };

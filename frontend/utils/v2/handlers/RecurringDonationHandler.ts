@@ -1,3 +1,4 @@
+import moment from "moment";
 import CRM, { ComparisonOperator } from "../../crm";
 import { RecurringDonation } from "../entities/RecurringDonation";
 import ContactHandler from "./ContactHandler";
@@ -41,7 +42,7 @@ class RecurringDonationHandler {
         })
 
         if (!response) {
-            throw new Error("Failed to create pending donation");
+            throw new Error("Failed to create recurring donation");
         }
 
         return (response.data.length > 0)
