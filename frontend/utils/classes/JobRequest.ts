@@ -92,6 +92,7 @@ export class JobRequest implements JobRequestProps {
             const response = await CRM("Activity", "create", {
                 values: [
                     ["source_contact_id", contactId],
+                    ["target_contact_id", contactId],
                     ["activity_type_id:name", "Volunteer Accepted Job"],
                     ["Volunteer_Accepted_Job_Details.Job_Request", this.id]
                 ]
