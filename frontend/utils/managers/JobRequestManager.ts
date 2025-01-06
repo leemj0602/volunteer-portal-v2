@@ -29,6 +29,7 @@ const JobRequestManager = new class JobRequestManager {
             ["source_contact_id", creator.id],
             ["status_id:name", status],
             ["subject", subject],
+            ["created_date", new Date()],
         ];
 
         const propsValues: [string, any][] = Object.entries(props).map(
