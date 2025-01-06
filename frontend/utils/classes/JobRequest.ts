@@ -1,4 +1,5 @@
 import CRM from "../crm";
+import moment from "moment-timezone";
 
 export enum JobRequestStatus {
     Approved = "Approved",
@@ -67,7 +68,11 @@ export class JobRequest implements JobRequestProps {
         this["status_id:name"] = props["status_id:name"];
         this.activity_date_time = props.activity_date_time;
         this.location = props.location;
-        this.created_date = props.created_date;
+        // Convert created_date from UTC to Singapore time
+        this.created_date = moment
+            .utc(props.created_date) // Parse as UTC
+            .tz("Asia/Singapore") // Convert to Singapore timezone
+            .format("YYYY-MM-DD HH:mm:ss"); // Format as desired        
         this["contact.email_primary.email"] = props["contact.email_primary.email"];
         this["contact.id"] = props["contact.id"];
         this["contact.first_name"] = props["contact.first_name"];
@@ -90,12 +95,12 @@ export class JobRequest implements JobRequestProps {
                     ["activity_type_id:name", "Volunteer Accepted Job"],
                     ["Volunteer_Accepted_Job_Details.Job_Request", this.id]
                 ]
-           }).catch(() => null);
-           if (!response) return null;
-           const data = response.data as AcceptedJob;
-           this["accepted_job.id"] = data.id;
-           this["accepted_job.id"] = data["Volunteer_Accepted_Job_Details.Job_Request"];
-           return this;
+            }).catch(() => null);
+            if (!response) return null;
+            const data = response.data as AcceptedJob;
+            this["accepted_job.id"] = data.id;
+            this["accepted_job.id"] = data["Volunteer_Accepted_Job_Details.Job_Request"];
+            return this;
         }
     }
 }
