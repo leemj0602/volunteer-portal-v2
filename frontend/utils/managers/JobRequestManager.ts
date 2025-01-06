@@ -18,8 +18,8 @@ const JobRequestManager = new class JobRequestManager {
         let status = JobRequestStatus.Approved;
 
         const optionValue = await OptionValueManager.get("Job_Request_Details_Request_Type", Number(props["Job_Request_Details.Request_Type"]!));
-        let subject = optionValue.name;
-        if (optionValue.name === "Others") {
+        let subject = optionValue.label;
+        if (optionValue.label === "Others") {
             status = JobRequestStatus.ApprovalRequired;
         }
 
