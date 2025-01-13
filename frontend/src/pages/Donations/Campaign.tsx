@@ -69,15 +69,20 @@ export default function CampaignPage() {
   return <Wrapper location="/donor/campaigns">
     {!campaign ? <Loading className="h-screen items-center" /> : <div className="p-4">
       <div className="bg-white rounded-md mt-4 py-6 px-4 max-w-[1600px] gap-x-8">
-        <div className="flex flex-col lg:flex-row">
+        {/* Image */}
+        <div className="h-[200px] md:h-[265px] rounded-lg relative border border-gray-50 bg-gray-200">
+          {campaign.data.thumbnail?.url ? <img src={campaign.data.thumbnail.url} className="w-full h-full object-contain rounded-lg" /> : <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+            <CiFileOff className="text-[80px] text-gray-500" />
+          </div>}
+        </div>
+        <hr className="md:hidden my-8" />
+        {/* Progress, Subject and Description */}
+        <div className="md:mt-4 flex flex-col lg:flex-row">
           {/* Left */}
-          <div className="flex-grow">
-            {/* Image */}
-            <div className="h-[200px] md:h-[265px] rounded-lg relative border border-gray-50 bg-gray-200">
-              {campaign.data.thumbnail?.url ? <img src={campaign.data.thumbnail.url} className="w-full h-full object-contain rounded-lg" /> : <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                <CiFileOff className="text-[80px] text-gray-500" />
-              </div>}
-            </div>
+          <div className='flex-grow'>
+            <h2 className="text-2xl text-secondary font-semibold">{campaign.data.subject}</h2>
+            {(campaign.data.details?.length ?? 0) > 0 && <div className="max-w-[780px] mt-4 text-black/70" dangerouslySetInnerHTML={{ __html: campaign.data.details! }}>
+            </div>}
           </div>
           {/* Right */}
           <div className="px-4 w-full lg:w-1/3 mt-4 lg:mt-8">
@@ -88,22 +93,15 @@ export default function CampaignPage() {
             </div>
             {/* Progress Bar */}
             <Progress progress={(0 / campaign.data.Donation_Campaign_Details!.Financial_Goal!) * 100} className="text-secondary mb-6" />
-            <form onSubmit={handleForm}>
-              <div className="font-semibold flex items-center border rounded-lg px-4">
-                <span className="text-gray-700">$</span>
-                <input onKeyDown={handleKeyDown} className="ml-2 focus:ring-0 w-full" type="number" name="amount" step="0.01" min={campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 1} />
-              </div>
-              <button className="w-full rounded-lg bg-secondary hover:bg-primary text-white font-semibold p-2 mt-3">Donate</button>
-              {(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 0) > 0 && <p className="text-sm text-gray-500 mt-1">Minimum donations start from ${numeral(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount).format('0,0')}</p>}
-            </form>
+            {/* <form onSubmit={handleForm}> */}
+            <div className="font-semibold flex items-center border rounded-lg px-4">
+              <span className="text-gray-700">$</span>
+              <input onKeyDown={handleKeyDown} className="ml-2 focus:ring-0 w-full" type="number" name="amount" step="0.01" min={campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 1} />
+            </div>
+            {/* <button className="w-full rounded-lg bg-secondary hover:bg-primary text-white font-semibold p-2 mt-3">Donate</button>
+              {(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 0) > 0 && <p className="text-sm text-gray-500 mt-1">Minimum donations start from ${numeral(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount).format('0,0')}</p>} */}
+            {/* </form> */}
           </div>
-        </div>
-        <hr className="md:hidden my-8" />
-        {/* Subject and Description */}
-        <div className="md:mt-4">
-          <h2 className="text-2xl text-secondary font-semibold">{campaign.data.subject}</h2>
-          {(campaign.data.details?.length ?? 0) > 0 && <div className="max-w-[780px] mt-4 text-black/70" dangerouslySetInnerHTML={{ __html: campaign.data.details! }}>
-          </div>}
         </div>
         <DonationOptions
           isRecurring={isRecurring}
