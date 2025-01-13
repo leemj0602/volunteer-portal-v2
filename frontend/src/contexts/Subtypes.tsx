@@ -14,7 +14,7 @@ export const SubtypesProvider = ({ children }: PropsWithChildren) => {
     (async () => {
       const email = (window as any).email;
       const contact = await ContactManager.fetch(email);
-      setSubTypes(contact.contact_sub_type ?? []);
+      setSubTypes(contact['contact_sub_type:label'] ?? []);
     })();
   }, []);
 

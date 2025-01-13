@@ -6,11 +6,10 @@ import Loading from "../../../components/Loading";
 import Summarisation from "./components/Summarisation";
 import History from "./components/History";
 import numeral from "numeral";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import RecurringDonations from "./components/RecurringDonations";
 import ContactManager from "../../../../utils/managers/ContactManager";
 import { useSubtypesContext } from "../../../contexts/Subtypes";
-import config from "../../../../../config.json";
 
 export default function Donations() {
     const [donations, setDonations] = useState<Contribution[]>();
@@ -21,8 +20,8 @@ export default function Donations() {
         (async () => {
             const email = (window as any).email;
             const contact = await ContactManager.fetch(email);
-            if (!contact.contact_sub_type?.includes('Donator')) {
-                setSubTypes(contact.contact_sub_type);
+            if (!contact['contact_sub_type:label']?.some(s => ['Individual Donor', 'Organisation Donor'].includes(s))) {
+                setSubTypes(contact['contact_sub_type:label']);
                 return navigate("/");
             }
 
