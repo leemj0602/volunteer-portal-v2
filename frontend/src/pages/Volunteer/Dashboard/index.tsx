@@ -35,8 +35,6 @@ export default function Volunteer() {
             <div className="w-full px-0 md:px-6 max-w-[1200px] mx-auto">
                 {/* Displays their name and email */}
                 <Header contact={contact} />
-                {/* Accepted Jobs */}
-                <AcceptedJobs contact={contact} />
                 {/* Displays their hours and attended events */}
                 <Statistics registrations={eventRegistrations!} />
                 {/* Displays all their event registrations */}
@@ -45,6 +43,8 @@ export default function Volunteer() {
                 <UpcomingEvents registrations={eventRegistrations!} />
                 {/* Displays all their training registrations */}
                 <TrainingRegistrations contact={contact} registrations={trainingRegistrations!} setRegistrations={setTrainingRegistrations} />
+                {/* Accepted Jobs */}
+                <AcceptedJobs contact={contact} />
             </div>
         </div>}
     </Wrapper>
