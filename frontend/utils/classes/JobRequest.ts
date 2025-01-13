@@ -94,7 +94,8 @@ export class JobRequest implements JobRequestProps {
                     ["source_contact_id", contactId],
                     ["target_contact_id", contactId],
                     ["activity_type_id:name", "Volunteer Accepted Job"],
-                    ["Volunteer_Accepted_Job_Details.Job_Request", this.id]
+                    ["Volunteer_Accepted_Job_Details.Job_Request", this.id],
+                    ["status_id:name", AcceptedJobStatus.Scheduled]
                 ]
             }).catch(() => null);
             if (!response) return null;
