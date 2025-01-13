@@ -94,10 +94,10 @@ export default function CampaignPage() {
             {/* Progress Bar */}
             <Progress progress={(0 / campaign.data.Donation_Campaign_Details!.Financial_Goal!) * 100} className="text-secondary mb-6" />
             {/* <form onSubmit={handleForm}> */}
-            <div className="font-semibold flex items-center border rounded-lg px-4">
+            {/* <div className="font-semibold flex items-center border rounded-lg px-4">
               <span className="text-gray-700">$</span>
               <input onKeyDown={handleKeyDown} className="ml-2 focus:ring-0 w-full" type="number" name="amount" step="0.01" min={campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 1} />
-            </div>
+            </div> */}
             {/* <button className="w-full rounded-lg bg-secondary hover:bg-primary text-white font-semibold p-2 mt-3">Donate</button>
               {(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount ?? 0) > 0 && <p className="text-sm text-gray-500 mt-1">Minimum donations start from ${numeral(campaign.data.Donation_Campaign_Details?.Minimum_Donation_Amount).format('0,0')}</p>} */}
             {/* </form> */}

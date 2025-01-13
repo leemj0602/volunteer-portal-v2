@@ -17,7 +17,7 @@ interface AcceptedJobProps {
 
 const limit = 5;
 const statusColor: { [key: string]: string } = {
-  "Pending": "bg-[#F0D202] text-white",
+  "Scheduled": "bg-[#F0D202] text-white",
   "Cancelled": "bg-[#f26a6a] text-white",
   "Completed": "bg-[#7bcf72] text-white",
   "Cancelled By Client": "bg-gray-200 text-[#f26a6a]",
