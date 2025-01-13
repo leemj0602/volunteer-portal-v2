@@ -12,14 +12,15 @@ interface FetchOptions {
 }
 const JobRequestManager = new class JobRequestManager {
     async create(creatorEmail: string, patientEmail: string, props: Partial<JobRequest>) {
+        const runDate = new Date().toISOString;
         const creator = await ContactManager.fetch(creatorEmail);
         const patient = await ContactManager.fetch(patientEmail);
 
         let status = JobRequestStatus.Approved;
 
         const optionValue = await OptionValueManager.get("Job_Request_Details_Request_Type", Number(props["Job_Request_Details.Request_Type"]!));
-        let subject = optionValue.name;
-        if (optionValue.name === "Others") {
+        let subject = optionValue.label;
+        if (optionValue.label === "Others") {
             status = JobRequestStatus.ApprovalRequired;
         }
 
@@ -40,9 +41,25 @@ const JobRequestManager = new class JobRequestManager {
         const response = await CRM("Activity", "create", {
             values: combinedValues,
         }).catch(() => null);
-
+        console.log(response);
         if (response) return status
-        else return null;
+        else {
+            const activityCreated = await CRM("Activity", "get", {
+                where: [
+                    ["subject", "=", subject],
+                    ["source_contact_id", "=", creator.id],
+                    ["target_contact_id", "IN", [patient.id]],
+                    ["created_date", ">=", runDate], // Narrow down using timestamp
+                ],
+                limit: 1,
+            }).catch(console.error);
+            if (activityCreated && activityCreated.data && activityCreated.data.length > 0) {
+                return status;
+            }
+            else {
+                return null
+            }
+        };
     }
 
     async fetch(props: { contactId: number }) {

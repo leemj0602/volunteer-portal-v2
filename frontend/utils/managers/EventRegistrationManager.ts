@@ -130,6 +130,7 @@ const EventRegistrationManager = new class EventRegistrationManager {
                 ["duration", duration],
                 ["Volunteer_Event_Attendance_Details.Event_Role", eventRoleId],
                 ["activity_date_time", currentDateTime],
+                ["status_id:name", "Completed"],
             ]
         });
 

@@ -49,7 +49,7 @@ export default function AcceptedJobs(props: AcceptedJobProps) {
 
   useEffect(() => {
     (async () => {
-      const jobs = await JobRequestManager.fetchAll({ where: [["accepted_job.source_contact_id", "=", props.contact.id]] });
+      const jobs = await JobRequestManager.fetchAll({ where: [["accepted_job.target_contact_id", "=", props.contact.id]] });
       const pages = Math.ceil(jobs.length / limit) - 1;
       setPages(pages);
       setJobs(jobs)
