@@ -45,7 +45,7 @@ try {
         }
     }
 
-    $feePercent = round(($subscriptionData['applicationFeeAmount'] / $fetched_price->unit_amount) * 10000, 2);
+    $feePercent = round((round($subscriptionData['applicationFeeAmount'], 2) / $fetched_price->unit_amount) * 10000, 2);
 
     $subscriptionParams = [
         'customer' => $customer['id'],
