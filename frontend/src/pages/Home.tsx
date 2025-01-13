@@ -18,7 +18,8 @@ export default function Home() {
     <Loading className='h-screen items-center' />
   </Wrapper> : <>
     {priority == 'Volunteer' && <Volunteer />}
-    {priority == 'Donator' && <Donations />}
+    {priority == 'Individual Donor' && <Donations />}
+    {priority == 'Organisation Donor' && <Donations />}
     {priority == 'Caregiver' && <Caregiver />}
     {priority == 'Patient' && <Patient />}
   </>

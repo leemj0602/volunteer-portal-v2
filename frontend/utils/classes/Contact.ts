@@ -32,6 +32,7 @@ export class Contact implements ContactProps {
     public "first_name": string | null = null;
     public "last_name": string | null = null;
     public "contact_sub_type": string[] | null = null;
+    public "contact_sub_type:label": string[] | null = null;
 
     public "Volunteer_Contact_Details.Skills_Interests": string[];
     [key: string]: any;

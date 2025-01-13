@@ -35,7 +35,7 @@ export default function Profile2() {
         if (subtypes?.includes("Volunteer")) setVolunteer(await CustomFieldSetHandler.fetch("Volunteer_Contact_Details"));
         if (subtypes?.includes("Patient")) setPatient(await CustomFieldSetHandler.fetch("Patient_Contact_Details"));
         if (subtypes?.includes("Caregiver")) setCaregiver(await CustomFieldSetHandler.fetch("Caregiver_Contact_Details"));
-        if (subtypes?.includes("Donator")) setDonor(await CustomFieldSetHandler.fetch("Donator_Contact_Details"));
+        if (subtypes?.some(subtype => ['Individual Donor', 'Organisation Donor'].includes(subtype))) setDonor(await CustomFieldSetHandler.fetch("Donator_Contact_Details"));
 
         setContact(contact);
         setPost(contact.flat);
@@ -109,10 +109,10 @@ export default function Profile2() {
           </div>
 
           <GenericFieldsInputs flat_contact={post} contact={contact} handleFieds={handleFields} disabled={!editing} />
-          <CustomFieldsInputs subtype="volunteer" fields={volunteer} flat_contact={post} handleFields={handleFields} disabled={!editing} />
-          <CustomFieldsInputs subtype="donator" fields={donor} flat_contact={post} handleFields={handleFields} disabled={!editing} />
-          <CustomFieldsInputs subtype="caregiver" fields={caregiver} flat_contact={post} handleFields={handleFields} disabled={!editing} />
-          <CustomFieldsInputs subtype="patient" fields={patient} flat_contact={post} handleFields={handleFields} disabled={!editing} />
+          {subtypes?.includes('Volunteer') && <CustomFieldsInputs group_name="volunteer" fields={volunteer} flat_contact={post} handleFields={handleFields} disabled={!editing} />}
+          {subtypes?.some(s => ['Individual Donor', 'Organisation Donor'].includes(s)) && <CustomFieldsInputs group_name="donator" fields={donor} flat_contact={post} handleFields={handleFields} disabled={!editing} />}
+          {subtypes?.includes('Caregiver') && <CustomFieldsInputs group_name="caregiver" fields={caregiver} flat_contact={post} handleFields={handleFields} disabled={!editing} />}
+          {subtypes?.includes('Patient') && <CustomFieldsInputs group_name="patient" fields={patient} flat_contact={post} handleFields={handleFields} disabled={!editing} />}
         </form>
       </div>
     </div>}

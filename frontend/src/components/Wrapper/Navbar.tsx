@@ -62,7 +62,7 @@ export default function Navbar(props: NavbarProps) {
 						<Item to="/volunteer/volunteer-info-pack" name="Volunteer Info Pack" />
 						<Item to="/volunteer/notifications" name="Notifications" />
 					</Category>}
-					{subtypes.includes('Donator') && <Category location={props.location} to="/donor" icon={FaDonate} name="Donations">
+					{subtypes.some(s => ['Individual Donor', 'Organisation Donor'].includes(s)) && <Category location={props.location} to="/donor" icon={FaDonate} name="Donations">
 						<Item to="/donor/campaigns" name="Campaigns" />
 						<Item to="/donor/donate" name="Donate" />
 						<Item to="/donor/donor-info-pack" name="Donor Info Pack" />
@@ -111,7 +111,7 @@ export default function Navbar(props: NavbarProps) {
 						<Item to="/volunteer/volunteer-info-pack" name="Volunteer Info Pack" />
 						<Item to="/volunteer/notifications" name="Notifications" />
 					</Category>}
-					{subtypes.includes('Donator') && <Category disableNavigate location={props.location} to="/donor" icon={FaDonate} name="Donations">
+					{subtypes.some(s => ['Individual Donor', 'Organisation Donor'].includes(s)) && <Category disableNavigate location={props.location} to="/donor" icon={FaDonate} name="Donations">
 						<Item to="/donor/campaigns" name="Campaigns" />
 						<Item to="/donor/donate" name="Donate" />
 						<Item to="/donor/donor-info-pack" name="Donor Info Pack" />

@@ -7,7 +7,7 @@ import CheckboxField from "../../../components/Fields/CheckboxField";
 
 interface CustomFieldsInputsProps {
   /** The subtype required to show this custom field set */
-  subtype: string;
+  group_name: string;
   /** The array of custom fields to iterate through and map from */
   fields: CustomField[] | undefined;
   flat_contact: Record<string, any>;
@@ -17,13 +17,11 @@ interface CustomFieldsInputsProps {
 }
 
 export default function CustomFieldsInputs(props: CustomFieldsInputsProps) {
-  const { subtypes } = useSubtypesContext()!;
-
-  return props.fields && props.fields.length > 0 && subtypes?.map(s => s.toLowerCase()).includes(props.subtype.toLowerCase()) && <>
-    <h1 className="text-xl font-semibold text-secondary mt-14 mb-4 text-center">{capitalize(props.subtype)} Details</h1>
+  return props.fields && props.fields.length > 0 && <>
+    <h1 className="text-xl font-semibold text-secondary mt-14 mb-4 text-center">{capitalize(props.group_name)} Details</h1>
     <div className="grid grid-cols-1 gap-x-3 gap-y-6 md:gap-y-8 md:grid-cols-2">
       {Array.from(props.fields).map(field => {
-        const id = `${capitalize(props.subtype)}_Contact_Details.${field.name}`;
+        const id = `${capitalize(props.group_name)}_Contact_Details.${field.name}`;
 
         switch (field.html_type) {
           case "Text":
