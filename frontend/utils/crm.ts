@@ -5,11 +5,12 @@ export type ComparisonOperator = "=" | "<=" | ">=" | ">" | "<" | "LIKE" | "<>" |
 
 type SimpleCondition = [string, ComparisonOperator, any?];
 type LogicalCondition = ["OR" | "AND" | "NOT", Array<SimpleCondition | LogicalCondition>];
+export type WhereClause = Array<SimpleCondition | LogicalCondition>;
 
 export interface CRMParamProps {
     select?: string[];
     limit?: number;
-    where?: Array<SimpleCondition | LogicalCondition>;
+    where?: WhereClause;
     order?: [string, "ASC" | "DESC"][];
     values?: [string, any][];
     offset?: number;

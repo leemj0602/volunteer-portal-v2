@@ -8,7 +8,7 @@ import ContactManager from "../../../utils/managers/ContactManager";
 import DropdownButton from "../../components/DropdownButton";
 import ReactDatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { ComparisonOperator } from "../../../utils/crm";
+import { ComparisonOperator, WhereClause } from "../../../utils/crm";
 import moment from "moment";
 import EventRoleManager from "../../../utils/managers/EventRoleManager";
 import EventCard from "../../components/Card/EventCard";
@@ -86,12 +86,39 @@ export default function Events() {
     // Updating the events
     const updateEvents = async () => {
         setEventRoles(undefined);
+        const formattedNow = moment(new Date()).format("YYYY-MM-DD HH:mm:ss");
 
-        const where: [string, ComparisonOperator, any][] = [
-            // Show all registrations that is still within the registration end date
-            ["Volunteer_Event_Role_Details.Registration_Start_Date", "<=", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")],
-            ["Volunteer_Event_Role_Details.Registration_End_Date", ">=", moment(new Date()).format("YYYY-MM-DD HH:mm:ss")]
-        ];
+        const where: WhereClause = [['OR', [
+            // Case 1: Both start and end dates are set and the current time is within the range
+            ['AND', [
+                ['Volunteer_Event_Role_Details.Registration_Start_Date', '<=', formattedNow],
+                ['Volunteer_Event_Role_Details.Registration_End_Date', '>=', formattedNow]
+            ]],
+            // Case 2: Start date is NULL (always open) and the end date is in the future
+            ['AND', [
+                ['Volunteer_Event_Role_Details.Registration_Start_Date', 'IS NULL'],
+                ['Volunteer_Event_Role_Details.Registration_End_Date', '>=', formattedNow]
+            ]],
+            // Case 3: Start date is in the past, end date is NULL (open indefinitely), and activity date is in the future
+            ['AND', [
+                ['Volunteer_Event_Role_Details.Registration_Start_Date', '<=', formattedNow],
+                ['Volunteer_Event_Role_Details.Registration_End_Date', 'IS NULL'],
+                ['activity_date_time', '>=', formattedNow]
+            ]],
+            // Case 4: Registration has ended but the activity is still in the future
+            ['AND', [
+                ['Volunteer_Event_Role_Details.Registration_End_Date', '<', formattedNow],
+                ['activity_date_time', '>=', formattedNow]
+            ]],
+            // Case 5: Both start and end dates are NULL (completely open) and activity date is in the future
+            ['AND', [
+                ['Volunteer_Event_Role_Details.Registration_Start_Date', 'IS NULL'],
+                ['Volunteer_Event_Role_Details.Registration_End_Date', 'IS NULL'],
+                ['activity_date_time', '>=', formattedNow]
+            ]]
+        ]]];
+
+
         // Getting any events where the subject includes the search query
         if (searchQuery) where.push(["event.subject", "CONTAINS", searchQuery]);
         // Filter for any events that may starthh after the provided start date or today
@@ -117,10 +144,10 @@ export default function Events() {
         if (page > totalPages) page = totalPages;
         if (page < 1) page = 1;
 
-        const eventRoles = await EventRoleManager.fetch({ 
-            where, page, limit, 
+        const eventRoles = await EventRoleManager.fetch({
+            where, page, limit,
             group: ["Volunteer_Event_Role_Details.Event", "Volunteer_Event_Role_Details.Role"],
-            order: [["activity_date_time", "ASC"]] 
+            order: [["activity_date_time", "ASC"]],
         });
 
         setEventRoles(eventRoles as EventRole[]);
@@ -227,7 +254,7 @@ export default function Events() {
                     {!eventRoles.length && <p className="text-lg text-gray-500">Looks like there aren't any events{[...searchParams.entries()].length ? " with the provided filters" : ""}.</p>}
                     {/* If there are events, show them in cards */}
                     {eventRoles.length > 0 && <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 mt-6">
-                        {eventRoles.map(eventRole => <EventCard className="flex justify-center" event={eventRole.event} roleId={eventRole["Volunteer_Event_Role_Details.Role"]?.toString()!} roleLabel={eventRole["Volunteer_Event_Role_Details.Role:label"]!}  />)}
+                        {eventRoles.map(eventRole => <EventCard className="flex justify-center" event={eventRole.event} roleId={eventRole["Volunteer_Event_Role_Details.Role"]?.toString()!} roleLabel={eventRole["Volunteer_Event_Role_Details.Role:label"]!} />)}
                     </div>}
                     {/* Pagination */}
                     {totalPages > 1 && <div className="mt-8 items-center justify-center text-center w-full">

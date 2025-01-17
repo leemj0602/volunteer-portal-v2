@@ -55,8 +55,8 @@ export default function Event() {
                 const StartDateTime = eventRole.activity_date_time ?? 'N/A';
                 const Duration = eventRole.duration ?? 0;
                 const EndDateTime = moment(StartDateTime).add(Duration, 'minutes');
-                const Vacancy = eventRole["Volunteer_Event_Role_Details.Vacancy"] ?? 'N/A';
-                const NumRegistrations = registrations.filter((r) => r["status_id:name"] !== "Cancelled" && r["status_id:name"] !== "Not Approved" ).length;
+                const Vacancy = !eventRole["Volunteer_Event_Role_Details.Vacancy"] ? 'N/A' : eventRole["Volunteer_Event_Role_Details.Vacancy"]
+                const NumRegistrations = registrations.filter((r) => r["status_id:name"] !== "Cancelled" && r["status_id:name"] !== "Not Approved").length;
                 const RegistrationStartDate = eventRole["Volunteer_Event_Role_Details.Registration_Start_Date"] ?? 'N/A';
                 let RegistrationEndDate = eventRole["Volunteer_Event_Role_Details.Registration_End_Date"] ?? 'N/A';
                 const Location = eventRole.event.location ?? 'N/A';
